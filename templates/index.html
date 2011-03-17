@@ -1,0 +1,28 @@
+$def with (logged_in, user, email, available, received)
+
+$if logged_in:
+	Hi $user
+	<ul>
+	<li><b>Available love:</b> $available; <b>Received love:</b> $received</li>
+	<li><b>Change email adress</b>
+	<form method="post" action="change_mail_address_action">
+	<div id="email_field"><input type="text" name="email" value="$email" />
+	<input type="submit" value="Change" /></div>
+	</form>
+	</li>
+	<li> <b>Change Password</b>
+	<form 	name="me.datalove.give.reset_password_form" 
+			class="me.datalove.give.reset_password_form" 
+			method="post" 
+			action="change_password_action">
+		<div id="password_field">Old Password: <input type="password" name="old_password" /></div>
+		<div id="password_field">New Password: <input type="password" name="new_password" /></div>
+		<div id="password_field">Confirm New Password: <input type="password" name="new_password_conf" /></div>
+		<div id="submit_button"><input type="submit" value="Change" /></div>
+	</form>
+	</li>
+	<li><a href="logoff">Logoff</a></li>
+	<li><a href="unregister">Unregister</a></li>. Warning: This step is not undoable.
+	</ul>
+$else:
+	<a href="login_form">Login</a>, <a href="register_form">Register</a>

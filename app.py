@@ -168,7 +168,7 @@ class login_action:
 		except AssertionError, e:
 			return e
 		except dbh.LoginException:
-			return 'Login failed: Nickname or password was wrong. ' + 
+			return 'Login failed: Nickname or password was wrong. ' + \
 					'<a href="reset_password_form">Reset password?</a>'
 	## Method for a HTTP GET request. 
 	def GET(self):
@@ -206,8 +206,8 @@ class give_user_datalove:
 		except AssertionError,e:
 			return e
 		except dbh.NotEnoughDataloveException, e:
-			return "You have not enough datalove to spend :(\n Wait until " + 
-					"next month, then you'll get some new or until someone " + 
+			return "You have not enough datalove to spend :(\n Wait until " + \
+					"next month, then you'll get some new or until someone " + \
 					"gives you datalove."
 		
 		if logged_in:
@@ -264,8 +264,8 @@ class reset_password_action:
 		email_from = 'password-reset@give.datalove.me'
 		
 		msg_text = "Hello "+i.nickname+",\n"+ \
-			"You're password was reset to '" + new_password + 
-			"'. Please change it immediately!\n\n" + 
+			"You're password was reset to '" + new_password + \
+			"'. Please change it immediately!\n\n" + \
 			"Greets, Your datalove.me-Team\n"
 		msg = MIMEText(msg_text)
 		
@@ -277,7 +277,7 @@ class reset_password_action:
 		s.sendmail(email_from,[email_to],msg.as_string())
 		s.quit()
 		
-		return 'Password reset successfully. you should get an e-mail to ' + 
+		return 'Password reset successfully. you should get an e-mail to ' + \
 				'the address you are registered to.'
 	## Method for a HTTP GET request. 
 	def GET(self):

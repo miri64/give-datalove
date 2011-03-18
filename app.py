@@ -185,7 +185,7 @@ class widget:
 			received_love = db_handler.get_received_love(user)
 		except AttributeError:
 			raise web.seeother('register_form')
-		except UserException,e:
+		except dbh.UserException,e:
 			return e
 		templates = web.template.render(os.path.join(abspath,'templates'))
 		return templates.widget(user,received_love)

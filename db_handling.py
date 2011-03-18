@@ -260,7 +260,7 @@ class DBHandler:
 		
 		if not len(self.db.select(
 					'sessions',
-					hat='session_id',
+					what='session_id',
 					where='session_id = $session_id',
 					vars=locals()
 				)):

@@ -44,7 +44,7 @@ class LoginException(Exception):
 	#  @returns value the value that represents the error, like an error message
 	#           or error id.
 	def __str__(self):
-		return unicode(self.value)
+		return repr(self.value)
 
 ## This Exception is raised in any situation that causes errors with the 
 #  <tt>session_id</tt>.
@@ -59,7 +59,7 @@ class IllegalSessionException(LoginException):
 	#  @returns value the value that represents the error, like an error message
 	#           or error id.
 	def __str__(self):
-		return unicode(self.value)
+		return repr(self.value)
 
 ## This Exception is raised in any situation that involves the existence of 
 #  users.
@@ -74,7 +74,7 @@ class UserException(LoginException):
 	#  @returns value the value that represents the error, like an error message
 	#           or error id.
 	def __str__(self):
-		return unicode(self.value)
+		return repr(self.value)
 
 ## This Exception is raised in any situation that involves the existence of 
 #  users.
@@ -89,7 +89,7 @@ class WrongPasswordException(LoginException):
 	#  @returns value the value that represents the error, like an error message
 	#           or error id.
 	def __str__(self):
-		return unicode(self.value)
+		return repr(self.value)
 
 ## This Exception is raised when a user does not have enough available datalove 
 #  to give.
@@ -105,7 +105,7 @@ class NotEnoughDataloveException(Exception):
 	#  @returns value the value that represents the error, like an error message
 	#           or error id.
 	def __str__(self):
-		return unicode(self.value)
+		return repr(self.value)
 
 ## This function hashes the password of the user, with it's nickname to 
 #  calculate the salt of the hash.

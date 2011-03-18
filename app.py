@@ -209,15 +209,13 @@ class give_user_datalove:
 			logged_in = False
 		except AssertionError,e:
 			return str(e)
-		except dbh.NotEnoughDataloveException, e:
-			return "You have not enough datalove to spend :(\n Wait until " + \
-					"next month, then you'll get some new or until someone " + \
-					"gives you datalove."
 		
 		if logged_in:
 			try:
 				db_handler.send_datalove(from_user,to_user,session_id)
 			except AssertionError,e:
+				return str(e)
+			except dbh.NotEnoughDataloveException, e:
 				return str(e)
 			raise web.seeother('widget?user='+to_user)
 		else:

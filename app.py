@@ -196,7 +196,7 @@ class give_user_datalove:
 	def GET(self,to_user):
 		web.header('Content-Type','text/html;charset=utf-8')
 		logged_in = True
-		if not db_handler(to_user):
+		if not db_handler.user_exists(to_user):
 			return "User does not exist."
 		session_id = get_session_id()
 		try:

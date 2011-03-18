@@ -131,7 +131,7 @@ class register_action:
 			db_handler.create_user(nickname,password,email)
 			raise web.seeother('login_form')
 		except AssertionError, e:
-			return e
+			return str(e)
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/register_form')
@@ -166,7 +166,7 @@ class login_action:
 			db_handler.user_login(nickname,password,session_id)
 			raise web.seeother('/')
 		except AssertionError, e:
-			return e
+			return str(e)
 		except dbh.LoginException:
 			return 'Login failed: Nickname or password was wrong. ' + \
 					'<a href="reset_password_form">Reset password?</a>'
@@ -186,7 +186,7 @@ class widget:
 		except AttributeError:
 			raise web.seeother('register_form')
 		except dbh.UserException,e:
-			return e
+			return str(e)
 		templates = web.template.render(os.path.join(abspath,'templates'))
 		return templates.widget(user,received_love)
 
@@ -206,7 +206,7 @@ class give_user_datalove:
 		except dbh.IllegalSessionException, e:
 			logged_in = False
 		except AssertionError,e:
-			return e
+			return str(e)
 		except dbh.NotEnoughDataloveException, e:
 			return "You have not enough datalove to spend :(\n Wait until " + \
 					"next month, then you'll get some new or until someone " + \
@@ -216,7 +216,7 @@ class give_user_datalove:
 			try:
 				db_handler.send_datalove(from_user,to_user,session_id)
 			except AssertionError,e:
-				return e
+				return str(e)
 			raise web.seeother('widget?user='+to_user)
 		else:
 			raise web.seeother('login_form')
@@ -262,7 +262,7 @@ class reset_password_action:
 		try:
 			new_password, email_to = db_handler.reset_password(i.nickname)
 		except UserException, e:
-			return e
+			return str(e)
 		email_from = 'password-reset@give.datalove.me'
 		
 		msg_text = "Hello "+i.nickname+",\n"+ \

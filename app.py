@@ -132,6 +132,8 @@ class register_action:
 			raise web.seeother('login_form')
 		except AssertionError, e:
 			return str(e)
+		except dbh.UserException, e:
+			return str(e)
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/register_form')

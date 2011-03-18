@@ -651,7 +651,7 @@ class DBHandler:
 		if not pw_as_hash:
 			password = hash_password(nickname,password)
 		else:
-			if not self.__check_pw_hash_length__(new_password): 
+			if not self.__check_pw_hash_length__(password): 
 				raise WrongPasswordException(
 						"The password has not the length of a SHA-256 hash, " + 
 						"though it should be hashed."

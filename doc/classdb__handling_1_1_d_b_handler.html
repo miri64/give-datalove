@@ -98,6 +98,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Checks the existance of a user.  <a href="#adcf1c95de421b54b6e3d8f3d29e74d4e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdb__handling_1_1_d_b_handler.html#aeb97772fff7afb598eef1327f491d40e">session_exists</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Checks the existance of a session.  <a href="#aeb97772fff7afb598eef1327f491d40e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdb__handling_1_1_d_b_handler.html#a08ed45f271200e6f33cbc835fbbfc055">session_associated_to_any_user</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Checks if a session is associated to any user.  <a href="#a08ed45f271200e6f33cbc835fbbfc055"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdb__handling_1_1_d_b_handler.html#a420c467b27d4ba240f10b6ab243d4129">__update_love__</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Increases the available datalove of an user by every first of month by the amont defined by <code><a class="el" href="namespacedb__handling.html#a826a912542aecabf4b7ac063c26c1eb8">DEFAULT_UPDATE_LOVE</a></code>.  <a href="#a420c467b27d4ba240f10b6ab243d4129"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdb__handling_1_1_d_b_handler.html#a6ec80a483b1a4f4aafb036b01c765821">__check_session_id__</a></td></tr>
@@ -857,6 +859,42 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a08ed45f271200e6f33cbc835fbbfc055"></a><!-- doxytag: member="db_handling::DBHandler::session_associated_to_any_user" ref="a08ed45f271200e6f33cbc835fbbfc055" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def db_handling.DBHandler.session_associated_to_any_user </td>
+          <td>(</td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>session_id</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Checks if a session is associated to any user. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>session_id</em>&nbsp;</td><td>Some session's ID. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd><code><b>True</b></code> if the session is associated to a user, <code><b>False</b></code> if it does not. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="aeb97772fff7afb598eef1327f491d40e"></a><!-- doxytag: member="db_handling::DBHandler::session_exists" ref="aeb97772fff7afb598eef1327f491d40e" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1104,7 +1142,7 @@ Public Attributes</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Mar 19 2011 16:42:09 for give.datalove.me by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Sat Mar 19 2011 17:02:36 for give.datalove.me by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

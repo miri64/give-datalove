@@ -390,6 +390,9 @@ class get_users_love:
 	def GET(self,nickname):
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
+			if not db_handler.user_exists(nickname):
+				web.ctx.status = '404 Not Found'
+				return "<b>Not Found:</b> User " + nickname + " does not exist."
 			available_love = db_handler.get_available_love(nickname)
 			received_love = db_handler.get_received_love(nickname)
 			return str(available_love) + ',' + str(received_love)
@@ -405,6 +408,9 @@ class get_users_available_love:
 	def GET(self,nickname):
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
+			if not db_handler.user_exists(nickname):
+				web.ctx.status = '404 Not Found'
+				return "<b>Not Found:</b> User " + nickname + " does not exist."
 			available_love = db_handler.get_available_love(nickname)
 			return str(available_love)
 		except BaseException, e:
@@ -420,6 +426,9 @@ class get_users_received_love:
 	def GET(self,nickname):
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
+			if not db_handler.user_exists(nickname):
+				web.ctx.status = '404 Not Found'
+				return "<b>Not Found:</b> User " + nickname + " does not exist."
 			received_love = db_handler.get_received_love(nickname)
 			return str(received_love)
 		except BaseException, e:
@@ -431,13 +440,13 @@ class get_users_received_love:
 class give_user_datalove_api:
 	## Method for a HTTP GET request. 
 	# @param to_user User the datalove should be given to.
-	def GET(self,to_user):
+	def GET(self,nickname):
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			logged_in = True
-			if not db_handler.user_exists(to_user):
+			if not db_handler.user_exists(nickname):
 				web.ctx.status = '404 Not Found'
-				return "<b>Not Found:</b> User " + to_user + " does not exist."
+				return "<b>Not Found:</b> User " + nickname + " does not exist."
 			session_id = get_session_id()
 			from_user, _, _, _ = db_handler.get_session(session_id)
 		except BaseException, e:
@@ -445,7 +454,7 @@ class give_user_datalove_api:
 			return '<b>Internal Server Error:</b> ' + str(e)
 		if logged_in:
 			try:
-				db_handler.send_datalove(from_user,to_user,session_id)
+				db_handler.send_datalove(from_user,nickname,session_id)
 			except AssertionError,e:
 				return str(e)
 			except dbh.NotEnoughDataloveException, e:
@@ -455,4 +464,4 @@ class give_user_datalove_api:
 				return '<b>Internal Server Error:</b> ' + str(e)
 			return ''
 		else:
-			raise web.seeother(url_path_join(config.hosturl,'login_form'))
+			raise web.seeother(url_path_join(config.host_url,'login_form'))

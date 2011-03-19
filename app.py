@@ -85,15 +85,12 @@ class index:
 	## Method for a HTTP GET request. 
 	def GET(self):
 		web.header('Content-Type','text/html;charset=utf-8')
-		logged_in = True
-		#web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
 		try:
+			logged_in = True
+			#web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
 			session_id = web.cookies().get(
 					web.config.session_parameters['cookie_name']
 				)
-			if not session_id:
-				i = web.input()
-				session_id = i.get('sid')
 			if not session_id:
 				user = None
 				email = None
@@ -101,43 +98,54 @@ class index:
 				received = None
 				logged_in = False
 			else:
-				user, email, available, received = db_handler.get_session(
-						session_id
-					)
-		except dbh.IllegalSessionException:
-			user = None
-			email = None
-			available = None
-			received = None
-			logged_in = False
-		templates = web.template.render(os.path.join(abspath,'templates'))
-		return templates.index(logged_in, user, email, available, received)
+				try:
+					user, email, available, received = db_handler.get_session(
+							session_id
+						)
+				except dbh.IllegalSessionException:
+					user = None
+					email = None
+					available = None
+					received = None
+					logged_in = False
+			templates = web.template.render(os.path.join(abspath,'templates'))
+			return templates.index(logged_in, user, email, available, received)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 
 ## Class for the <tt>/register_form</tt> URL.
 class register_form:
 	## Method for a HTTP GET request. 
 	def GET(self):
-		web.header('Content-Type','text/html;charset=utf-8')
-		templates = web.template.render(os.path.join(abspath,'templates'))
-		return templates.register_form()
+		try:
+			web.header('Content-Type','text/html;charset=utf-8')
+			templates = web.template.render(os.path.join(abspath,'templates'))
+			return templates.register_form()
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 
 ## Class for the <tt>/register_action</tt> URL.
 class register_action:
 	## Method for a HTTP POST request. 
 	def POST(self):
 		web.header('Content-Type','text/html;charset=utf-8')
-		import hashlib
-		i = web.input()
 		try:
+			import hashlib
+			i = web.input()
 			nickname = i.nickname
 			password = dbh.hash_password(nickname,i.password)
 			email = i.email
 			db_handler.create_user(nickname,password,email)
-			raise web.seeother('login_form')
 		except AssertionError, e:
 			return str(e)
 		except dbh.UserException, e:
 			return str(e)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother('login_form')
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/register_form')
@@ -149,18 +157,14 @@ class login_form:
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			session_id = get_session_id()
-			try:
-				_, _, _, _ = db_handler.get_session(session_id)
-				raise web.seeother('/')
-			except dbh.LoginException:
-				pass
-			except AssertionError:
-				pass
+			_, _, _, _ = db_handler.get_session(session_id)
+		except dbh.IllegalSessionException:
 			templates = web.template.render(os.path.join(abspath,'templates'))
 			return templates.login_form()
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother('/')
 
 ## Class for the <tt>/login_action</tt> URL.
 class login_action:
@@ -170,20 +174,19 @@ class login_action:
 		try:
 			import hashlib
 			i = web.input()
-			try:
-				session_id = get_session_id()
-				nickname = i.nickname
-				password = dbh.hash_password(nickname,i.password)
-				db_handler.user_login(nickname,password,session_id)
-				raise web.seeother('/')
-			except AssertionError, e:
-				return str(e)
-			except dbh.LoginException:
-				return 'Login failed: Nickname or password was wrong. ' + \
-						'<a href="reset_password_form">Reset password?</a>'
+			session_id = get_session_id()
+			nickname = i.nickname
+			password = dbh.hash_password(nickname,i.password)
+			db_handler.user_login(nickname,password,session_id)
+		except AssertionError, e:
+			return str(e)
+		except dbh.LoginException:
+			return 'Login failed: Nickname or password was wrong. ' + \
+					'<a href="reset_password_form">Reset password?</a>'
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother('/')
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/login_form')
@@ -195,15 +198,14 @@ class widget:
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			i = web.input()
-			try:
-				user = i.user
-				received_love = db_handler.get_received_love(user)
-			except AttributeError:
-				raise web.seeother('register_form')
-			except dbh.UserException,e:
-				return str(e)
+			user = i.user
+			received_love = db_handler.get_received_love(user)
 			templates = web.template.render(os.path.join(abspath,'templates'))
 			return templates.widget(user,received_love)
+		except dbh.UserException,e:
+			return str(e)
+		except AttributeError:
+			raise web.seeother('/register_form')
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
@@ -220,26 +222,27 @@ class give_user_datalove:
 			if not db_handler.user_exists(to_user):
 				return "User does not exist."
 			session_id = get_session_id()
-			try:
-				from_user, _, _, _ = db_handler.get_session(session_id)
-			except dbh.IllegalSessionException, e:
-				logged_in = False
-			except AssertionError,e:
-				return str(e)
-			
-			if logged_in:
-				try:
-					db_handler.send_datalove(from_user,to_user,session_id)
-				except AssertionError,e:
-					return str(e)
-				except dbh.NotEnoughDataloveException, e:
-					return str(e)
-				raise web.seeother('widget?user='+to_user)
-			else:
-				raise web.seeother('login_form')
+			from_user, _, _, _ = db_handler.get_session(session_id)
+		except dbh.IllegalSessionException, e:
+			logged_in = False
+		except AssertionError,e:
+			return str(e)
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
+		if logged_in:
+			try:
+				db_handler.send_datalove(from_user,to_user,session_id)
+			except AssertionError,e:
+				return str(e)
+			except dbh.NotEnoughDataloveException, e:
+				return str(e)
+			except BaseException, e:
+				web.ctx.status = '500 Internal Server Error'
+				return '<b>Internal Server Error:</b> ' + str(e)
+			raise web.seeother('widget?user='+to_user)
+		else:
+			raise web.seeother('login_form')
 
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
@@ -250,11 +253,11 @@ class logoff:
 			session_id = get_session_id()
 			nickname, _, _, _ = db_handler.get_session(session_id)
 			db_handler.user_logoff(nickname,session_id)
-			session.kill()
-			raise web.seeother('/')
+			session.expired()
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother('/')
 
 ## Class for the <tt>/unregister</tt> URL.
 class unregister:
@@ -266,11 +269,10 @@ class unregister:
 			session_id = get_session_id()
 			user, _, _, _ = db_handler.get_session(session_id)
 			db_handler.drop_user(user,session_id)
-			
-			raise web.seeother('/')
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother('/')
 
 ## Class for the <tt>/reset_password_form</tt> URL.
 class reset_password_form:
@@ -331,10 +333,10 @@ class change_mail_address_action:
 			user, _, _, _ = db_handler.get_session(session_id)
 			email = web.input().get('email')
 			db_handler.change_email_address(user,session_id,email)
-			raise web.seeother('/')
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother('/')
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/')
@@ -353,10 +355,10 @@ class change_password_action:
 					nickname,web.input().get('new_password')
 				)
 			db_handler.change_password(nickname,old_password,new_password)
-			raise web.seeother('/')
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother('/')
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/')

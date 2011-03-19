@@ -5,7 +5,7 @@
 #
 #  No Copyright, no license, comes as it is
 
-import web,os,config
+import web,os,config,re
 
 import db_handling as dbh
 
@@ -28,17 +28,18 @@ urls = (
 	'/login_action', 'login_action',
 	'/login_form', 'login_form',
 	'/widget', 'widget',
-	'/give_(.+)_datalove', 'give_user_datalove',
+	'/give_([A-Za-z0-9]+)_datalove', 'give_user_datalove',
 	'/logoff', 'logoff',
 	'/unregister', 'unregister',
 	'/reset_password_form', 'reset_password_form',
 	'/reset_password_action', 'reset_password_action',
 	'/change_mail_address_action','change_mail_address_action',
 	'/change_password_action', 'change_password_action',
-	'/api/(.+)','get_users_datalove',
-	'/api/(.+)/available_datalove', 'get_users_available_datalove',
-	'/api/(.+)/received_datalove', 'get_users_received_datalove',
-	'/api/(.+)/give_datalove', 'give_user_datalove',
+	'/api/([A-Za-z0-9]+)','get_users_love',
+	'/api/([A-Za-z0-9]+)/','get_users_love',
+	'/api/([A-Za-z0-9]+)/available_datalove', 'get_users_available_love',
+	'/api/([A-Za-z0-9]+)/received_datalove', 'get_users_received_love',
+	'/api/([A-Za-z0-9]+)/give_datalove', 'give_user_datalove_api',
 )
 
 ## The absolute path of this script.
@@ -79,6 +80,25 @@ def get_session_id():
 	#else:
 	#	session_id = web.input().get('sid')
 	return session_id
+
+## Joins two fragments of an URL path with an '/' (if needed).
+# @param a The first fragment. This must contain the at least the scheme and 
+#        host part of the URL.
+# @param b The remainder of the URL path.
+# @returns A nicely joined URL path.
+def url_path_join(a, b):
+	path = a
+	if a.endswith('/'):
+		if b.startswith('/'):
+			path += b[1:]
+		else:
+			path += b
+	else:
+		if b.startswith('/'):
+			path += b
+		else:
+			path += '/' + b
+	return path
 
 ## Class for the <tt>/index</tt> URL.
 class index:
@@ -139,10 +159,10 @@ class register_action:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother('login_form')
+		raise web.seeother(url_path_join(config.hosturl,'login_form'))
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother('/register_form')
+		raise web.seeother(url_path_join(config.hosturl,'register_form'))
 
 ## Class for the <tt>/login_form</tt> URL.
 class login_form:
@@ -159,7 +179,7 @@ class login_form:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother('/')
+		raise web.seeother(config.hosturl)
 
 ## Class for the <tt>/login_action</tt> URL.
 class login_action:
@@ -181,10 +201,10 @@ class login_action:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother('/')
+		raise web.seeother(config.hosturl)
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother('/login_form')
+		raise web.seeother(url_path_join(config.hosturl,'login_form'))
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:
@@ -200,7 +220,7 @@ class widget:
 		except dbh.UserException,e:
 			return str(e)
 		except AttributeError:
-			raise web.seeother('/register_form')
+			raise web.seeother(url_path_join(config.hosturl,'register_form'))
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
@@ -235,9 +255,11 @@ class give_user_datalove:
 			except BaseException, e:
 				web.ctx.status = '500 Internal Server Error'
 				return '<b>Internal Server Error:</b> ' + str(e)
-			raise web.seeother('widget?user='+to_user)
+			raise web.seeother(
+					url_path_join(config.hosturl,'widget?user='+to_user)
+				)
 		else:
-			raise web.seeother('login_form')
+			raise web.seeother(url_path_join(config.hosturl,'login_form'))
 
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
@@ -252,7 +274,7 @@ class logoff:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother('/')
+		raise web.seeother(config.hosturl)
 
 ## Class for the <tt>/unregister</tt> URL.
 class unregister:
@@ -267,7 +289,7 @@ class unregister:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother('/')
+		raise web.seeother(config.hosturl)
 
 ## Class for the <tt>/reset_password_form</tt> URL.
 class reset_password_form:
@@ -317,7 +339,7 @@ class reset_password_action:
 			return '<b>Internal Server Error:</b> ' + str(e)
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother('/reset_password_form')
+		raise web.seeother(url_path_join(config.hosturl,'/reset_password_form'))
 
 ## Class for the <tt>/change_mail_address_action</tt> URL.
 class change_mail_address_action:
@@ -329,12 +351,13 @@ class change_mail_address_action:
 			email = web.input().get('email')
 			db_handler.change_email_address(user,session_id,email)
 		except BaseException, e:
+			web.header('Content-Type','text/html;charset=utf-8')
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother('/')
+		raise web.seeother(config.hosturl)
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother('/')
+		raise web.seeother(config.hosturl)
 
 ## Class for the <tt>/change_password_action</tt> URL.
 class change_password_action:
@@ -351,9 +374,85 @@ class change_password_action:
 				)
 			db_handler.change_password(nickname,old_password,new_password)
 		except BaseException, e:
+			web.header('Content-Type','text/html;charset=utf-8')
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother('/')
+		raise web.seeother(config.hosturl)
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother('/')
+		raise web.seeother(config.hosturl)
+
+## Class for the <tt>/api/(.+)/</tt> URL where the regular 
+#  expression stands for the user's name.
+class get_users_love:
+	## Method for a HTTP GET request. 
+	# @param nickname The user's nickname
+	def GET(self,nickname):
+		web.header('Content-Type','text/html;charset=utf-8')
+		try:
+			available_love = db_handler.get_available_love(nickname)
+			received_love = db_handler.get_received_love(nickname)
+			return str(available_love) + ',' + str(received_love)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
+
+## Class for the <tt>/api/(.+)/available_datalove</tt> URL where the regular 
+#  expression stands for the user's name.
+class get_users_available_love:
+	## Method for a HTTP GET request. 
+	# @param nickname The user's nickname
+	def GET(self,nickname):
+		web.header('Content-Type','text/html;charset=utf-8')
+		try:
+			available_love = db_handler.get_available_love(nickname)
+			return str(available_love)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
+
+
+## Class for the <tt>/api/(.+)/received_datalove</tt> URL where the regular 
+#  expression stands for the user's name.
+class get_users_received_love:
+	## Method for a HTTP GET request. 
+	# @param nickname The user's nickname
+	def GET(self,nickname):
+		web.header('Content-Type','text/html;charset=utf-8')
+		try:
+			received_love = db_handler.get_received_love(nickname)
+			return str(received_love)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
+
+## Class for the <tt>/api/(.+)/give_datalove</tt> URL where the regular 
+#  expression stands for the user's name.
+class give_user_datalove_api:
+	## Method for a HTTP GET request. 
+	# @param to_user User the datalove should be given to.
+	def GET(self,to_user):
+		web.header('Content-Type','text/html;charset=utf-8')
+		try:
+			logged_in = True
+			if not db_handler.user_exists(to_user):
+				web.ctx.status = '404 Not Found'
+				return "<b>Not Found:</b> User " + to_user + " does not exist."
+			session_id = get_session_id()
+			from_user, _, _, _ = db_handler.get_session(session_id)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
+		if logged_in:
+			try:
+				db_handler.send_datalove(from_user,to_user,session_id)
+			except AssertionError,e:
+				return str(e)
+			except dbh.NotEnoughDataloveException, e:
+				return str(e)
+			except BaseException, e:
+				web.ctx.status = '500 Internal Server Error'
+				return '<b>Internal Server Error:</b> ' + str(e)
+			return ''
+		else:
+			raise web.seeother(url_path_join(config.hosturl,'login_form'))

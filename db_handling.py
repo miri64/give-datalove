@@ -587,7 +587,7 @@ class DBHandler:
 	#          if it does not.
 	def session_exists(self,session_id):
 		rows = self.db.select(
-				'session_id',
+				'sessions',
 				where='session_id = $session_id',
 				vars=locals()
 			)

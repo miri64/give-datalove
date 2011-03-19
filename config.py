@@ -17,3 +17,6 @@ db_username		= '<username>'
 
 ##	@brief The password to connect with the database.
 db_password		= '<password>'
+
+##	@brief The hosts URL for references.
+host_url		= '<host_url>'

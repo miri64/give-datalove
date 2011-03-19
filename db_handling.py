@@ -574,10 +574,24 @@ class DBHandler:
 	# @returns <tt><b>True</tt><b> if the user exists, <tt><b>False</tt><b> if 
 	#          he or she does not.
 	def user_exists(self,nickname):
-		try:
-			return 0 != len(self.__select_user__('*',nickname))
-		except UserException:
-			return False
+		rows = self.db.select(
+				'users',
+				where='nickname = $nickname',
+				vars=locals()
+			)
+		return len(rows) != 0
+	
+	## Checks the existance of a session.
+	# @param session_id Some session's ID.
+	# @returns <tt><b>True</tt><b> if the session exists, <tt><b>False</tt><b> 
+	#          if it does not.
+	def session_exists(self,session_id):
+		rows = self.db.select(
+				'session_id',
+				where='session_id = $session_id',
+				vars=locals()
+			)
+		return len(rows) != 0
 	
 	## Increases the available datalove of an user by every first of month by 
 	#  the amont defined by <tt>\ref DEFAULT_UPDATE_LOVE</tt>.

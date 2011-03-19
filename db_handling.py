@@ -571,7 +571,7 @@ class DBHandler:
 	
 	## Checks the existance of a user.
 	# @param nickname Some user's nickname.
-	# @returns <tt><b>True</tt><b> if the user exists, <tt><b>False</tt><b> if 
+	# @returns <tt><b>True</b></tt> if the user exists, <tt><b>False</b></tt> if 
 	#          he or she does not.
 	def user_exists(self,nickname):
 		rows = self.db.select(
@@ -583,7 +583,7 @@ class DBHandler:
 	
 	## Checks the existance of a session.
 	# @param session_id Some session's ID.
-	# @returns <tt><b>True</tt><b> if the session exists, <tt><b>False</tt><b> 
+	# @returns <tt><b>True</b></tt> if the session exists, <tt><b>False</b></tt>
 	#          if it does not.
 	def session_exists(self,session_id):
 		rows = self.db.select(

@@ -34,7 +34,11 @@ urls = (
 	'/reset_password_form', 'reset_password_form',
 	'/reset_password_action', 'reset_password_action',
 	'/change_mail_address_action','change_mail_address_action',
-	'/change_password_action', 'change_password_action'
+	'/change_password_action', 'change_password_action',
+	'/api/(.+)','get_users_datalove',
+	'/api/(.+)/available_datalove', 'get_users_available_datalove',
+	'/api/(.+)/received_datalove', 'get_users_received_datalove',
+	'/api/(.+)/give_datalove', 'give_user_datalove',
 )
 
 ## The absolute path of this script.
@@ -143,35 +147,43 @@ class login_form:
 	## Method for a HTTP GET request. 
 	def GET(self):
 		web.header('Content-Type','text/html;charset=utf-8')
-		session_id = get_session_id()
 		try:
-			_, _, _, _ = db_handler.get_session(session_id)
-			raise web.seeother('/')
-		except dbh.LoginException:
-			pass
-		except AssertionError:
-			pass
-		templates = web.template.render(os.path.join(abspath,'templates'))
-		return templates.login_form()
+			session_id = get_session_id()
+			try:
+				_, _, _, _ = db_handler.get_session(session_id)
+				raise web.seeother('/')
+			except dbh.LoginException:
+				pass
+			except AssertionError:
+				pass
+			templates = web.template.render(os.path.join(abspath,'templates'))
+			return templates.login_form()
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 
 ## Class for the <tt>/login_action</tt> URL.
 class login_action:
 	## Method for a HTTP POST request. 
 	def POST(self):
 		web.header('Content-Type','text/html;charset=utf-8')
-		import hashlib
-		i = web.input()
 		try:
-			session_id = get_session_id()
-			nickname = i.nickname
-			password = dbh.hash_password(nickname,i.password)
-			db_handler.user_login(nickname,password,session_id)
-			raise web.seeother('/')
-		except AssertionError, e:
-			return str(e)
-		except dbh.LoginException:
-			return 'Login failed: Nickname or password was wrong. ' + \
-					'<a href="reset_password_form">Reset password?</a>'
+			import hashlib
+			i = web.input()
+			try:
+				session_id = get_session_id()
+				nickname = i.nickname
+				password = dbh.hash_password(nickname,i.password)
+				db_handler.user_login(nickname,password,session_id)
+				raise web.seeother('/')
+			except AssertionError, e:
+				return str(e)
+			except dbh.LoginException:
+				return 'Login failed: Nickname or password was wrong. ' + \
+						'<a href="reset_password_form">Reset password?</a>'
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/login_form')
@@ -181,16 +193,20 @@ class widget:
 	## Method for a HTTP GET request. 
 	def GET(self):
 		web.header('Content-Type','text/html;charset=utf-8')
-		i = web.input()
 		try:
-			user = i.user
-			received_love = db_handler.get_received_love(user)
-		except AttributeError:
-			raise web.seeother('register_form')
-		except dbh.UserException,e:
-			return str(e)
-		templates = web.template.render(os.path.join(abspath,'templates'))
-		return templates.widget(user,received_love)
+			i = web.input()
+			try:
+				user = i.user
+				received_love = db_handler.get_received_love(user)
+			except AttributeError:
+				raise web.seeother('register_form')
+			except dbh.UserException,e:
+				return str(e)
+			templates = web.template.render(os.path.join(abspath,'templates'))
+			return templates.widget(user,received_love)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 
 ## Class for the <tt>/give_(.*)_datalove</tt> URL where the regular expression 
 #  stands for the user's name.
@@ -199,88 +215,109 @@ class give_user_datalove:
 	# @param to_user User the datalove should be given to.
 	def GET(self,to_user):
 		web.header('Content-Type','text/html;charset=utf-8')
-		logged_in = True
-		if not db_handler.user_exists(to_user):
-			return "User does not exist."
-		session_id = get_session_id()
 		try:
-			from_user, _, _, _ = db_handler.get_session(session_id)
-		except dbh.IllegalSessionException, e:
-			logged_in = False
-		except AssertionError,e:
-			return str(e)
-		
-		if logged_in:
+			logged_in = True
+			if not db_handler.user_exists(to_user):
+				return "User does not exist."
+			session_id = get_session_id()
 			try:
-				db_handler.send_datalove(from_user,to_user,session_id)
+				from_user, _, _, _ = db_handler.get_session(session_id)
+			except dbh.IllegalSessionException, e:
+				logged_in = False
 			except AssertionError,e:
 				return str(e)
-			except dbh.NotEnoughDataloveException, e:
-				return str(e)
-			raise web.seeother('widget?user='+to_user)
-		else:
-			raise web.seeother('login_form')
+			
+			if logged_in:
+				try:
+					db_handler.send_datalove(from_user,to_user,session_id)
+				except AssertionError,e:
+					return str(e)
+				except dbh.NotEnoughDataloveException, e:
+					return str(e)
+				raise web.seeother('widget?user='+to_user)
+			else:
+				raise web.seeother('login_form')
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
 	## Method for a HTTP GET request. 
 	def GET(self):
 		web.header('Content-Type','text/html;charset=utf-8')
-		session_id = get_session_id()
-		nickname, _, _, _ = db_handler.get_session(session_id)
-		db_handler.user_logoff(nickname,session_id)
-		session.kill()
-		raise web.seeother('/')
+		try:
+			session_id = get_session_id()
+			nickname, _, _, _ = db_handler.get_session(session_id)
+			db_handler.user_logoff(nickname,session_id)
+			session.kill()
+			raise web.seeother('/')
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 
 ## Class for the <tt>/unregister</tt> URL.
 class unregister:
 	## Method for a HTTP GET request. 
 	def GET(self):
-		web.header('Content-Type','text/html;charset=utf-8')
-		session_id = get_session_id()
-		user, _, _, _ = db_handler.get_session(session_id)
-		db_handler.drop_user(user,session_id)
-		
-		raise web.seeother('/')
+		try:
+			web.header('Content-Type','text/html;charset=utf-8')
+			
+			session_id = get_session_id()
+			user, _, _, _ = db_handler.get_session(session_id)
+			db_handler.drop_user(user,session_id)
+			
+			raise web.seeother('/')
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 
 ## Class for the <tt>/reset_password_form</tt> URL.
 class reset_password_form:
 	## Method for a HTTP GET request. 
 	def GET(self):
 		web.header('Content-Type','text/html;charset=utf-8')
-		templates = web.template.render(os.path.join(abspath,'templates'))
-		return templates.reset_password_form()
+		try:
+			templates = web.template.render(os.path.join(abspath,'templates'))
+			return templates.reset_password_form()
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 
 ## Class for the <tt>/reset_password_action</tt> URL.
 class reset_password_action:
 	## Method for a HTTP POST request. 
 	def POST(self):
-		import smtplib
-		from email.mime.text import MIMEText
 		web.header('Content-Type','text/html;charset=utf-8')
-		i = web.input()
 		try:
-			new_password, email_to = db_handler.reset_password(i.nickname)
-		except UserException, e:
-			return str(e)
-		email_from = 'password-reset@give.datalove.me'
-		
-		msg_text = "Hello "+i.nickname+",\n"+ \
-			"You're password was reset to '" + new_password + \
-			"'. Please change it immediately!\n\n" + \
-			"Greets, Your datalove.me-Team\n"
-		msg = MIMEText(msg_text)
-		
-		msg['Subject'] = 'Your new password for give.datalove.me'
-		msg['From'] = email_from
-		msg['To'] = email_to
-		
-		s = smtplib.SMTP('localhost')
-		s.sendmail(email_from,[email_to],msg.as_string())
-		s.quit()
-		
-		return 'Password reset successfully. you should get an e-mail to ' + \
-				'the address you are registered to.'
+			import smtplib
+			from email.mime.text import MIMEText
+			i = web.input()
+			try:
+				new_password, email_to = db_handler.reset_password(i.nickname)
+			except UserException, e:
+				return str(e)
+			email_from = 'password-reset@give.datalove.me'
+			
+			msg_text = "Hello "+i.nickname+",\n"+ \
+				"You're password was reset to '" + new_password + \
+				"'. Please change it immediately!\n\n" + \
+				"Greets, Your datalove.me-Team\n"
+			msg = MIMEText(msg_text)
+			
+			msg['Subject'] = 'Your new password for give.datalove.me'
+			msg['From'] = email_from
+			msg['To'] = email_to
+			
+			s = smtplib.SMTP('localhost')
+			s.sendmail(email_from,[email_to],msg.as_string())
+			s.quit()
+			
+			return 'Password reset successfully. you should get an e-mail to ' + \
+					'the address you are registered to.'
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/reset_password_form')
@@ -289,11 +326,15 @@ class reset_password_action:
 class change_mail_address_action:
 	## Method for a HTTP POST request. 
 	def POST(self):
-		session_id = get_session_id()
-		user, _, _, _ = db_handler.get_session(session_id)
-		email = web.input().get('email')
-		db_handler.change_email_address(user,session_id,email)
-		raise web.seeother('/')
+		try:
+			session_id = get_session_id()
+			user, _, _, _ = db_handler.get_session(session_id)
+			email = web.input().get('email')
+			db_handler.change_email_address(user,session_id,email)
+			raise web.seeother('/')
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/')
@@ -302,16 +343,20 @@ class change_mail_address_action:
 class change_password_action:
 	## Method for a HTTP POST request. 
 	def POST(self):
-		session_id = get_session_id()
-		nickname, _, _, _ = db_handler.get_session(session_id)
-		old_password = dbh.hash_password(
-				nickname,web.input().get('old_password')
-			)
-		new_password = dbh.hash_password(
-				nickname,web.input().get('new_password')
-			)
-		db_handler.change_password(nickname,old_password,new_password)
-		raise web.seeother('/')
+		try:
+			session_id = get_session_id()
+			nickname, _, _, _ = db_handler.get_session(session_id)
+			old_password = dbh.hash_password(
+					nickname,web.input().get('old_password')
+				)
+			new_password = dbh.hash_password(
+					nickname,web.input().get('new_password')
+				)
+			db_handler.change_password(nickname,old_password,new_password)
+			raise web.seeother('/')
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother('/')

@@ -251,7 +251,7 @@ class DBHandler:
 	#            is set <tt><b>True</b></tt> or if the <i>password</i> is just 
 	#            wrong.
 	def user_login(self, nickname, password, session_id, pw_as_hash = True):
-		if session_associated_to_any_user(session_id):
+		if self.session_associated_to_any_user(session_id):
 			raise AssertionError(
 					"There is already a user logged in with this session. " +
 					"Only one user per session is allowed."

@@ -240,6 +240,8 @@ class DBHandler:
 	#        <tt>\ref WrongPasswordException</tt> is raised. If 
 	#        <i>pw_as_hash</i> is <tt><b>False</b></tt> the function hashes the 
 	#        password with SHA-256 before the insertion to the database.
+	# @exception AssertionError Is raised if the <i>session_id</i> is allready
+	#            associated to another user.
 	# @exception UserException Is raised if there is no user with the given 
 	#            <i>nickname</i>.
 	# @exception IllegalSessionException Is raised if the <i>session_id</i> was 
@@ -249,6 +251,11 @@ class DBHandler:
 	#            is set <tt><b>True</b></tt> or if the <i>password</i> is just 
 	#            wrong.
 	def user_login(self, nickname, password, session_id, pw_as_hash = True):
+		if session_associated_to_any_user(session_id):
+			raise AssertionError(
+					"There is already a user logged in with this session. " +
+					"Only one user per session is allowed."
+				)
 		if not pw_as_hash:
 			password = hash_password(nickname,password)
 		else:
@@ -321,12 +328,11 @@ class DBHandler:
 	#          available love count, and the received love count of the user who
 	#          is associated to the session identified by the <i>session_id</i>
 	def get_session(self, session_id):
-		rows = self.db.select(
-				['users','sessions'],
-				what='nickname,email,available_love,received_love',
-				where = "users.session_id = $session_id AND " + 
-				        "users.session_id = sessions.session_id",
-				vars = locals()
+		rows = self.db.query(
+				"""SELECT * 
+				   FROM users NATURAL JOIN sessions
+				   WHERE session_id = $session_id""",
+				vars=locals()
 			)
 		
 		if len(rows) == 0:
@@ -589,6 +595,19 @@ class DBHandler:
 		rows = self.db.select(
 				'sessions',
 				where='session_id = $session_id',
+				vars=locals()
+			)
+		return len(rows) != 0
+	
+	## Checks if a session is associated to any user.
+	# @param session_id Some session's ID.
+	# @returns <tt><b>True</b></tt> if the session is associated to a user, 
+	#          <tt><b>False</b></tt> if it does not.
+	def session_associated_to_any_user(self,session_id):
+		rows = self.db.query(
+				"""SELECT * 
+				   FROM users NATURAL JOIN sessions
+				   WHERE session_id = $session_id""",
 				vars=locals()
 			)
 		return len(rows) != 0

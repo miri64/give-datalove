@@ -91,23 +91,17 @@ class index:
 			session_id = web.cookies().get(
 					web.config.session_parameters['cookie_name']
 				)
-			if not session_id:
+			if not session_id or \
+					not db_handler.session_associated_to_any_user(session_id):
 				user = None
 				email = None
 				available = None
 				received = None
 				logged_in = False
 			else:
-				try:
-					user, email, available, received = db_handler.get_session(
-							session_id
-						)
-				except dbh.IllegalSessionException:
-					user = None
-					email = None
-					available = None
-					received = None
-					logged_in = False
+				user, email, available, received = db_handler.get_session(
+						session_id
+					)
 			templates = web.template.render(os.path.join(abspath,'templates'))
 			return templates.index(logged_in, user, email, available, received)
 		except BaseException, e:
@@ -157,10 +151,11 @@ class login_form:
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			session_id = get_session_id()
-			_, _, _, _ = db_handler.get_session(session_id)
-		except dbh.IllegalSessionException:
-			templates = web.template.render(os.path.join(abspath,'templates'))
-			return templates.login_form()
+			if not db_handler.session_associated_to_any_user(session_id):
+				templates = web.template.render(
+						os.path.join(abspath,'templates')
+					)
+				return templates.login_form()
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
@@ -253,7 +248,7 @@ class logoff:
 			session_id = get_session_id()
 			nickname, _, _, _ = db_handler.get_session(session_id)
 			db_handler.user_logoff(nickname,session_id)
-			session.expired()
+			session.kill()
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)

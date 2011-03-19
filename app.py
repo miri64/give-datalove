@@ -159,10 +159,10 @@ class register_action:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(url_path_join(config.hosturl,'login_form'))
+		raise web.seeother(url_path_join(config.host_url,'login_form'))
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother(url_path_join(config.hosturl,'register_form'))
+		raise web.seeother(url_path_join(config.host_url,'register_form'))
 
 ## Class for the <tt>/login_form</tt> URL.
 class login_form:
@@ -179,7 +179,7 @@ class login_form:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.hosturl)
+		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/login_action</tt> URL.
 class login_action:
@@ -201,10 +201,10 @@ class login_action:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.hosturl)
+		raise web.seeother(config.host_url)
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother(url_path_join(config.hosturl,'login_form'))
+		raise web.seeother(url_path_join(config.host_url,'login_form'))
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:
@@ -220,7 +220,7 @@ class widget:
 		except dbh.UserException,e:
 			return str(e)
 		except AttributeError:
-			raise web.seeother(url_path_join(config.hosturl,'register_form'))
+			raise web.seeother(url_path_join(config.host_url,'register_form'))
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
@@ -256,10 +256,10 @@ class give_user_datalove:
 				web.ctx.status = '500 Internal Server Error'
 				return '<b>Internal Server Error:</b> ' + str(e)
 			raise web.seeother(
-					url_path_join(config.hosturl,'widget?user='+to_user)
+					url_path_join(config.host_url,'widget?user='+to_user)
 				)
 		else:
-			raise web.seeother(url_path_join(config.hosturl,'login_form'))
+			raise web.seeother(url_path_join(config.host_url,'login_form'))
 
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
@@ -274,7 +274,7 @@ class logoff:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.hosturl)
+		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/unregister</tt> URL.
 class unregister:
@@ -289,7 +289,7 @@ class unregister:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.hosturl)
+		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/reset_password_form</tt> URL.
 class reset_password_form:
@@ -339,7 +339,7 @@ class reset_password_action:
 			return '<b>Internal Server Error:</b> ' + str(e)
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother(url_path_join(config.hosturl,'/reset_password_form'))
+		raise web.seeother(url_path_join(config.host_url,'/reset_password_form'))
 
 ## Class for the <tt>/change_mail_address_action</tt> URL.
 class change_mail_address_action:
@@ -354,10 +354,10 @@ class change_mail_address_action:
 			web.header('Content-Type','text/html;charset=utf-8')
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.hosturl)
+		raise web.seeother(config.host_url)
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother(config.hosturl)
+		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/change_password_action</tt> URL.
 class change_password_action:
@@ -377,10 +377,10 @@ class change_password_action:
 			web.header('Content-Type','text/html;charset=utf-8')
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.hosturl)
+		raise web.seeother(config.host_url)
 	## Method for a HTTP GET request. 
 	def GET(self):
-		raise web.seeother(config.hosturl)
+		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/api/(.+)/</tt> URL where the regular 
 #  expression stands for the user's name.

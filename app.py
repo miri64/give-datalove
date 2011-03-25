@@ -148,6 +148,10 @@ class register_action:
 		try:
 			import hashlib
 			i = web.input()
+			if i.password != i.conf_password:
+				return "Password and confirmation of password "+ \
+						"were not equal."
+			
 			nickname = i.nickname
 			password = dbh.hash_password(nickname,i.password)
 			email = i.email
@@ -366,11 +370,18 @@ class change_password_action:
 		try:
 			session_id = get_session_id()
 			nickname, _, _, _ = db_handler.get_session(session_id)
+			
+			i = web.input() 
+			
+			if i.new_password != i.new_password_conf:
+				return "New password and confirmation of new password "+ \
+						"were not equal."
+			
 			old_password = dbh.hash_password(
-					nickname,web.input().get('old_password')
+					nickname,i.old_password
 				)
 			new_password = dbh.hash_password(
-					nickname,web.input().get('new_password')
+					nickname,i.new_password
 				)
 			db_handler.change_password(nickname,old_password,new_password)
 		except BaseException, e:

@@ -5,7 +5,7 @@
 #
 #  No Copyright, no license, comes as it is
 
-import web,os,config,re
+import web,os,config
 
 import db_handling as dbh
 
@@ -28,18 +28,18 @@ urls = (
 	'/login_action', 'login_action',
 	'/login_form', 'login_form',
 	'/widget', 'widget',
-	'/give_([A-Za-z0-9]+)_datalove', 'give_user_datalove',
+	r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
 	'/logoff', 'logoff',
 	'/unregister', 'unregister',
 	'/reset_password_form', 'reset_password_form',
 	'/reset_password_action', 'reset_password_action',
 	'/change_mail_address_action','change_mail_address_action',
 	'/change_password_action', 'change_password_action',
-	'/api/([A-Za-z0-9]+)','get_users_love',
-	'/api/([A-Za-z0-9]+)/','get_users_love',
-	'/api/([A-Za-z0-9]+)/available_datalove', 'get_users_available_love',
-	'/api/([A-Za-z0-9]+)/received_datalove', 'get_users_received_love',
-	'/api/([A-Za-z0-9]+)/give_datalove', 'give_user_datalove_api',
+	r'/api/([^?$/\\#%\s]+)','get_users_love',
+	r'/api/([^?$/\\#%\s]+)/','get_users_love',
+	r'/api/([^?$/\\#%\s]+)/available_datalove', 'get_users_available_love',
+	r'/api/([^?$/\\#%\s]+)/received_datalove', 'get_users_received_love',
+	r'/api/([^?$/\\#%\s]+)/give_datalove', 'give_user_datalove_api',
 )
 
 ## The absolute path of this script.
@@ -111,19 +111,19 @@ class index:
 			session_id = web.cookies().get(
 					web.config.session_parameters['cookie_name']
 				)
+			templates = web.template.render(os.path.join(abspath,'templates'))
 			if not session_id or \
 					not db_handler.session_associated_to_any_user(session_id):
-				user = None
-				email = None
-				available = None
-				received = None
-				logged_in = False
+				content = "Some generic about text."
+				return templates.index(content)
 			else:
-				user, email, available, received = db_handler.get_session(
+				nickname, _, available, received = db_handler.get_session(
 						session_id
 					)
-			templates = web.template.render(os.path.join(abspath,'templates'))
-			return templates.index(logged_in, user, email, available, received)
+				content = """<p class="abouth">Hi %s</p>
+					<p class="about">You have %d datalovez received and %d 
+					waiting to be spread</p>""" % (nickname,received,available)
+				return templates.index(content,nickname)
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
@@ -151,7 +151,6 @@ class register_action:
 			if i.password != i.conf_password:
 				return "Password and confirmation of password "+ \
 						"were not equal."
-			
 			nickname = i.nickname
 			password = dbh.hash_password(nickname,i.password)
 			email = i.email

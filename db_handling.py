@@ -127,6 +127,17 @@ class DBHandler:
 	def __init__(self,db):
 		self.db = db
 	
+	## Checks if a string contains any characters in a set of given characters,
+	# even their URL escapes.
+	# @param str String to be checked.
+	# @param set Set on which the string is checked upon.
+	# @return True, if str contains any characters in set, False, if not.
+	def __containsAny__(self, str, set):
+		import urllib
+		urlescapes = [urllib.quote_plus(c) for c in set]
+		return True in [c in str for c in set] or \
+				-1 not in [str.find(esc) for esc in urlescapes]
+	
 	## Creates a new user in the database table users.
 	# @param nickname The new user's nickname.
 	# @param password The new user's password.
@@ -166,6 +177,12 @@ class DBHandler:
 					"Nickname to long. Must be at most " + 
 					str(MAX_NICK_LEN) + 
 					" characters long.")
+		
+		if self.__containsAny__(nickname, '?$/\\#% \t\n\r\f\v'):
+			raise AssertionError(
+					"Nickname must not contain whitespaces or any of the " +
+					"following characters: ?, $, /, \\, #, %"
+				)
 		if self.user_exists(nickname):
 			raise UserException(
 					"Username " + 

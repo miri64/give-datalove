@@ -16,14 +16,15 @@ $def with (content, nickname = None)
     <div id="sidebar">
         <ul>
 $if nickname:
-    <li><a href="logoff">Logoff</a></li>
-    <li><a href="manage_account">Manage account</a></li>
+                <li><a href="logoff">Logoff</a></li>
+                <li><a href="manage_account">Manage account</a></li>
 $else:
-    <li><a href="login_form">Login</a></li>
-<li><a href="http://datalove.me/give/widget.html">Widget for website</a></li>
-<li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
-<li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
-<li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
+                <li><a href="login_form">Login</a></li>
+$ pass
+            <li><a href="http://datalove.me/give/widget.html">Widget for website</a></li>
+            <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
+            <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
+            <li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
         </ul>
     </div>
     <div id="content">

@@ -1,4 +1,4 @@
-$def with (content, nickname = None)
+$def with (content, logged_in = False)
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -15,25 +15,55 @@ $def with (content, nickname = None)
 <div>
     <div id="sidebar">
         <ul>
-$if nickname:
+$if logged_in:
                 <li><a href="logoff">Logoff</a></li>
                 <li><a href="manage_account">Manage account</a></li>
-$else:
-                <li><a href="login_form">Login</a></li>
 $ pass
             <li><a href="http://datalove.me/give/widget.html">Widget for website</a></li>
             <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
             <li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
         </ul>
+$if not logged_in:
+        <style type="text/css">
+            input {
+                border: #ffffff 1pt solid;
+                background-color: #000000;
+                font-family: monospace;
+                color: #ffffff;
+                margin: 2px;
+            }
+            
+            input.button {
+                border-left: #ffffff 2pt solid;
+                border-top: #ffffff 2pt solid;
+                border-right: #aaaaaa 2pt solid;
+                border-bottom: #aaaaaa 2pt solid;
+                background-color: #000000;
+                font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
+                font-weight: bold;
+                color: #ffffff;
+                margin: 2px;
+            }
+        </style>
+        <form     name="me.datalove.give.login_form" 
+            class="me.datalove.give.login_form" 
+            method="post" 
+            action="login_action">
+            <p class="about" style="text-align: right;">
+                <span class="input_label" style="font-size: 75%; text-align: right;">Nickname</span><br />
+                <input type="text" name="nickname" style="width: 100%;" /><br />
+                <span class="input_label" style="font-size: 75%; text-align: right;">Password</span><br />
+                <input type="password" name="password" style="width: 100%;" /><br />
+                <a href="register_form" style="font-size: 75%;">Register</a> |
+                <a href="reset_password_form" style="font-size: 75%;">Forgot password?</a> 
+                <input class="button" type="submit" value="Login" /><br />
+            </p>
+        </form>
+$ pass
     </div>
     <div id="content">
-        $:content
-        <!-- Here goes content
-        class="about" == white text (like about text)
-        class="love" == bold red
-        class="datalove" == bold white (like principles text)
-        -->
+$:content
     </div>
     <div class="footer">
     No Copyright, no license. Sorry, no kittehs.<br />

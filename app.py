@@ -23,6 +23,7 @@ test_cookie_text = 'Do you accept cookies?'
 # @see <a href="http://webpy.org/docs/0.3/">Web.py Documentation</a>
 urls = (
 	'/', 'index',
+	'/manage_account', 'manage_account',
 	'/register_action', 'register_action',
 	'/register_form', 'register_form',
 	'/login_action', 'login_action',
@@ -113,7 +114,7 @@ class index:
 			templates = web.template.render(os.path.join(abspath,'templates'))
 			if not session_id or \
 					not db_handler.session_associated_to_any_user(session_id):
-				content = "Some generic about text."
+				content = templates.faq()
 				return templates.index(content)
 			else:
 				nickname, _, available, received = db_handler.get_session(
@@ -122,11 +123,33 @@ class index:
 				content = """<p class="love">Hi %s</p>
 					<p class="about">You have %d datalovez received and %d 
 					waiting to be spread</p>""" % (nickname,received,available)
-				return templates.index(content,nickname)
+				return templates.index(content,nickname != None)
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
 
+## Class for the <tt>/manage_account</tt> URL.
+class manage_account:
+	## Method for a HTTP GET request. 
+	def GET(self):
+		web.header('Content-Type','text/html;charset=utf-8')
+		try:
+			session_id = web.cookies().get(
+					web.config.session_parameters['cookie_name']
+				)
+			templates = web.template.render(os.path.join(abspath,'templates'))
+			if session_id and \
+					db_handler.session_associated_to_any_user(session_id):
+				nickname, email, _, _ = db_handler.get_session(
+						session_id
+					)
+				content = templates.manage_account(nickname,email)
+				return templates.index(content,nickname != None)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother(config.host_url)
+			
 ## Class for the <tt>/register_form</tt> URL.
 class register_form:
 	## Method for a HTTP GET request. 

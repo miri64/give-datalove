@@ -1,0 +1,41 @@
+$def with (nickname, email)
+		<style type="text/css">
+			form p.about input {
+				border: #ffffff 1pt solid;
+				background-color: #000000;
+				font-family: monospace;
+				color: #ffffff;
+				margin: 2px;
+			}
+			
+			form p.about input.button {
+				border-left: #ffffff 2pt solid;
+				border-top: #ffffff 2pt solid;
+				border-right: #aaaaaa 2pt solid;
+				border-bottom: #aaaaaa 2pt solid;
+				background-color: #000000;
+				font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
+				font-weight: bold;
+				color: #ffffff;
+				margin: 2px;
+			}
+		</style>
+		<p class="love">Manage Account [<a href='/'>$nickname</a>]</p>
+		<p class="abouth">Change email address:</p>
+		<form method="post" action="change_mail_address_action">
+			<p class="about" style="padding-left: 2em; text-align: right; width: 400px;">
+				Email address: <input type="text" name="email" value="$email" /> <br />
+				<input class="button" type="submit" value="Change" />
+			</p>
+		</form>
+		<p class="abouth">Change Password:</p>
+		<form method="post" action="change_mail_address_action">
+			<p class="about" style="padding-left: 2em; text-align: right; width: 400px;">
+				Old Password: <input type="password" name="old_password" /> <br />
+				New Password: <input type="password" name="new_password" /> <br />
+				Confirm New Password: <input type="password" name="new_password_conf" /> <br />
+				<input class="button" type="submit" value="Change"/>
+			</p>
+		</form>
+		<p class="abouth">Delete account:</p>
+		<p class="about"><a href="/unregister">Do it!</a></p>

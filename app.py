@@ -106,7 +106,6 @@ class index:
 	def GET(self):
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
-			logged_in = True
 			#web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
 			session_id = web.cookies().get(
 					web.config.session_parameters['cookie_name']
@@ -120,7 +119,7 @@ class index:
 				nickname, _, available, received = db_handler.get_session(
 						session_id
 					)
-				content = """<p class="abouth">Hi %s</p>
+				content = """<p class="love">Hi %s</p>
 					<p class="about">You have %d datalovez received and %d 
 					waiting to be spread</p>""" % (nickname,received,available)
 				return templates.index(content,nickname)
@@ -228,8 +227,8 @@ class widget:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
 
-## Class for the <tt>/give_(.*)_datalove</tt> URL where the regular expression 
-#  stands for the user's name.
+## Class for the <tt>/give_([^?$/\\#%\s]+)_datalove</tt> URL where the regular 
+#  expression stands for the user's name.
 class give_user_datalove:
 	## Method for a HTTP GET request. 
 	# @param to_user User the datalove should be given to.
@@ -392,7 +391,7 @@ class change_password_action:
 	def GET(self):
 		raise web.seeother(config.host_url)
 
-## Class for the <tt>/api/(.+)/</tt> URL where the regular 
+## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.
 class get_users_love:
 	## Method for a HTTP GET request. 
@@ -410,8 +409,8 @@ class get_users_love:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
 
-## Class for the <tt>/api/(.+)/available_datalove</tt> URL where the regular 
-#  expression stands for the user's name.
+## Class for the <tt>/api/([^?$/\\#%\s]+)/available_datalove</tt> URL where the 
+#  regular expression stands for the user's name.
 class get_users_available_love:
 	## Method for a HTTP GET request. 
 	# @param nickname The user's nickname
@@ -428,8 +427,8 @@ class get_users_available_love:
 			return '<b>Internal Server Error:</b> ' + str(e)
 
 
-## Class for the <tt>/api/(.+)/received_datalove</tt> URL where the regular 
-#  expression stands for the user's name.
+## Class for the <tt>/api/([^?$/\\#%\s]+)/received_datalove</tt> URL where the 
+#  regular expression stands for the user's name.
 class get_users_received_love:
 	## Method for a HTTP GET request. 
 	# @param nickname The user's nickname
@@ -445,8 +444,8 @@ class get_users_received_love:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
 
-## Class for the <tt>/api/(.+)/give_datalove</tt> URL where the regular 
-#  expression stands for the user's name.
+## Class for the <tt>/api/([^?$/\\#%\s]+)/give_datalove</tt> URL where the 
+#  regular expression stands for the user's name.
 class give_user_datalove_api:
 	## Method for a HTTP GET request. 
 	# @param to_user User the datalove should be given to.

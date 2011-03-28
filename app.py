@@ -204,7 +204,7 @@ class register_action:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(url_path_join(config.host_url,'login_form'))
+		raise web.seeother(config.host_url)
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother(url_path_join(config.host_url,'register_form'))
@@ -262,7 +262,7 @@ class give_user_datalove:
 					url_path_join(config.host_url,'widget?user='+to_user)
 				)
 		else:
-			raise web.seeother(url_path_join(config.host_url,'login_form'))
+			raise web.seeother(config.host_url)
 
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
@@ -474,4 +474,4 @@ class give_user_datalove_api:
 				return '<b>Internal Server Error:</b> ' + str(e)
 			return ''
 		else:
-			raise web.seeother(url_path_join(config.host_url,'login_form'))
+			raise web.seeother(config.host_url)

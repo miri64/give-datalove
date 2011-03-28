@@ -26,8 +26,6 @@ urls = (
 	'/manage_account', 'manage_account',
 	'/register_action', 'register_action',
 	'/register_form', 'register_form',
-	'/login_action', 'login_action',
-	'/login_form', 'login_form',
 	'/widget', 'widget',
 	r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
 	'/logoff', 'logoff',
@@ -210,48 +208,6 @@ class register_action:
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother(url_path_join(config.host_url,'register_form'))
-
-## Class for the <tt>/login_form</tt> URL.
-class login_form:
-	## Method for a HTTP GET request. 
-	def GET(self):
-		web.header('Content-Type','text/html;charset=utf-8')
-		try:
-			session_id = get_session_id()
-			if not db_handler.session_associated_to_any_user(session_id):
-				templates = web.template.render(
-						os.path.join(abspath,'templates')
-					)
-				return templates.login_form()
-		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.host_url)
-
-## Class for the <tt>/login_action</tt> URL.
-class login_action:
-	## Method for a HTTP POST request. 
-	def POST(self):
-		web.header('Content-Type','text/html;charset=utf-8')
-		try:
-			import hashlib
-			i = web.input()
-			session_id = get_session_id()
-			nickname = i.nickname
-			password = dbh.hash_password(nickname,i.password)
-			db_handler.user_login(nickname,password,session_id)
-		except AssertionError, e:
-			return str(e)
-		except dbh.LoginException:
-			return 'Login failed: Nickname or password was wrong. ' + \
-					'<a href="reset_password_form">Reset password?</a>'
-		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.host_url)
-	## Method for a HTTP GET request. 
-	def GET(self):
-		raise web.seeother(url_path_join(config.host_url,'login_form'))
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:

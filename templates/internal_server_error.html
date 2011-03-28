@@ -1,0 +1,9 @@
+$def with (msg = None, error_stack = None)
+$# Is loaded if 500 Internal Server Error is send by the application.
+<h1>500 Internal Server Error</h1>
+$if msg: 
+    <b>Cause: $msg</b>
+$if error_stack: 
+    <pre>
+$error_stack
+    </pre>

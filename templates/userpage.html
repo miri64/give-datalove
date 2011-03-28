@@ -1,6 +1,7 @@
 $def with (nickname,received_datalove,available_datalove)
-<p class="love">Hi $nickname,</p>
-<p class="about">
-	You have $received_datalove datalovez received and $available_datalove
-	waiting to be spread.
-</p>
+$# Is loaded as content on / (with index.html template) if user is logged in.
+		<p class="love">Ohai $nickname,</p>
+		<p class="about">
+			U haz $received_datalove datalovez received and $available_datalove
+			waiting to be spread.
+		</p>

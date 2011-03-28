@@ -112,15 +112,13 @@ class index:
 			templates = web.template.render(os.path.join(abspath,'templates'))
 			if not session_id or \
 					not db_handler.session_associated_to_any_user(session_id):
-				content = templates.faq()
+				content = templates.welcome()
 				return templates.index(content,login_error = login_error)
 			else:
 				nickname, _, available, received = db_handler.get_session(
 						session_id
 					)
-				content = """<p class="love">Hi %s</p>
-					<p class="about">You have %d datalovez received and %d 
-					waiting to be spread</p>""" % (nickname,received,available)
+				content = templates.userpage(nickname,received,available)
 				return templates.index(content,nickname != None,login_error)
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'

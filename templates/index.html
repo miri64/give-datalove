@@ -15,56 +15,54 @@ $def with (content, logged_in = False, login_error = None)
 <div>
     <div id="sidebar">
         <ul>
-$if logged_in:
+            $if logged_in:
                 <li><a href="logoff">Logoff</a></li>
                 <li><a href="manage_account">Manage account</a></li>
-$ pass
             <li><a href="http://datalove.me/give/widget.html">Widget for website</a></li>
             <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
             <li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
         </ul>
-$if not logged_in:
-        <style type="text/css">
-            input {
-                border: #ffffff 1pt solid;
-                background-color: #000000;
-                font-family: monospace;
-                color: #ffffff;
-                margin: 2px;
-            }
-            
-            input.button {
-                border-left: #ffffff 2pt solid;
-                border-top: #ffffff 2pt solid;
-                border-right: #aaaaaa 2pt solid;
-                border-bottom: #aaaaaa 2pt solid;
-                background-color: #000000;
-                font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
-                font-weight: bold;
-                color: #ffffff;
-                margin: 2px;
-            }
-        </style>
-        <form     name="me.datalove.give.login_form" 
-            class="me.datalove.give.login_form" 
-            method="post" 
-            action="#">
-            <div class="about" style="text-align: right;">
-                <span class="input_label" style="font-size: 75%; text-align: right;">Nickname</span><br />
-                <input type="text" name="nickname" style="width: 100%;" /><br />
-                <span class="input_label" style="font-size: 75%; text-align: right;">Password</span><br />
-                <input type="password" name="password" style="width: 100%;" /><br />
-                $if login_error: 
-                    <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px">
-                        $login_error
-                    </div><br />
-                <a href="register_form" style="font-size: 75%;">Register</a> |
-                <a href="reset_password_form" style="font-size: 75%;">Forgot password?</a> 
-                <input class="button" type="submit" value="Login" /><br />
-            </div>
-        </form>
-$ pass
+        $if not logged_in:
+            <style type="text/css">
+                input {
+                    border: #ffffff 1pt solid;
+                    background-color: #000000;
+                    font-family: monospace;
+                    color: #ffffff;
+                    margin: 2px;
+                }
+                
+                input.button {
+                    border-left: #ffffff 2pt solid;
+                    border-top: #ffffff 2pt solid;
+                    border-right: #aaaaaa 2pt solid;
+                    border-bottom: #aaaaaa 2pt solid;
+                    background-color: #000000;
+                    font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
+                    font-weight: bold;
+                    color: #ffffff;
+                    margin: 2px;
+                }
+            </style>
+            <form     name="me.datalove.give.login_form" 
+                class="me.datalove.give.login_form" 
+                method="post" 
+                action="#">
+                <div class="about" style="text-align: right;">
+                    <span class="input_label" style="font-size: 75%; text-align: right;">Nickname</span><br />
+                    <input type="text" name="nickname" style="width: 100%;" /><br />
+                    <span class="input_label" style="font-size: 75%; text-align: right;">Password</span><br />
+                    <input type="password" name="password" style="width: 100%;" /><br />
+                    $if login_error: 
+                        <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px">
+                            $login_error
+                        </div><br />
+                    <a href="register_form" style="font-size: 75%;">Register</a> |
+                    <a href="reset_password_form" style="font-size: 75%;">Forgot password?</a> 
+                    <input class="button" type="submit" value="Login" /><br />
+                </div>
+            </form>
     </div>
     <div id="content">
 $:content

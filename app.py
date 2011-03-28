@@ -5,7 +5,7 @@
 #
 #  No Copyright, no license, comes as it is
 
-import web,os,config
+import web,os,config,traceback
 
 import db_handling as dbh
 
@@ -97,6 +97,27 @@ def url_path_join(a, b):
 			path += '/' + b
 	return path
 
+## Sends the client a HTTP 500 Internal Server Error with a message and an
+#  error stack.
+# @param msg (optional) The error message to this error.
+# @param error_stack (optional) The error stack of 
+# @return The content of the HTTP 500 Internal Server Error message.
+def raise_internal_server_error(msg = None, error_stack = None):
+	web.header('Content-Type','text/html;charset=utf-8')
+	web.ctx.status = '500 Internal Server Error'
+	templates = web.template.render(os.path.join(abspath,'templates'))
+	return templates.internal_server_error(str(msg),str(error_stack))
+
+## Sends the client a HTTP 404 Not Found with a message.
+# @param msg (optional) A message that explains how the searched item was not
+#        found.
+# @return The content of the HTTP 404 Not Found message.
+def raise_not_found(msg):
+	web.header('Content-Type','text/html;charset=utf-8')
+	web.ctx.status = '404 Not Found'
+	templates = web.template.render(os.path.join(abspath,'templates'))
+	return templates.not_found(str(msg))
+
 ## Class for the <tt>/index</tt> URL.
 class index:
 	## Shows the page
@@ -121,8 +142,7 @@ class index:
 				content = templates.userpage(nickname,received,available)
 				return templates.index(content,nickname != None,login_error)
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 	
 	## Handles what happens on login
 	def login_action(self):
@@ -148,9 +168,7 @@ class index:
 					'Password not associated to nickname.'
 				)
 		except BaseException, e:
-			web.header('Content-Type','text/html;charset=utf-8')
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/manage_account</tt> URL, i. e. forms for changing email
@@ -182,8 +200,7 @@ class manage_account:
 					)
 				return templates.index(content,nickname != None)
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 		raise web.seeother(config.host_url)
 		
 	## Method for a HTTP GET request. 
@@ -236,9 +253,7 @@ class manage_account:
 				except dbh.LoginException, e:
 					return self.show(pw_change_error = e)
 		except BaseException, e:
-			web.header('Content-Type','text/html;charset=utf-8')
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 		raise web.seeother(url_path_join(config.host_url,'manage_account'))
 		
 ## Class for the <tt>/register_form</tt> URL.
@@ -250,8 +265,7 @@ class register_form:
 			templates = web.template.render(os.path.join(abspath,'templates'))
 			return templates.register_form()
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 
 ## Class for the <tt>/register_action</tt> URL.
 class register_action:
@@ -269,12 +283,11 @@ class register_action:
 			email = i.email
 			db_handler.create_user(nickname,password,email)
 		except AssertionError, e:
-			return str(e)
+			return e
 		except dbh.UserException, e:
-			return str(e)
+			return e
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 		raise web.seeother(config.host_url)
 	## Method for a HTTP GET request. 
 	def GET(self):
@@ -287,17 +300,16 @@ class widget:
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			i = web.input()
-			user = i.user
-			received_love = db_handler.get_received_love(user)
+			nickname = i.user
+			received_love = db_handler.get_received_love(nickname)
 			templates = web.template.render(os.path.join(abspath,'templates'))
-			return templates.widget(user,received_love)
+			return templates.widget(nickname,received_love)
 		except dbh.UserException,e:
-			return str(e)
+			return e
 		except AttributeError:
 			raise web.seeother(url_path_join(config.host_url,'register_form'))
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 
 ## Class for the <tt>/give_([^?$/\\#%\s]+)_datalove</tt> URL where the regular 
 #  expression stands for the user's name.
@@ -315,20 +327,18 @@ class give_user_datalove:
 		except dbh.IllegalSessionException, e:
 			logged_in = False
 		except AssertionError,e:
-			return str(e)
+			return e
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 		if logged_in:
 			try:
 				db_handler.send_datalove(from_user,to_user,session_id)
 			except AssertionError,e:
-				return str(e)
+				return e
 			except dbh.NotEnoughDataloveException, e:
-				return str(e)
+				return e
 			except BaseException, e:
-				web.ctx.status = '500 Internal Server Error'
-				return '<b>Internal Server Error:</b> ' + str(e)
+				return raise_internal_server_error(e,traceback.format_exc())
 			raise web.seeother(
 					url_path_join(config.host_url,'widget?user='+to_user)
 				)
@@ -346,8 +356,7 @@ class logoff:
 			db_handler.user_logoff(nickname,session_id)
 			session.kill()
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/unregister</tt> URL.
@@ -361,8 +370,7 @@ class unregister:
 			user, _, _, _ = db_handler.get_session(session_id)
 			db_handler.drop_user(user,session_id)
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/reset_password_form</tt> URL.
@@ -374,8 +382,7 @@ class reset_password_form:
 			templates = web.template.render(os.path.join(abspath,'templates'))
 			return templates.reset_password_form()
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 
 ## Class for the <tt>/reset_password_action</tt> URL.
 class reset_password_action:
@@ -389,7 +396,7 @@ class reset_password_action:
 			try:
 				new_password, email_to = db_handler.reset_password(i.nickname)
 			except UserException, e:
-				return str(e)
+				return e
 			email_from = 'password-reset@give.datalove.me'
 			
 			msg_text = "Hello "+i.nickname+",\n"+ \
@@ -406,11 +413,10 @@ class reset_password_action:
 			s.sendmail(email_from,[email_to],msg.as_string())
 			s.quit()
 			
-			return 'Password reset successfully. you should get an e-mail to ' + \
-					'the address you are registered to.'
+			return 'Password reset successfully. you should get an e-mail ' + \
+					'to the address you are registered to.'
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother(url_path_join(config.host_url,'/reset_password_form'))
@@ -424,14 +430,14 @@ class get_users_love:
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			if not db_handler.user_exists(nickname):
-				web.ctx.status = '404 Not Found'
-				return "<b>Not Found:</b> User " + nickname + " does not exist."
+				return raise_not_found(
+						"User '%s' does not exist." % nickname
+					)
 			available_love = db_handler.get_available_love(nickname)
 			received_love = db_handler.get_received_love(nickname)
 			return str(available_love) + ',' + str(received_love)
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/available_datalove</tt> URL where the 
 #  regular expression stands for the user's name.
@@ -442,14 +448,13 @@ class get_users_available_love:
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			if not db_handler.user_exists(nickname):
-				web.ctx.status = '404 Not Found'
-				return "<b>Not Found:</b> User " + nickname + " does not exist."
+				return raise_not_found(
+						"User '%s' does not exist." % nickname
+					)
 			available_love = db_handler.get_available_love(nickname)
 			return str(available_love)
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
-
+			return raise_internal_server_error(e,traceback.format_exc())
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/received_datalove</tt> URL where the 
 #  regular expression stands for the user's name.
@@ -460,13 +465,13 @@ class get_users_received_love:
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			if not db_handler.user_exists(nickname):
-				web.ctx.status = '404 Not Found'
-				return "<b>Not Found:</b> User " + nickname + " does not exist."
+				return raise_not_found(
+						"User '%s' does not exist." % nickname
+					)
 			received_love = db_handler.get_received_love(nickname)
 			return str(received_love)
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/give_datalove</tt> URL where the 
 #  regular expression stands for the user's name.
@@ -478,23 +483,22 @@ class give_user_datalove_api:
 		try:
 			logged_in = True
 			if not db_handler.user_exists(nickname):
-				web.ctx.status = '404 Not Found'
-				return "<b>Not Found:</b> User " + nickname + " does not exist."
+				return raise_not_found(
+						"User '%s' does not exist." % nickname
+					)
 			session_id = get_session_id()
 			from_user, _, _, _ = db_handler.get_session(session_id)
 		except BaseException, e:
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
+			return raise_internal_server_error(e,traceback.format_exc())
 		if logged_in:
 			try:
 				db_handler.send_datalove(from_user,nickname,session_id)
 			except AssertionError,e:
-				return str(e)
+				return e
 			except dbh.NotEnoughDataloveException, e:
-				return str(e)
+				return e
 			except BaseException, e:
-				web.ctx.status = '500 Internal Server Error'
-				return '<b>Internal Server Error:</b> ' + str(e)
-			return ''
+				return raise_internal_server_error(e,traceback.format_exc())
+			return 'SEND'
 		else:
 			raise web.seeother(config.host_url)

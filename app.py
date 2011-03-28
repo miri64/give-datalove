@@ -211,7 +211,36 @@ class manage_account:
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
+    
+    ## Handles what happens on password change
+    def change_password_action(
+                self,
+                nickname,
+                old_password,
+                new_password,
+                new_password_conf
+            ):
+        if new_password != new_password_conf:
+            return self.show(
+                    pw_change_error = "New password and confirmation " +
+                            "of new password were not equal."
+                )
         
+        old_password = dbh.hash_password(
+                nickname,old_password
+            )
+        new_password = dbh.hash_password(
+                nickname,new_password
+            )
+        try:
+            db_handler.change_password(
+                    nickname,
+                    old_password,
+                    new_password
+                )
+        except dbh.LoginException, e:
+            return self.show(pw_change_error = e)
+    
     ## Method for a HTTP GET request. 
     def GET(self):
         return self.show()
@@ -223,7 +252,6 @@ class manage_account:
             nickname, _, _, _ = db_handler.get_session(session_id)
             
             i = web.input() 
-            
             
             session_id = get_session_id()
             user, _, _, _ = db_handler.get_session(session_id)
@@ -241,26 +269,12 @@ class manage_account:
                 except AssertionError, e:
                     return self.show(email_change_error = e)
             elif old_password and new_password and new_password_conf:
-                if new_password != new_password_conf:
-                    return self.show(
-                            pw_change_error = "New password and confirmation " +
-                                    "of new password were not equal."
-                        )
-            
-                old_password = dbh.hash_password(
-                    nickname,old_password
-                )
-                new_password = dbh.hash_password(
-                    nickname,new_password
-                )
-                try:
-                    db_handler.change_password(
-                            nickname,
-                            old_password,
-                            new_password
-                        )
-                except dbh.LoginException, e:
-                    return self.show(pw_change_error = e)
+                self.change_password_action(
+                        nickname,
+                        old_password, 
+                        new_password,
+                        new_password_conf
+                    )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(url_path_join(config.host_url,'manage_account'))

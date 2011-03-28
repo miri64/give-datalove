@@ -1,4 +1,4 @@
-$def with (content, logged_in = False)
+$def with (content, logged_in = False, login_error = None)
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -55,6 +55,7 @@ $if not logged_in:
                 <input type="text" name="nickname" style="width: 100%;" /><br />
                 <span class="input_label" style="font-size: 75%; text-align: right;">Password</span><br />
                 <input type="password" name="password" style="width: 100%;" /><br />
+                $if login_error: <span style="color: #ff0000;">$login_error</span>
                 <a href="register_form" style="font-size: 75%;">Register</a> |
                 <a href="reset_password_form" style="font-size: 75%;">Forgot password?</a> 
                 <input class="button" type="submit" value="Login" /><br />

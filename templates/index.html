@@ -49,13 +49,16 @@ $if not logged_in:
         <form     name="me.datalove.give.login_form" 
             class="me.datalove.give.login_form" 
             method="post" 
-            action="login_action">
+            action="/">
             <p class="about" style="text-align: right;">
                 <span class="input_label" style="font-size: 75%; text-align: right;">Nickname</span><br />
                 <input type="text" name="nickname" style="width: 100%;" /><br />
                 <span class="input_label" style="font-size: 75%; text-align: right;">Password</span><br />
                 <input type="password" name="password" style="width: 100%;" /><br />
-                $if login_error: <span style="color: #ff0000;">$login_error</span>
+                $if login_error: 
+                    <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px">
+                        $login_error
+                    </div>
                 <a href="register_form" style="font-size: 75%;">Register</a> |
                 <a href="reset_password_form" style="font-size: 75%;">Forgot password?</a> 
                 <input class="button" type="submit" value="Login" /><br />

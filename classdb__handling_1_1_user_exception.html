@@ -13,6 +13,43 @@
 <script type="text/javascript"><!--
 var searchBox = new SearchBox("searchBox", "search",false,'Search');
 --></script>
+<script type="text/javascript">
+function hasClass(ele,cls) {
+  return ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
+}
+
+function addClass(ele,cls) {
+  if (!this.hasClass(ele,cls)) ele.className += " "+cls;
+}
+
+function removeClass(ele,cls) {
+  if (hasClass(ele,cls)) {
+    var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+    ele.className=ele.className.replace(reg,' ');
+  }
+}
+
+function toggleVisibility(linkObj) {
+ var base = linkObj.getAttribute('id');
+ var summary = document.getElementById(base + '-summary');
+ var content = document.getElementById(base + '-content');
+ var trigger = document.getElementById(base + '-trigger');
+ if ( hasClass(linkObj,'closed') ) {
+   summary.style.display = 'none';
+   content.style.display = 'block';
+   trigger.src = 'open.png';
+   removeClass(linkObj,'closed');
+   addClass(linkObj,'opened');
+ } else if ( hasClass(linkObj,'opened') ) {
+   summary.style.display = 'block';
+   content.style.display = 'none';
+   trigger.src = 'closed.png';
+   removeClass(linkObj,'opened');
+   addClass(linkObj,'closed');
+ }
+ return false;
+}
+</script>
 <div class="navigation" id="top">
   <div class="tabs">
     <ul class="tablist">
@@ -63,9 +100,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <!-- doxytag: class="db_handling::UserException" --><!-- doxytag: inherits="db_handling::LoginException" -->
 <p>This Exception is raised in any situation that involves the existence of users.  
 <a href="#_details">More...</a></p>
-<div class="dynheader">
-Inheritance diagram for db_handling.UserException:</div>
-<div class="dyncontent">
+<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png"/> Inheritance diagram for db_handling.UserException:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
  <div class="center">
   <img src="classdb__handling_1_1_user_exception.png" usemap="#db_handling.UserException_map" alt=""/>
   <map id="db_handling.UserException_map" name="db_handling.UserException_map">
@@ -167,7 +206,7 @@ Public Attributes</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon Mar 28 2011 22:31:30 for give.datalove.me by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Mar 28 2011 22:57:46 for give.datalove.me by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

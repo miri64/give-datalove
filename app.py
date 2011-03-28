@@ -104,7 +104,7 @@ def url_path_join(a, b):
 ## Class for the <tt>/index</tt> URL.
 class index:
 	## Method for a HTTP GET request. 
-	def GET(self):
+	def show(self, login_error = None):
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			#web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
@@ -115,7 +115,7 @@ class index:
 			if not session_id or \
 					not db_handler.session_associated_to_any_user(session_id):
 				content = templates.faq()
-				return templates.index(content)
+				return templates.index(content,False,login_error)
 			else:
 				nickname, _, available, received = db_handler.get_session(
 						session_id
@@ -123,10 +123,32 @@ class index:
 				content = """<p class="love">Hi %s</p>
 					<p class="about">You have %d datalovez received and %d 
 					waiting to be spread</p>""" % (nickname,received,available)
-				return templates.index(content,nickname != None)
+				return templates.index(content,nickname != None,login_error)
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
+		
+	def GET(self):
+		return self.show()
+	
+	def POST(self):
+		try:
+			import hashlib
+			i = web.input()
+			session_id = get_session_id()
+			nickname = i.nickname
+			password = dbh.hash_password(nickname,i.password)
+			db_handler.user_login(nickname,password,session_id)
+		except AssertionError, e:
+			return self.show(e)
+		except dbh.LoginException:
+			return self.show(
+					'Password not associated to nickname.'
+				)
+		except BaseException, e:
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/manage_account</tt> URL.
 class manage_account:

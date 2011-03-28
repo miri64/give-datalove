@@ -101,7 +101,9 @@ def url_path_join(a, b):
 
 ## Class for the <tt>/index</tt> URL.
 class index:
-	## Method for a HTTP GET request. 
+	## Shows the page
+	# @param login_error Possible errors (as string) that happened during login.
+	# @return String in HTML code of what the side looks like
 	def show(self, login_error = None):
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
@@ -113,7 +115,7 @@ class index:
 			if not session_id or \
 					not db_handler.session_associated_to_any_user(session_id):
 				content = templates.faq()
-				return templates.index(content,False,login_error)
+				return templates.index(content,login_error = login_error)
 			else:
 				nickname, _, available, received = db_handler.get_session(
 						session_id
@@ -125,18 +127,24 @@ class index:
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
-		
+	
+	## Handles what happens on login
+	def login_action(self):
+		import hashlib
+		i = web.input()
+		session_id = get_session_id()
+		nickname = i.nickname
+		password = dbh.hash_password(nickname,i.password)
+		db_handler.user_login(nickname,password,session_id)
+	
+	## Method for a HTTP GET request. 
 	def GET(self):
 		return self.show()
 	
+	## Method for a HTTP POST request. 
 	def POST(self):
 		try:
-			import hashlib
-			i = web.input()
-			session_id = get_session_id()
-			nickname = i.nickname
-			password = dbh.hash_password(nickname,i.password)
-			db_handler.user_login(nickname,password,session_id)
+			self.login_action()
 		except AssertionError, e:
 			return self.show(e)
 		except dbh.LoginException:
@@ -144,14 +152,21 @@ class index:
 					'Password not associated to nickname.'
 				)
 		except BaseException, e:
+			web.header('Content-Type','text/html;charset=utf-8')
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
 		raise web.seeother(config.host_url)
 
-## Class for the <tt>/manage_account</tt> URL.
+## Class for the <tt>/manage_account</tt> URL, i. e. forms for changing email
+#  address and password.
 class manage_account:
-	## Method for a HTTP GET request. 
-	def GET(self):
+	## Shows the page
+	# @param email_change_error Possible errors (as string) that happened 
+	#        during the change of the email address.
+	# @param pw_change_error Possible errors (as string) that happened 
+	#        during the change of the password.
+	# @return String in HTML code of what the side looks like
+	def show(self, email_change_error = None, pw_change_error = None):
 		web.header('Content-Type','text/html;charset=utf-8')
 		try:
 			session_id = web.cookies().get(
@@ -163,13 +178,73 @@ class manage_account:
 				nickname, email, _, _ = db_handler.get_session(
 						session_id
 					)
-				content = templates.manage_account(nickname,email)
+				content = templates.manage_account(
+						nickname,
+						email,
+						email_change_error,
+						pw_change_error
+					)
 				return templates.index(content,nickname != None)
 		except BaseException, e:
 			web.ctx.status = '500 Internal Server Error'
 			return '<b>Internal Server Error:</b> ' + str(e)
 		raise web.seeother(config.host_url)
+		
+	## Method for a HTTP GET request. 
+	def GET(self):
+		return self.show()
+	
+	## Method for a HTTP POST request. 
+	def POST(self):
+		try:
+			session_id = get_session_id()
+			nickname, _, _, _ = db_handler.get_session(session_id)
 			
+			i = web.input() 
+			
+			
+			session_id = get_session_id()
+			user, _, _, _ = db_handler.get_session(session_id)
+			i = web.input()
+			email = i.get('email')
+			old_password = i.get('old_password')
+			new_password = i.get('new_password')
+			new_password_conf = i.get('new_password_conf')
+			
+			if email:
+				try:
+					db_handler.change_email_address(user,session_id,email)
+				except dbh.LoginException, e:
+					return self.show(email_change_error = e)
+				except AssertionError, e:
+					return self.show(email_change_error = e)
+			elif old_password and new_password and new_password_conf:
+				if new_password != new_password_conf:
+					return self.show(
+							pw_change_error = "New password and confirmation " +
+									"of new password were not equal."
+						)
+			
+				old_password = dbh.hash_password(
+					nickname,old_password
+				)
+				new_password = dbh.hash_password(
+					nickname,new_password
+				)
+				try:
+					db_handler.change_password(
+							nickname,
+							old_password,
+							new_password
+						)
+				except dbh.LoginException, e:
+					return self.show(pw_change_error = e)
+		except BaseException, e:
+			web.header('Content-Type','text/html;charset=utf-8')
+			web.ctx.status = '500 Internal Server Error'
+			return '<b>Internal Server Error:</b> ' + str(e)
+		raise web.seeother(url_path_join(config.host_url,'manage_account'))
+		
 ## Class for the <tt>/register_form</tt> URL.
 class register_form:
 	## Method for a HTTP GET request. 
@@ -353,6 +428,10 @@ class change_mail_address_action:
 			user, _, _, _ = db_handler.get_session(session_id)
 			email = web.input().get('email')
 			db_handler.change_email_address(user,session_id,email)
+		except dbh.LoginException, e:
+			return e
+		except AssertionError, e:
+			return e
 		except BaseException, e:
 			web.header('Content-Type','text/html;charset=utf-8')
 			web.ctx.status = '500 Internal Server Error'

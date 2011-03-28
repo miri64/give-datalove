@@ -368,6 +368,10 @@ class DBHandler:
 	# @param email The new email address.
 	# @exception UserException If there is no user with the given 
 	#            <i>nickname</i>.
+	# @exception IllegalSessionException If <tt>session_id</tt> is not 
+	#            associated to <tt>nickname</tt>.
+	# @exception AssertionError If <tt>email</tt> does not contain an '@' 
+	#            character.
 	def change_email_address(self, nickname, session_id, email):
 		if not self.user_exists(nickname):
 			raise UserException('User '+str(nickname)+' does not exist.')
@@ -379,6 +383,10 @@ class DBHandler:
 					str(nickname) + 
 					"."
 				)
+		if('@' not in email):
+				raise AssertionError(
+						"Email address must contain an '@' character."
+					)
 		self.db.update(
 				'users',
 				where="nickname = $nickname",
@@ -468,7 +476,7 @@ class DBHandler:
 		
 		if not self.__check_password__(nickname,old_password):
 				# Raises UserException if user does not exist.
-			raise WrongPasswordException("Wrong password!")
+			raise WrongPasswordException("The old password is wrong!")
 		
 		self.db.update(
 				'users',

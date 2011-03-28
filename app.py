@@ -32,8 +32,6 @@ urls = (
 	'/unregister', 'unregister',
 	'/reset_password_form', 'reset_password_form',
 	'/reset_password_action', 'reset_password_action',
-	'/change_mail_address_action','change_mail_address_action',
-	'/change_password_action', 'change_password_action',
 	r'/api/([^?$/\\#%\s]+)','get_users_love',
 	r'/api/([^?$/\\#%\s]+)/','get_users_love',
 	r'/api/([^?$/\\#%\s]+)/available_datalove', 'get_users_available_love',
@@ -418,58 +416,6 @@ class reset_password_action:
 	## Method for a HTTP GET request. 
 	def GET(self):
 		raise web.seeother(url_path_join(config.host_url,'/reset_password_form'))
-
-## Class for the <tt>/change_mail_address_action</tt> URL.
-class change_mail_address_action:
-	## Method for a HTTP POST request. 
-	def POST(self):
-		try:
-			session_id = get_session_id()
-			user, _, _, _ = db_handler.get_session(session_id)
-			email = web.input().get('email')
-			db_handler.change_email_address(user,session_id,email)
-		except dbh.LoginException, e:
-			return e
-		except AssertionError, e:
-			return e
-		except BaseException, e:
-			web.header('Content-Type','text/html;charset=utf-8')
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.host_url)
-	## Method for a HTTP GET request. 
-	def GET(self):
-		raise web.seeother(config.host_url)
-
-## Class for the <tt>/change_password_action</tt> URL.
-class change_password_action:
-	## Method for a HTTP POST request. 
-	def POST(self):
-		try:
-			session_id = get_session_id()
-			nickname, _, _, _ = db_handler.get_session(session_id)
-			
-			i = web.input() 
-			
-			if i.new_password != i.new_password_conf:
-				return "New password and confirmation of new password "+ \
-						"were not equal."
-			
-			old_password = dbh.hash_password(
-					nickname,i.old_password
-				)
-			new_password = dbh.hash_password(
-					nickname,i.new_password
-				)
-			db_handler.change_password(nickname,old_password,new_password)
-		except BaseException, e:
-			web.header('Content-Type','text/html;charset=utf-8')
-			web.ctx.status = '500 Internal Server Error'
-			return '<b>Internal Server Error:</b> ' + str(e)
-		raise web.seeother(config.host_url)
-	## Method for a HTTP GET request. 
-	def GET(self):
-		raise web.seeother(config.host_url)
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.

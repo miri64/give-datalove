@@ -35,7 +35,7 @@ $# The standard frame for all pages.
         font-size: 8px;
         position: fixed;
         top: 56px;
-        left: 5px
+        left: 5px;
     }
     
 </style>
@@ -44,11 +44,11 @@ $# The standard frame for all pages.
 <body>
 <a href="give_${user}_datalove">
     <div class="widget">
-        $if error: 
-            <span style="background-color: #ffffff">$error</span>
         <div class="received_love">
             ${"%012d" % received_love}
         </div>
+        $if error: 
+            <span style="background-color: #ffffff">$error</span>
     </div>
 </a>
 </body>

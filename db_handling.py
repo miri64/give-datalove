@@ -528,8 +528,7 @@ class DBHandler:
             datalove_points = 1):
         if from_nickname == to_nickname:
             raise AssertionError(
-                    "Don't be so data-narcistic. " + 
-                    "Share the datalove with other users."
+                    "Share datalove with other users, not yourself."
                 )
                 
         if(datalove_points < 0):

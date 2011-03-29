@@ -68,7 +68,9 @@ app = web.application(urls, globals())
 store = web.session.DBStore(db, 'sessions')
 
 ## The applications session object.
-session = web.session.Session(app, store)
+session = web.session.Session(app, store, initializer={'spend_love': dict()})
+# spend_love counts the amount of love spend to a user when not logged in
+# if the user is logged in, this love is automatically spend.
 
 ## The mod_wsgi application function.
 #  @see <a href="https://code.google.com/p/modwsgi/wiki/WhereToGetHelp?tm=6">
@@ -134,9 +136,7 @@ class index:
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
-            session_id = web.cookies().get(
-                    web.config.session_parameters['cookie_name']
-                )
+            session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
@@ -163,7 +163,12 @@ class index:
         nickname = i.nickname
         password = dbh.hash_password(nickname,i.password)
         db_handler.user_login(nickname,password,session_id)
-    
+        # spend love that was spend, while not logged in
+        for to_user,datalovez in session.spend_love.items():
+            if to_user != nickname:
+                db_handler.send_datalove(nickname,to_user,session_id,datalovez)
+            session.spend_love[to_user] = 0
+        
     ## Method for a HTTP GET request. 
     def GET(self):
         return self.show()
@@ -194,9 +199,7 @@ class manage_account:
     def show(self, email_change_error = None, pw_change_error = None):
         try:
             web.header('Content-Type','text/html;charset=utf-8')
-            session_id = web.cookies().get(
-                    web.config.session_parameters['cookie_name']
-                )
+            session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
             if session_id and \
                     db_handler.session_associated_to_any_user(session_id):
@@ -376,9 +379,17 @@ class give_user_datalove:
             if not db_handler.user_exists(to_user):
                 return "User does not exist."
             session_id = get_session_id()
+            if not db_handler.session_associated_to_any_user(session_id):
+                templates = web.template.render(
+                        os.path.join(abspath,'templates')
+                    )
+                
+                if to_user in session.spend_love:
+                    session.spend_love[to_user] += 1
+                else:
+                    session.spend_love[to_user] = 1
+                return templates.no_login_widget()
             from_user, _, _, _ = db_handler.get_session(session_id)
-        except dbh.IllegalSessionException, e:
-            logged_in = False
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
@@ -405,9 +416,6 @@ class give_user_datalove:
                             config.host_url,'widget?user=%s' % to_user
                         )
                 )
-        else:
-            raise web.seeother(config.host_url)
-
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
     ## Method for a HTTP GET request. 
@@ -445,9 +453,7 @@ class reset_password:
     def show(self, nickname = None, error = None, success = False):
         try:
             web.header('Content-Type','text/html;charset=utf-8')
-            session_id = web.cookies().get(
-                    web.config.session_parameters['cookie_name']
-                )
+            session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
             content = templates.reset_password_form(nickname,error,success)
             return templates.index(

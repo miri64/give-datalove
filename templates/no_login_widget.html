@@ -1,4 +1,4 @@
-$def with (user, received_love, error = None)
+$def with ()
 $# The standard frame for all pages.
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -12,7 +12,7 @@ $# The standard frame for all pages.
     }
     
     .widget {
-        color: #ff0000;
+        color: #ffffff;
         text-align: center;
         padding-top: 3px;
         font-family: "Lucida Sans", "DejaVu Sans", "Bitstream Vera Sans", "Liberation Sans", Verdana, "Verdana Ref", sans-serif;
@@ -22,34 +22,26 @@ $# The standard frame for all pages.
         left: 0px;
         width: 70px;
         height: 71px;
-        background-image: url(http://datalove.me/give/widget_off.png);
     }
     
-    .widget:hover {
-        background-image: url(http://datalove.me/give/widget_over.png);
-    }
     
-    .received_love {
-        color: #ff0000;
-        font-family: monospace;
-        font-size: 8px;
-        position: fixed;
-        top: 56px;
-        left: 5px
+    a {
+        color:#d90000;
+        text-decoration:none;
     }
-    
+
+    a:hover {
+        border-bottom:1px dotted white;
+    }
 </style>
 <title>~~~~=:) - give.datalove.me - (:=~~~~</title>
 </head>
 <body>
-<a href="give_${user}_datalove">
     <div class="widget">
-        $if error: 
-            <span style="background-color: #ffffff">$error</span>
         <div class="received_love">
-            ${"%012d" % received_love}
+            You are not logged in yet. 
+            <a href="/" target="_blank">Log in?</a>
         </div>
     </div>
-</a>
 </body>
 </html>

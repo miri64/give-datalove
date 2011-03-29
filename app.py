@@ -285,7 +285,7 @@ class manage_account:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(url_path_join(config.host_url,'manage_account'))
         
-## Class for the <tt>/register_form</tt> URL.
+## Class for the <tt>/register</tt> URL.
 class register:
     ## Shows the page.
     # @param nickname The nickname to register.
@@ -357,7 +357,7 @@ class widget:
         except dbh.UserException,e:
             return e
         except AttributeError:
-            raise web.seeother(url_path_join(config.host_url,'register_form'))
+            raise web.seeother(url_path_join(config.host_url,'register'))
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
 

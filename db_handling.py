@@ -541,7 +541,6 @@ class DBHandler:
             raise AssertionError(
                     "Share datalove with other users, not yourself."
                 )
-                
         if(datalove_points < 0):
             raise ValueError(
                     "datalove_points must be positive. It is " + 
@@ -583,12 +582,13 @@ class DBHandler:
                         available_love=to_user.available_love,
                         received_love=to_user.received_love
                     )
+                return actually_spend_love
             else:
                 raise NotEnoughDataloveException(
                         from_nickname + 
                         " has not enough datalovepoints to spend."
                     )
-        return actually_spend_love
+        return 0
     
     ## Returns the user's amount of available datalove points.
     # @param nickname Some user's nickname.

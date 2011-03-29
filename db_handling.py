@@ -113,6 +113,7 @@ class NotEnoughDataloveException(Exception):
 # @param password password to hash.
 # @return SHA-256 hash of the password as an hexadecimal number string
 def hash_password(nickname,password):
+    nickname = nickname.lower()
     if(not nickname or not password):
         raise AssertionError("Nickname or Password not set.")
     salt = sum([ord(char) for char in nickname]) % len(nickname)
@@ -170,6 +171,7 @@ class DBHandler:
     def create_user(self, nickname, password, email = None, 
                     available_love = DEFAULT_STARTING_LOVE, 
                     pw_as_hash = True):
+        nickname = nickname.lower()
         if(not nickname or not password):
             raise AssertionError("Nickname or Password not set.")
         if len(nickname) > MAX_NICK_LEN:
@@ -232,6 +234,7 @@ class DBHandler:
     # @exception IllegalSessionException Is raised if the <i>session_id</i> is 
     #            not associated to the user identified by <i>nickname</i>.
     def drop_user(self, nickname, session_id):
+        nickname = nickname.lower()
         if not self.user_exists(nickname):
             raise UserException('User '+str(nickname)+' does not exist.')
         if not self.__check_session_id__(nickname,session_id):
@@ -268,6 +271,7 @@ class DBHandler:
     #            is set <tt><b>True</b></tt> or if the <i>password</i> is just 
     #            wrong.
     def user_login(self, nickname, password, session_id, pw_as_hash = True):
+        nickname = nickname.lower()
         if self.session_associated_to_any_user(session_id):
             raise AssertionError(
                     "There is already a user logged in with this session. " +
@@ -319,6 +323,7 @@ class DBHandler:
     # @exception IllegalSessionException Is raised if the <i>session_id</i> 
     #             is not associated to the user identified by <i>nickname</i>.
     def user_logoff(self, nickname, session_id):
+        nickname = nickname.lower()
         if not self.user_exists(nickname):
             raise UserException('User ' + nickname + ' does not exist.')
         if not self.__check_session_id__(nickname, session_id):
@@ -373,6 +378,7 @@ class DBHandler:
     # @exception AssertionError If <tt>email</tt> does not contain an '@' 
     #            character.
     def change_email_address(self, nickname, session_id, email):
+        nickname = nickname.lower()
         if not self.user_exists(nickname):
             raise UserException('User '+str(nickname)+' does not exist.')
         if not self.__check_session_id__(nickname, session_id):
@@ -394,7 +400,7 @@ class DBHandler:
                 email=email
             )
     
-    ## Resets the password to a randomly generated 4 character string (using 
+    ## Resets the password to a randomly generated 8 character string (using 
     #  the shell command <tt>pwgen -1</tt>)
     # @param nickname The user's nickname.
     # @exception UserException Is raised if there is no user with the given 
@@ -404,6 +410,7 @@ class DBHandler:
     # @returns A tuple consisting of the new generated password and the user's 
     #          email address where to send it to.
     def reset_password(self, nickname):
+        nickname = nickname.lower()
         user = self.__select_user__(
                 'email', 
                 nickname
@@ -459,6 +466,7 @@ class DBHandler:
     #            <i>nickname</i>.
     def change_password(self, nickname, old_password, new_password, 
             pw_as_hash = True):
+        nickname = nickname.lower()
         if not pw_as_hash:
             old_password = hash_password(nickname,old_password)
             new_password = hash_password(nickname,new_password)
@@ -498,6 +506,7 @@ class DBHandler:
         if nicknames == None: nicknames = all_nicknames
         points = dict()
         for i,nickname in enumerate(all_nicknames):
+            nickname = nickname.lower()
             if nickname in nicknames:
                 user = users[i]
                 self.db.update(
@@ -526,6 +535,8 @@ class DBHandler:
     # @returns The actual amount of datalove points spend.
     def send_datalove(self, from_nickname, to_nickname, session_id, 
             datalove_points = 1):
+        from_nickname = from_nickname.lower()
+        to_nickname = to_nickname.lower()
         if from_nickname == to_nickname:
             raise AssertionError(
                     "Share datalove with other users, not yourself."
@@ -585,6 +596,7 @@ class DBHandler:
     #            <i>nickname</i>.
     # @returns The amount of available datalove of the user.
     def get_available_love(self,nickname):
+        nickname = nickname.lower()
         user = self.__select_user__('available_love',nickname)
                 # Raises UserException if user does not exist.
         return int(user.available_love)
@@ -595,6 +607,7 @@ class DBHandler:
     #            <i>nickname</i>.
     # @returns The amount of received datalove of the user.
     def get_received_love(self,nickname):
+        nickname = nickname.lower()
         user = self.__select_user__('received_love',nickname)
                 # Raises UserException if user does not exist.
         return int(user.received_love)
@@ -604,6 +617,7 @@ class DBHandler:
     # @returns <tt><b>True</b></tt> if the user exists, <tt><b>False</b></tt> if 
     #          he or she does not.
     def user_exists(self,nickname):
+        nickname = nickname.lower()
         rows = self.db.select(
                 'users',
                 where='nickname = $nickname',
@@ -643,6 +657,7 @@ class DBHandler:
     #            <i>nickname</i>.
     # @returns The user's new amount of available datalove points.
     def __update_love__(self,nickname):
+        nickname = nickname.lower()
         user = self.__select_user__(
                 'available_love, last_changed', 
                 nickname
@@ -736,6 +751,7 @@ class DBHandler:
     #    <a href="http://webpy.org/docs/0.3/api#web.utils">ThreadedDict</a></tt> 
     #    object.
     def __select_user__(self,columns,nickname):
+        nickname = nickname.lower()
         rows = self.db.select(
                 'users',
                 what=columns,

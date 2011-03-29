@@ -348,16 +348,18 @@ class widget:
     ## Method for a HTTP GET request. 
     def GET(self):
         web.header('Content-Type','text/html;charset=utf-8')
+        templates = web.template.render(os.path.join(abspath,'templates'))
         try:
             i = web.input()
             nickname = i.user
             received_love = db_handler.get_received_love(nickname)
-            templates = web.template.render(os.path.join(abspath,'templates'))
             return templates.widget(nickname,received_love)
         except dbh.UserException,e:
-            return e
+            i = web.input()
+            nickname = i.user
+            return templates.widget(nickname,0,e)
         except AttributeError:
-            raise web.seeother(url_path_join(config.host_url,'register'))
+            raise web.seeother(config.host_url)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
 

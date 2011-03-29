@@ -379,8 +379,6 @@ class give_user_datalove:
             from_user, _, _, _ = db_handler.get_session(session_id)
         except dbh.IllegalSessionException, e:
             logged_in = False
-        except AssertionError,e:
-            return e
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:

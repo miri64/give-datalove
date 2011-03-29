@@ -165,6 +165,8 @@ class index:
         db_handler.user_login(nickname,password,session_id)
         # spend love that was spend, while not logged in
         for to_user,datalovez in session.spend_love.items():
+            if not db_handler.get_available_love(nickname):
+                break
             if to_user != nickname:
                 db_handler.send_datalove(nickname,to_user,session_id,datalovez)
             session.spend_love[to_user] = 0

@@ -352,13 +352,10 @@ class widget:
         try:
             i = web.input()
             nickname = i.user
+            error = i.get('error')
             received_love = db_handler.get_received_love(nickname)
-            return templates.widget(nickname,received_love)
+            return templates.widget(nickname,received_love,error)
         except dbh.UserException,e:
-            i = web.input()
-            nickname = i.user
-            return templates.widget(nickname,0,e)
-        except AssertionError,e:
             i = web.input()
             nickname = i.user
             return templates.widget(nickname,0,e)
@@ -390,13 +387,25 @@ class give_user_datalove:
             try:
                 db_handler.send_datalove(from_user,to_user,session_id)
             except AssertionError,e:
-                return e
+                raise web.seeother(
+                        url_path_join(
+                                config.host_url,'widget?user=%s&error=%s' 
+                                        % (to_user,e)
+                            )
+                    )
             except dbh.NotEnoughDataloveException, e:
-                return e
+                raise web.seeother(
+                        url_path_join(
+                                config.host_url,'widget?user=%s&error=%s' 
+                                        % (to_user,e)
+                            )
+                    )
             except BaseException, e:
                 return raise_internal_server_error(e,traceback.format_exc())
             raise web.seeother(
-                    url_path_join(config.host_url,'widget?user='+to_user)
+                    url_path_join(
+                            config.host_url,'widget?user=%s' % to_user
+                        )
                 )
         else:
             raise web.seeother(config.host_url)

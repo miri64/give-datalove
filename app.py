@@ -358,6 +358,10 @@ class widget:
             i = web.input()
             nickname = i.user
             return templates.widget(nickname,0,e)
+        except AssertionError,e:
+            i = web.input()
+            nickname = i.user
+            return templates.widget(nickname,0,e)
         except AttributeError:
             raise web.seeother(config.host_url)
         except BaseException, e:

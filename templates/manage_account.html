@@ -27,7 +27,7 @@ $# Is loaded as content on /manage_account (with index.html template).
             <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
                 Email address: <input type="text" name="email" value="$email" /> <br />
                 $if email_change_error:
-                    <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;">
+                    <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
                         $email_change_error
                     </div>
                 <input class="button" type="submit" value="Change email address" />
@@ -40,7 +40,7 @@ $# Is loaded as content on /manage_account (with index.html template).
                 New Password: <input type="password" name="new_password" /> <br />
                 Confirm New Password: <input type="password" name="new_password_conf" /> <br />
                 $if pw_change_error:
-                    <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;">
+                    <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
                         $pw_change_error
                     </div>
                 <input class="button" type="submit" value="Change password"/>

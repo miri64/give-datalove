@@ -1,4 +1,4 @@
-$def with (content, logged_in = False, login_error = None)
+$def with (content, login_block = True, logged_in = False, login_error = None)
 $# The standard frame for all pages.
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -24,7 +24,7 @@ $# The standard frame for all pages.
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
             <li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
         </ul>
-        $if not logged_in:
+        $if login_block:
             <style type="text/css">
                 input {
                     border: #ffffff 1pt solid;
@@ -56,10 +56,10 @@ $# The standard frame for all pages.
                     <span class="input_label" style="font-size: 75%; text-align: right;">Password</span><br />
                     <input type="password" name="password" style="width: 100%;" /><br />
                     $if login_error: 
-                        <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px">
+                        <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
                             $login_error
                         </div><br />
-                    <a href="register_form" style="font-size: 75%;">Register</a> |
+                    <a href="register" style="font-size: 75%;">Register</a> |
                     <a href="reset_password_form" style="font-size: 75%;">Forgot password?</a> 
                     <input class="button" type="submit" value="Login" /><br />
                 </div>

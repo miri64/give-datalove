@@ -33,8 +33,7 @@ test_cookie_text = 'Do you accept cookies?'
 urls = (
     '/', 'index',
     '/manage_account', 'manage_account',
-    '/register_action', 'register_action',
-    '/register_form', 'register_form',
+    '/register', 'register',
     '/widget', 'widget',
     r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
     '/logoff', 'logoff',
@@ -133,8 +132,8 @@ class index:
     # @param login_error Possible errors (as string) that happened during login.
     # @return String in HTML code of what the side looks like
     def show(self, login_error = None):
-        web.header('Content-Type','text/html;charset=utf-8')
         try:
+            web.header('Content-Type','text/html;charset=utf-8')
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
             session_id = web.cookies().get(
                     web.config.session_parameters['cookie_name']
@@ -149,7 +148,11 @@ class index:
                         session_id
                     )
                 content = templates.userpage(nickname,received,available)
-                return templates.index(content,nickname != None,login_error)
+                return templates.index(
+                        content,
+                        logged_in = True,
+                        login_block = False
+                    )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
     
@@ -190,8 +193,8 @@ class manage_account:
     #        during the change of the password.
     # @return String in HTML code of what the side looks like
     def show(self, email_change_error = None, pw_change_error = None):
-        web.header('Content-Type','text/html;charset=utf-8')
         try:
+            web.header('Content-Type','text/html;charset=utf-8')
             session_id = web.cookies().get(
                     web.config.session_parameters['cookie_name']
                 )
@@ -207,7 +210,11 @@ class manage_account:
                         email_change_error,
                         pw_change_error
                     )
-                return templates.index(content,nickname != None)
+                return templates.index(
+                        content,
+                        logged_in = True,
+                        login_block = False
+                    )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
@@ -280,41 +287,60 @@ class manage_account:
         raise web.seeother(url_path_join(config.host_url,'manage_account'))
         
 ## Class for the <tt>/register_form</tt> URL.
-class register_form:
-    ## Method for a HTTP GET request. 
-    def GET(self):
+class register:
+    ## Shows the page
+    # @param registration_error (optional) Possible errors (as string) that 
+    #        happened during registration.
+    # @return String in HTML code of what the side looks like
+    def show(self, nickname = None, email = None, registration_error = None):
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             templates = web.template.render(os.path.join(abspath,'templates'))
-            return templates.register_form()
+            content = templates.register_form(
+                    nickname, 
+                    email, 
+                    registration_error
+                )
+            return templates.index(content,login_block = False)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-
-## Class for the <tt>/register_action</tt> URL.
-class register_action:
+        raise web.seeother(config.host_url)
+        
+    ## Method for a HTTP GET request. 
+    def GET(self):
+        return self.show()
+            
     ## Method for a HTTP POST request. 
     def POST(self):
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             import hashlib
             i = web.input()
-            if i.password != i.conf_password:
-                return "Password and confirmation of password "+ \
-                        "were not equal."
             nickname = i.nickname
-            password = dbh.hash_password(nickname,i.password)
+            password = i.password
             email = i.email
+            if password != i.conf_password:
+                return self.show(
+                        nickname,
+                        email,
+                        "Password and confirmation of password " + 
+                        "were not equal."
+                    )
+            password = dbh.hash_password(nickname,password)
             db_handler.create_user(nickname,password,email)
         except AssertionError, e:
-            return e
+            i = web.input()
+            nickname = i.nickname
+            email = i.email
+            return self.show(nickname,email,e)
         except dbh.UserException, e:
-            return e
+            i = web.input()
+            nickname = i.nickname
+            email = i.email
+            return self.show(nickname,email,e)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
-    ## Method for a HTTP GET request. 
-    def GET(self):
-        raise web.seeother(url_path_join(config.host_url,'register_form'))
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:

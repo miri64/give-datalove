@@ -1,11 +1,42 @@
-<form 	name="me.datalove.give.register_form" 
-		class="me.datalove.give.register_form" 
-		method="post" 
-		action="register_action">
-	<div id="nickname_field">Nickname*: <input type="text" name="nickname" /></div>
-	<div id="password_field">Password*: <input type="password" name="password" /></div>
-	<div id="password_field">Confirm Password*: <input type="password" name="conf_password" /></div>
-	<div id="email_field">E-mail: <input type="text" name="email" /></div>
-	<div id="submit_button"><input type="submit" value="Register" /></div>
-	* This field is mandatory. Note that password recovery is not possible without an e-mail address
-</form>
+$def with (nickname = None, email = None, registration_error = None)
+$# Is loaded as content on /register (with index.html template).
+        <style type="text/css">
+            input {
+                border: #ffffff 1pt solid;
+                background-color: #000000;
+                font-family: monospace;
+                color: #ffffff;
+                margin: 2px;
+            }
+            
+            input.button {
+                border-left: #ffffff 2pt solid;
+                border-top: #ffffff 2pt solid;
+                border-right: #aaaaaa 2pt solid;
+                border-bottom: #aaaaaa 2pt solid;
+                background-color: #000000;
+                font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
+                font-weight: bold;
+                color: #ffffff;
+                margin: 2px;
+            }
+        </style>
+        <p class="love">Register to give.datalove.me</p>
+        <form method="post" action="#">
+            <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
+                Nickname*: <input type="text" name="nickname" value="$nickname" /> <br />
+                Password*: <input type="password" name="password" /> <br />
+                Confirm Password*: <input type="password" name="conf_password" /> <br />
+                E-mail: <input type="text" name="email" value="$email" /> <br />
+                $if registration_error:
+                    <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
+                        $registration_error
+                    </div>
+                <input class="button" type="submit" value="Register account" /> <br />
+                <div style="font-size: 75%;text-align: left;">
+                    * This field is mandatory. Note that password recovery is not possible without an e-mail address
+                </div>
+            </div>
+        </form>
+        <!--Place holder-->
+        <div style="height: 200px">&nbsp;</div>

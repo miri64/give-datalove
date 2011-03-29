@@ -38,8 +38,7 @@ urls = (
     r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
     '/logoff', 'logoff',
     '/unregister', 'unregister',
-    '/reset_password_form', 'reset_password_form',
-    '/reset_password_action', 'reset_password_action',
+    '/reset_password', 'reset_password',
     r'/api/([^?$/\\#%\s]+)','get_users_love',
     r'/api/([^?$/\\#%\s]+)/','get_users_love',
     r'/api/([^?$/\\#%\s]+)/available_datalove', 'get_users_available_love',
@@ -288,7 +287,9 @@ class manage_account:
         
 ## Class for the <tt>/register_form</tt> URL.
 class register:
-    ## Shows the page
+    ## Shows the page.
+    # @param nickname The nickname to register.
+    # @param email The email address associated to the new account.
     # @param registration_error (optional) Possible errors (as string) that 
     #        happened during registration.
     # @return String in HTML code of what the side looks like
@@ -423,21 +424,29 @@ class unregister:
         raise web.seeother(config.host_url)
 
 ## Class for the <tt>/reset_password_form</tt> URL.
-class reset_password_form:
-    ## Method for a HTTP GET request. 
-    def GET(self):
-        web.header('Content-Type','text/html;charset=utf-8')
+class reset_password:
+    ## Shows the page
+    # @param nickname Nickname for the account the password must be reset.
+    # @param error Possible errors during reset.
+    # @return String in HTML code of what the side looks like
+    def show(self, nickname = None, error = None, success = False):
         try:
+            web.header('Content-Type','text/html;charset=utf-8')
+            session_id = web.cookies().get(
+                    web.config.session_parameters['cookie_name']
+                )
             templates = web.template.render(os.path.join(abspath,'templates'))
-            return templates.reset_password_form()
+            content = templates.reset_password_form(nickname,error,success)
+            return templates.index(
+                    content,
+                    logged_in = False,
+                    login_block = True
+                )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-
-## Class for the <tt>/reset_password_action</tt> URL.
-class reset_password_action:
-    ## Method for a HTTP POST request. 
-    def POST(self):
-        web.header('Content-Type','text/html;charset=utf-8')
+        raise web.seeother(config.host_url)
+    
+    def reset_password_action(self):
         try:
             import smtplib
             from email.mime.text import MIMEText
@@ -445,7 +454,8 @@ class reset_password_action:
             try:
                 new_password, email_to = db_handler.reset_password(i.nickname)
             except UserException, e:
-                return e
+                nickname = web.input().get('nickname')
+                return self.show(nickname,e)
             email_from = 'password-reset@give.datalove.me'
             
             msg_text = "Hello "+i.nickname+",\n"+ \
@@ -462,13 +472,17 @@ class reset_password_action:
             s.sendmail(email_from,[email_to],msg.as_string())
             s.quit()
             
-            return 'Password reset successfully. you should get an e-mail ' + \
-                    'to the address you are registered to.'
+            return self.show(success = True)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
+    
     ## Method for a HTTP GET request. 
     def GET(self):
-        raise web.seeother(url_path_join(config.host_url,'/reset_password_form'))
+        return self.show()
+    
+    ## Method for a HTTP POST request. 
+    def POST(self):
+        return self.reset_password_action()
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.

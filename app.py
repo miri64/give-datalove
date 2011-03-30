@@ -18,7 +18,7 @@ import web,os,config,traceback
 
 import db_handling as dbh
 
-web.config.debug = False
+web.config.debug = True
 web.config.session_parameters['cookie_name'] = 'give_datalove_session_id'
 web.config.session_parameters['timeout'] = 2 * 7 * 24 * 60 * 60
         # 2 weeks in seconds
@@ -356,7 +356,11 @@ class widget:
         templates = web.template.render(os.path.join(abspath,'templates'))
         try:
             i = web.input()
-            nickname = i.user
+            nickname = ''
+            if(hasattr(i,'random')):    
+                nickname = random_nickname().GET()
+            else:
+                nickname = i.user
             error = i.get('error')
             received_love = db_handler.get_received_love(nickname)
             return templates.widget(nickname,received_love,error)
@@ -504,6 +508,16 @@ class reset_password:
     ## Method for a HTTP POST request. 
     def POST(self):
         return self.reset_password_action()
+
+## Class for the <tt>/api/([^?$/\\#%\s]+)/random_user</tt> where the regular
+# expression stands for the username.
+#
+class random_nickname:
+    ## Method for a HTTP GET request.
+    #
+    def GET(self):
+        web.header('Content-Type','text/html;charset=utf-8')
+        return db_handler.random_nickname()
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.

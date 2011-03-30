@@ -67,24 +67,75 @@ app = web.application(urls, globals())
 ## The Session store
 store = web.session.DBStore(db, 'sessions')
 
+## Session management that works with session IDs in URL to
+class CookieIndependentSession(web.session.Session):
+    def __init__(self, app, store, initializer=None):
+        self.__dict__['store'] = store
+        self.__dict__['_initializer'] = initializer
+        self.__dict__['_last_cleanup_time'] = 0
+        self.__dict__['_config'] = \
+                web.utils.storage(web.config.session_parameters)
+
+        if app:
+            app.add_processor(self._processor)
+        
+    def _load(self):
+        """Load the session from the store, by the id from cookie"""
+        cookie_name = self._config.cookie_name
+        cookie_domain = self._config.cookie_domain
+        self.session_id = web.cookies().get(cookie_name) or \
+                            web.input().get('sid')
+                
+        # protection against session_id tampering
+        if self.session_id and not self._valid_session_id(self.session_id):
+            self.session_id = None
+
+        self._check_expiry()
+        if self.session_id:
+            d = self.store[self.session_id]
+            self.update(d)
+            self._validate_ip()
+        
+        if not self.session_id:
+            self.session_id = self._generate_session_id()
+
+            if self._initializer:
+                if isinstance(self._initializer, dict):
+                    self.update(self._initializer)
+                elif hasattr(self._initializer, '__call__'):
+                    self._initializer()
+ 
+        self.ip = web.ctx.ip
+
 ## The applications session object.
-session = web.session.Session(app, store, initializer={'spend_love': dict()})
+session = CookieIndependentSession(
+        app, 
+        store, 
+        initializer={'spend_love': dict()}
+    )
 # spend_love counts the amount of love spend to a user when not logged in
 # if the user is logged in, this love is automatically spend.
+session_cookie = True
 
 ## The mod_wsgi application function.
 #  @see <a href="https://code.google.com/p/modwsgi/wiki/WhereToGetHelp?tm=6">
 #       mod_wsga Documentation</a>
 application = app.wsgifunc()    # get web.py application as wsgi application
+    
 
 ## Get the session id from a cookie (or in later implementations the URL).
 #  @returns The current session's session ID.
 def get_session_id():
-    #test = web.cookies().get('test_cookie')
-    #if test == test_cookie_text:
+    global session_cookie
     session_id = web.cookies().get(web.config.session_parameters['cookie_name'])
-    #else:
-    #    session_id = web.input().get('sid')
+    print session_id
+    if not session_id:
+        session_cookie = False
+        session_id = web.input().get('sid')
+        print(web.input())
+    if not session_id:
+        session_id = session.session_id
+    print session_id
     return session_id
 
 ## Joins two fragments of an URL path with an '/' (if needed).
@@ -141,17 +192,32 @@ class index:
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
                 content = templates.welcome()
-                return templates.index(content,login_error = login_error)
+                if session_cookie:
+                    return templates.index(content,login_error = login_error)
+                else:
+                    return templates.index(
+                            content,
+                            session_id = session_id,
+                            login_error = login_error,
+                        )
             else:
                 nickname, _, available, received = db_handler.get_session(
                         session_id
                     )
                 content = templates.userpage(nickname,received,available)
-                return templates.index(
-                        content,
-                        logged_in = True,
-                        login_block = False
-                    )
+                if session_cookie:
+                    return templates.index(
+                            content,
+                            logged_in = True,
+                            login_block = False
+                        )
+                else:
+                    return templates.index(
+                            content,
+                            session_id = session_id,
+                            logged_in = True,
+                            login_block = False
+                        )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
     
@@ -181,13 +247,19 @@ class index:
             self.login_action()
         except AssertionError, e:
             return self.show(e)
+        except dbh.IllegalSessionException,e:
+            return self.show(e)
         except dbh.LoginException:
             return self.show(
                     'Password not associated to nickname.'
                 )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-        raise web.seeother(config.host_url)
+        if session_cookie:
+            raise web.seeother(config.host_url)
+        else:
+            session_id = get_session_id()
+            raise web.seeother(config.host_url+"?sid="+str(session_id))
 
 ## Class for the <tt>/manage_account</tt> URL, i. e. forms for changing email
 #  address and password.
@@ -360,7 +432,7 @@ class widget:
             error = i.get('error')
             received_love = db_handler.get_received_love(nickname)
             return templates.widget(nickname,received_love,error)
-        except dbh.UserException,e:
+        except dbh.LoginException,e:
             i = web.input()
             nickname = i.user
             return templates.widget(nickname,0,e)

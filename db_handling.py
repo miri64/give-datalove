@@ -809,3 +809,12 @@ class DBHandler:
                 vars=locals()
             )
         return received, sent
+
+    def get_total_loverz(self):
+        amount = self.db.query(
+                """SELECT count(nickname) AS amount
+                   FROM users
+                   """,
+                vars=locals()
+            )
+        return amount[0].amount

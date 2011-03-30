@@ -1,4 +1,4 @@
-$def with (content, login_block = True, logged_in = False, session_id = None, login_error = None)
+$def with (content, total_loverz, login_block = True, logged_in = False, session_id = None, login_error = None)
 $# The standard frame for all pages.
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -23,6 +23,7 @@ $else:
             $if logged_in and session_id:
                 <li><a href="logoff?sid=$session_id">Logoff</a></li>
                 <li><a href="manage_account?sid=$session_id">Manage account</a></li>
+                <li><a href="history">History</a></li>
             $if logged_in and not session_id:
                 <li><a href="logoff">Logoff</a></li>
                 <li><a href="manage_account">Manage account</a></li>
@@ -89,6 +90,7 @@ $else:
 $:content
     </div>
     <div class="footer">
+	<span style="font-weight:bold">There are $total_loverz dataloverz registered!</span><br />
     No Copyright, no license. Sorry, no kittehs.<br />
     Version 1.0 - beating heart <br />
     Part of the Telecomix Network.<br />

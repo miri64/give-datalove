@@ -189,14 +189,16 @@ class index:
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
             session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
+            total_loverz = db_handler.get_total_loverz()
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
                 content = templates.welcome()
                 if session_cookie:
-                    return templates.index(content,login_error = login_error)
+                    return templates.index(content, total_loverz = total_loverz,login_error = login_error)
                 else:
                     return templates.index(
                             content,
+                            total_loverz = total_loverz,
                             session_id = session_id,
                             login_error = login_error,
                         )
@@ -208,12 +210,14 @@ class index:
                 if session_cookie:
                     return templates.index(
                             content,
+                            total_loverz = total_loverz,
                             logged_in = True,
                             login_block = False
                         )
                 else:
                     return templates.index(
                             content,
+                            total_loverz = total_loverz,
                             session_id = session_id,
                             logged_in = True,
                             login_block = False
@@ -280,6 +284,7 @@ class manage_account:
                 nickname, email, _, _ = db_handler.get_session(
                         session_id
                     )
+                total_loverz = db_handler.get_total_loverz()
                 if session_cookie:
                     content = templates.manage_account(
                             nickname,
@@ -289,6 +294,7 @@ class manage_account:
                         )
                     return templates.index(
                             content,
+                            total_loverz = total_loverz,
                             logged_in = True,
                             login_block = False
                         )
@@ -302,6 +308,7 @@ class manage_account:
                         )
                     return templates.index(
                             content,
+                            total_loverz = total_loverz,
                             session_id = session_id,
                             logged_in = True,
                             login_block = False
@@ -397,6 +404,7 @@ class register:
             web.header('Content-Type','text/html;charset=utf-8')
             templates = web.template.render(os.path.join(abspath,'templates'))
             content = ''
+            total_loverz = db_handler.get_total_loverz()
             if session_cookie:
                 content = templates.register_form(
                         nickname, 
@@ -411,7 +419,7 @@ class register:
                         session_id = session_id,
                         registration_error = registration_error
                     )
-            return templates.index(content,login_block = False)
+            return templates.index(content, total_loverz = total_loverz,login_block = False)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         print 'show', session_cookie
@@ -468,15 +476,18 @@ class users:
     def GET(self):
         web.header('Content-Type','text/html;charset=utf-8')
         templates = web.template.render(os.path.join(abspath,'templates'))
+        total_loverz = db_handler.get_total_loverz()
         try:
             users = db_handler.get_users()
+            
             if session_cookie:
                 content = templates.users(users)
             else:
                 session_id = get_session_id()
                 content = templates.users(users,session_id)
             return templates.index(
-                    content, 
+                    content,
+                    total_loverz = total_loverz,
                     login_block = False, 
                     logged_in = True
                 )
@@ -630,6 +641,7 @@ class reset_password:
             web.header('Content-Type','text/html;charset=utf-8')
             session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
+            total_loverz = db_handler.get_total_loverz()
             if session_cookie:
                 content = templates.reset_password_form(
                         nickname,
@@ -645,6 +657,7 @@ class reset_password:
                     )
             return templates.index(
                     content,
+                    total_loverz = total_loverz,
                     logged_in = False,
                     login_block = False
                 )
@@ -796,10 +809,11 @@ class history:
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
             session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'), globals={'alter_time':self.alter_timestamp})
+            total_loverz = db_handler.get_total_loverz()
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
                 content = templates.welcome()
-                return templates.index(content,login_error = login_error)
+                return templates.index(content, total_loverz = total_loverz, login_error = login_error)
             else:
                 nickname, _, available, received = db_handler.get_session(
                         session_id
@@ -810,6 +824,7 @@ class history:
                 content = templates.historypage(received, sent)
                 return templates.index(
                         content,
+                        total_loverz = total_loverz,
                         logged_in = True,
                         login_block = False
                     )

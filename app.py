@@ -278,17 +278,32 @@ class manage_account:
                 nickname, email, _, _ = db_handler.get_session(
                         session_id
                     )
-                content = templates.manage_account(
-                        nickname,
-                        email,
-                        email_change_error,
-                        pw_change_error
-                    )
-                return templates.index(
-                        content,
-                        logged_in = True,
-                        login_block = False
-                    )
+                if session_cookie:
+                    content = templates.manage_account(
+                            nickname,
+                            email,
+                            email_change_error,
+                            pw_change_error
+                        )
+                    return templates.index(
+                            content,
+                            logged_in = True,
+                            login_block = False
+                        )
+                else:
+                    content = templates.manage_account(
+                            nickname,
+                            email,
+                            session_id,
+                            email_change_error,
+                            pw_change_error
+                        )
+                    return templates.index(
+                            content,
+                            session_id = session_id,
+                            logged_in = True,
+                            login_block = False
+                        )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
@@ -358,7 +373,14 @@ class manage_account:
                     )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-        raise web.seeother(url_path_join(config.host_url,'manage_account'))
+        if session_cookie:
+            raise web.seeother(url_path_join(config.host_url,'manage_account'))
+        else:
+            session_id = get_session_id()
+            raise web.seeother(
+                    url_path_join(config.host_url,'manage_account') +
+                    '?sid=' + session_id
+                )
         
 ## Class for the <tt>/register</tt> URL.
 class register:

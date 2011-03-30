@@ -600,7 +600,8 @@ class DBHandler:
         self.db.insert(
                 'history',
                 sender=from_nickname,
-                recipient=to_nickname
+                recipient=to_nickname,
+                amount=actually_spend_love
             )
         return actually_spend_love
     
@@ -792,20 +793,20 @@ class DBHandler:
     # @returns A tuple consisting of tuples with each the sent and received
     #    love.
     def get_history(self, nickname):
-        sent = self.db.query(
-                """SELECT recipient, timestamp
-                   FROM history
-                   WHERE sender = $nickname
-                   ORDER BY timestamp DESC
-                   LIMIT 30""",
+        sent = self.db.select(
+                'history',
+                what='recipient, amount, timestamp',
+                where='sender = $nickname',
+                order='timestamp DESC',
+                limit=30,
                 vars=locals()
             )
-        received = self.db.query(
-                """SELECT sender, timestamp
-                   FROM history
-                   WHERE recipient = $nickname
-                   ORDER BY timestamp DESC
-                   LIMIT 30""",
+        received = self.db.select(
+                'history',
+                what='sender, amount, timestamp',
+                where='recipient = $nickname',
+                order='timestamp DESC',
+                limit=30,
                 vars=locals()
             )
         return received, sent

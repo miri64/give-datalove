@@ -27,10 +27,11 @@ $def with (received, sent)
 <div class="historydiv">
     <p class="abouth">Received</p>
     <table class="historytable">
-    <tr><th>From</th><th>Time</th></tr>
+    <tr><th>From</th><th>Amount</th><th>Time</th></tr>
     $for i in received:
         <tr>
             <td>$i.sender</td>
+            <td style="text-align: center;">$i.amount</td>
             <td>$alter_time(i.timestamp)</td>
         </tr>
     </table>
@@ -38,10 +39,11 @@ $def with (received, sent)
 <div class="historydiv">
     <p class="abouth">Sent</p>
     <table class="historytable">
-    <tr><th>To</th><th>Time</th></tr>
+    <tr><th>To</th><th>Amount</th><th>Time</th></tr>
     $for i in sent:
         <tr>
             <td>$i.recipient</td>
+            <td style="text-align: center;">$i.amount</td>
             <td>$alter_time(i.timestamp)</td>
         </tr>
     </table>

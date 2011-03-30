@@ -120,12 +120,6 @@ session = CookieIndependentSession(
 # if the user is logged in, this love is automatically spend.
 session_cookie = True
 
-## The mod_wsgi application function.
-#  @see <a href="https://code.google.com/p/modwsgi/wiki/WhereToGetHelp?tm=6">
-#       mod_wsga Documentation</a>
-application = app.wsgifunc()    # get web.py application as wsgi application
-    
-
 ## Get the session id from a cookie (or in later implementations the URL).
 #  @returns The current session's session ID.
 def get_session_id():
@@ -834,3 +828,5 @@ class history:
     ## Method for a HTTP GET request. 
     def GET(self):
         return self.show()
+
+if __name__ == '__main__': app.run()

@@ -357,7 +357,12 @@ class users:
         templates = web.template.render(os.path.join(abspath,'templates'))
         try:
             users = db_handler.get_users()
-            return templates.users(users)
+            content = templates.users(users)
+            return templates.index(
+                    content, 
+                    login_block = False, 
+                    logged_in = True
+                )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
 

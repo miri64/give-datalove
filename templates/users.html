@@ -1,40 +1,8 @@
 $def with (users)
 $# A list of registered users
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>~~~~=:) - give.datalove.me - (:=~~~~</title>
-<link rel="stylesheet" type="text/css" media="screen" href="http://datalove.me/datalove.css" />
-<link rel="shortcut icon" type="image/x-icon" href="http://datalove.me/datalove-favicon.png" />
-</head>
-<body>
-    <div id="sidebar">
-        <ul>
-            <li><a href="http://datalove.me/give/widget.html">Widget for website</a></li>
-            <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
-            <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
-            <li><a href="http://give.datalove.me:8080/users">Loverz</a></li>
-            <li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
-        </ul>
-    </div>
-    <div id="content">
-		<ul>
-		$for user in users:
-			<li>${user.nickname} (haz ${user.received_love} datalovez) <a href="give_${user.nickname}_datalove">Give some love</a></li>
-		</ul>
-	</div>
-    <div class="footer">
-    No Copyright, no license. Sorry, no kittehs.<br />
-    Version 1.0 - beating heart <br />
-    Part of the Telecomix Network.<br />
-    <div class="footerrow">
-	    <a href="http://www.telecomix.org"><img src="http://datalove.me/telecomix.gif" border="0"  align="bottom" align="left" /></a>
-    	<a href="http://www.kopimi.com"><img src="http://www.kopimi.com/kopimi/k/mkopimi_gay.gif" border="0"  align="bottom" align="left" /></a>
-		<div class="mails"><span>info [at] datalove [dot] me<br />
-			info [at] werebuild [dot] eu<br />
-			info [at] telecomix [dot] org</span>
-		</div>
-	</div>
-</body>
-</html>
+        <div id="content">
+            <ul>
+                $for user in users:
+                    <li>${user.nickname} (haz ${user.received_love} datalovez) <a href="give_${user.nickname}_datalove">Give some love</a></li>
+            </ul>
+        </div>

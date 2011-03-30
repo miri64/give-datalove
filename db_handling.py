@@ -529,6 +529,9 @@ class DBHandler:
     # @exception AssertionError Is raised if <i>from_nickname</i> and 
     #        <i>to_nickname</i> are the same.
     # @exception ValueError Is raised if <i>datalove_points</i> is negative.
+    # @exception IllegalSessionException Is raised if the <i>session_id</i> 
+    #             is not associated to the user identified by 
+    #             <i>from_nickname</i>.
     # @exception UserException Is raised if any of the given users not exists.
     # @exception NotEnoughDataloveException Is raised if the user has 0 
     #            available datalove points.
@@ -548,47 +551,53 @@ class DBHandler:
                     " currently."
                 )
         
-        if self.__check_session_id__(from_nickname,session_id):
-            from_user_available_love = self.__update_love__(from_nickname)
-                    # Raises UserException if user with from_nickname does not 
-                    # exist.
-            
-            if from_user_available_love > 0:
-                actually_spend_love = min(
-                        from_user_available_love, 
-                        datalove_points
-                    )
-                from_user_available_love -= actually_spend_love
-                to_user = self.__select_user__(
-                        "available_love, received_love",
-                        to_nickname
-                    ) 
-                    # Raises UserException if user with to_nickname does not 
-                    # exist.
-                
-                to_user.available_love += actually_spend_love
-                to_user.received_love += actually_spend_love
-                
-                self.db.update(
-                        'users',
-                        where='nickname = $from_nickname',
-                        vars=locals(), 
-                        available_love=from_user_available_love
-                    )
-                self.db.update(
-                        'users',
-                        where='nickname = $to_nickname',
-                        vars=locals(), 
-                        available_love=to_user.available_love,
-                        received_love=to_user.received_love
-                    )
-                return actually_spend_love
-            else:
-                raise NotEnoughDataloveException(
-                        from_nickname + 
-                        " has not enough datalovepoints to spend."
-                    )
-        return 0
+        if not self.__check_session_id__(from_nickname,session_id):
+            raise IllegalSessionException(
+                    "Session " + 
+                    session_id + 
+                    " not associated to user " + 
+                    from_nickname + 
+                    "."
+                )
+        
+        from_user_available_love = self.__update_love__(from_nickname)
+                # Raises UserException if user with from_nickname does not 
+                # exist.
+        
+        if not from_user_available_love:
+            raise NotEnoughDataloveException(
+                    from_nickname + 
+                    " has not enough datalovepoints to spend."
+                )
+        actually_spend_love = min(
+                from_user_available_love, 
+                datalove_points
+            )
+        from_user_available_love -= actually_spend_love
+        to_user = self.__select_user__(
+                "available_love, received_love",
+                to_nickname
+            ) 
+            # Raises UserException if user with to_nickname does not 
+            # exist.
+        
+        to_user.available_love += actually_spend_love
+        to_user.received_love += actually_spend_love
+        
+        self.db.update(
+                'users',
+                where='nickname = $from_nickname',
+                vars=locals(), 
+                available_love=from_user_available_love
+            )
+        self.db.update(
+                'users',
+                where='nickname = $to_nickname',
+                vars=locals(), 
+                available_love=to_user.available_love,
+                received_love=to_user.received_love
+            )
+        return actually_spend_love
     
     ## Returns the user's amount of available datalove points.
     # @param nickname Some user's nickname.

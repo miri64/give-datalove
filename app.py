@@ -282,8 +282,8 @@ class manage_account:
                     content = templates.manage_account(
                             nickname,
                             email,
-                            email_change_error,
-                            pw_change_error
+                            email_change_error = email_change_error,
+                            pw_change_error = pw_change_error
                         )
                     return templates.index(
                             content,
@@ -294,9 +294,9 @@ class manage_account:
                     content = templates.manage_account(
                             nickname,
                             email,
-                            session_id,
-                            email_change_error,
-                            pw_change_error
+                            session_id = session_id,
+                            email_change_error = email_change_error,
+                            pw_change_error = pw_change_error
                         )
                     return templates.index(
                             content,
@@ -394,15 +394,30 @@ class register:
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             templates = web.template.render(os.path.join(abspath,'templates'))
-            content = templates.register_form(
-                    nickname, 
-                    email, 
-                    registration_error
-                )
+            content = ''
+            if session_cookie:
+                content = templates.register_form(
+                        nickname, 
+                        email, 
+                        registration_error = registration_error
+                    )
+            else:
+                session_id = get_session_id()
+                content = templates.register_form(
+                        nickname, 
+                        email, 
+                        session_id = session_id,
+                        registration_error = registration_error
+                    )
             return templates.index(content,login_block = False)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-        raise web.seeother(config.host_url)
+        print 'show', session_cookie
+        if session_cookie:
+            raise web.seeother(config.host_url)
+        else:
+            session_id = get_session_id()
+            raise web.seeother(config.host_url+'?sid='+session_id)
         
     ## Method for a HTTP GET request. 
     def GET(self):
@@ -438,7 +453,12 @@ class register:
             return self.show(nickname,email,e)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-        raise web.seeother(config.host_url)
+        print 'POST', session_cookie
+        if session_cookie:
+            raise web.seeother(config.host_url)
+        else:
+            session_id = get_session_id()
+            raise web.seeother(config.host_url+'?sid='+session_id)
 
 ## Class for the <tt>/users</tt> URL
 class users:

@@ -35,7 +35,8 @@ urls = (
     '/manage_account', 'manage_account',
     '/register', 'register',
     '/history', 'history',
-    '/widge', 'widget',
+    '/users','users',
+    '/widget', 'widget',
     r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
     '/logoff', 'logoff',
     '/unregister', 'unregister',
@@ -69,24 +70,72 @@ app = web.application(urls, globals())
 ## The Session store
 store = web.session.DBStore(db, 'sessions')
 
+## Session management that works with session IDs in URL to
+class CookieIndependentSession(web.session.Session):
+    def __init__(self, app, store, initializer=None):
+        self.__dict__['store'] = store
+        self.__dict__['_initializer'] = initializer
+        self.__dict__['_last_cleanup_time'] = 0
+        self.__dict__['_config'] = \
+                web.utils.storage(web.config.session_parameters)
+
+        if app:
+            app.add_processor(self._processor)
+        
+    def _load(self):
+        """Load the session from the store, by the id from cookie"""
+        cookie_name = self._config.cookie_name
+        cookie_domain = self._config.cookie_domain
+        self.session_id = web.cookies().get(cookie_name) or \
+                            web.input().get('sid')
+                
+        # protection against session_id tampering
+        if self.session_id and not self._valid_session_id(self.session_id):
+            self.session_id = None
+
+        self._check_expiry()
+        if self.session_id:
+            d = self.store[self.session_id]
+            self.update(d)
+            self._validate_ip()
+        
+        if not self.session_id:
+            self.session_id = self._generate_session_id()
+
+            if self._initializer:
+                if isinstance(self._initializer, dict):
+                    self.update(self._initializer)
+                elif hasattr(self._initializer, '__call__'):
+                    self._initializer()
+ 
+        self.ip = web.ctx.ip
+
 ## The applications session object.
-session = web.session.Session(app, store, initializer={'spend_love': dict()})
+session = CookieIndependentSession(
+        app, 
+        store, 
+        initializer={'spend_love': dict()}
+    )
 # spend_love counts the amount of love spend to a user when not logged in
 # if the user is logged in, this love is automatically spend.
+session_cookie = True
 
 ## The mod_wsgi application function.
 #  @see <a href="https://code.google.com/p/modwsgi/wiki/WhereToGetHelp?tm=6">
 #       mod_wsga Documentation</a>
 application = app.wsgifunc()    # get web.py application as wsgi application
+    
 
 ## Get the session id from a cookie (or in later implementations the URL).
 #  @returns The current session's session ID.
 def get_session_id():
-    #test = web.cookies().get('test_cookie')
-    #if test == test_cookie_text:
+    global session_cookie
     session_id = web.cookies().get(web.config.session_parameters['cookie_name'])
-    #else:
-    #    session_id = web.input().get('sid')
+    if not session_id:
+        session_cookie = False
+        session_id = web.input().get('sid')
+    if not session_id:
+        session_id = session.session_id
     return session_id
 
 ## Joins two fragments of an URL path with an '/' (if needed).
@@ -143,17 +192,32 @@ class index:
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
                 content = templates.welcome()
-                return templates.index(content,login_error = login_error)
+                if session_cookie:
+                    return templates.index(content,login_error = login_error)
+                else:
+                    return templates.index(
+                            content,
+                            session_id = session_id,
+                            login_error = login_error,
+                        )
             else:
                 nickname, _, available, received = db_handler.get_session(
                         session_id
                     )
                 content = templates.userpage(nickname,received,available)
-                return templates.index(
-                        content,
-                        logged_in = True,
-                        login_block = False
-                    )
+                if session_cookie:
+                    return templates.index(
+                            content,
+                            logged_in = True,
+                            login_block = False
+                        )
+                else:
+                    return templates.index(
+                            content,
+                            session_id = session_id,
+                            logged_in = True,
+                            login_block = False
+                        )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
     
@@ -183,13 +247,19 @@ class index:
             self.login_action()
         except AssertionError, e:
             return self.show(e)
+        except dbh.IllegalSessionException,e:
+            return self.show(e)
         except dbh.LoginException:
             return self.show(
                     'Password not associated to nickname.'
                 )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-        raise web.seeother(config.host_url)
+        if session_cookie:
+            raise web.seeother(config.host_url)
+        else:
+            session_id = get_session_id()
+            raise web.seeother(config.host_url+"?sid="+str(session_id))
 
 ## Class for the <tt>/manage_account</tt> URL, i. e. forms for changing email
 #  address and password.
@@ -210,17 +280,32 @@ class manage_account:
                 nickname, email, _, _ = db_handler.get_session(
                         session_id
                     )
-                content = templates.manage_account(
-                        nickname,
-                        email,
-                        email_change_error,
-                        pw_change_error
-                    )
-                return templates.index(
-                        content,
-                        logged_in = True,
-                        login_block = False
-                    )
+                if session_cookie:
+                    content = templates.manage_account(
+                            nickname,
+                            email,
+                            email_change_error = email_change_error,
+                            pw_change_error = pw_change_error
+                        )
+                    return templates.index(
+                            content,
+                            logged_in = True,
+                            login_block = False
+                        )
+                else:
+                    content = templates.manage_account(
+                            nickname,
+                            email,
+                            session_id = session_id,
+                            email_change_error = email_change_error,
+                            pw_change_error = pw_change_error
+                        )
+                    return templates.index(
+                            content,
+                            session_id = session_id,
+                            logged_in = True,
+                            login_block = False
+                        )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
@@ -290,7 +375,14 @@ class manage_account:
                     )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-        raise web.seeother(url_path_join(config.host_url,'manage_account'))
+        if session_cookie:
+            raise web.seeother(url_path_join(config.host_url,'manage_account'))
+        else:
+            session_id = get_session_id()
+            raise web.seeother(
+                    url_path_join(config.host_url,'manage_account') +
+                    '?sid=' + session_id
+                )
         
 ## Class for the <tt>/register</tt> URL.
 class register:
@@ -304,15 +396,30 @@ class register:
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             templates = web.template.render(os.path.join(abspath,'templates'))
-            content = templates.register_form(
-                    nickname, 
-                    email, 
-                    registration_error
-                )
+            content = ''
+            if session_cookie:
+                content = templates.register_form(
+                        nickname, 
+                        email, 
+                        registration_error = registration_error
+                    )
+            else:
+                session_id = get_session_id()
+                content = templates.register_form(
+                        nickname, 
+                        email, 
+                        session_id = session_id,
+                        registration_error = registration_error
+                    )
             return templates.index(content,login_block = False)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-        raise web.seeother(config.host_url)
+        print 'show', session_cookie
+        if session_cookie:
+            raise web.seeother(config.host_url)
+        else:
+            session_id = get_session_id()
+            raise web.seeother(config.host_url+'?sid='+session_id)
         
     ## Method for a HTTP GET request. 
     def GET(self):
@@ -348,7 +455,33 @@ class register:
             return self.show(nickname,email,e)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
-        raise web.seeother(config.host_url)
+        print 'POST', session_cookie
+        if session_cookie:
+            raise web.seeother(config.host_url)
+        else:
+            session_id = get_session_id()
+            raise web.seeother(config.host_url+'?sid='+session_id)
+
+## Class for the <tt>/users</tt> URL
+class users:
+    ## Method for a HTTP GET request.
+    def GET(self):
+        web.header('Content-Type','text/html;charset=utf-8')
+        templates = web.template.render(os.path.join(abspath,'templates'))
+        try:
+            users = db_handler.get_users()
+            if session_cookie:
+                content = templates.users(users)
+            else:
+                session_id = get_session_id()
+                content = templates.users(users,session_id)
+            return templates.index(
+                    content, 
+                    login_block = False, 
+                    logged_in = True
+                )
+        except BaseException, e:
+            return raise_internal_server_error(e,traceback.format_exc())
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:
@@ -356,18 +489,28 @@ class widget:
     def GET(self):
         web.header('Content-Type','text/html;charset=utf-8')
         templates = web.template.render(os.path.join(abspath,'templates'))
+        session_id = get_session_id()
         try:
             i = web.input()
-            nickname = i.user
+            nickname = ''
+            if(hasattr(i,'random')):    
+                nickname = random_nickname().GET()
+            else:
+                nickname = i.user
             error = i.get('error')
             received_love = db_handler.get_received_love(nickname)
-            return templates.widget(nickname,received_love,error)
-        except dbh.UserException,e:
+            return templates.widget(nickname,session_id,received_love,error)
+        except dbh.LoginException,e:
             i = web.input()
             nickname = i.user
-            return templates.widget(nickname,0,e)
+            return templates.widget(nickname,session_id,0,e)
         except AttributeError:
-            raise web.seeother(config.host_url)
+            i = web.input()
+            return templates.widget(
+                    '',
+                    0,
+                    "No user given."
+                )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
 
@@ -383,6 +526,7 @@ class give_user_datalove:
             if not db_handler.user_exists(to_user):
                 return "User does not exist."
             session_id = get_session_id()
+            print session_id
             if not db_handler.session_associated_to_any_user(session_id):
                 templates = web.template.render(
                         os.path.join(abspath,'templates')
@@ -392,7 +536,7 @@ class give_user_datalove:
                     session.spend_love[to_user] += 1
                 else:
                     session.spend_love[to_user] = 1
-                return templates.no_login_widget()
+                return templates.no_login_widget(session_id)
             from_user, _, _, _ = db_handler.get_session(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
@@ -400,26 +544,53 @@ class give_user_datalove:
             try:
                 db_handler.send_datalove(from_user,to_user,session_id)
             except AssertionError,e:
-                raise web.seeother(
-                        url_path_join(
-                                config.host_url,'widget?user=%s&error=%s' 
-                                        % (to_user,e)
-                            )
-                    )
+                if session_cookie:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    'widget?user=%s&error=%s' % (to_user,e)
+                                )
+                        )
+                else:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    'widget?user=%s&error=%s&sid=%s' 
+                                            % (to_user,e,session_id)
+                                )
+                        )
             except dbh.NotEnoughDataloveException, e:
-                raise web.seeother(
-                        url_path_join(
-                                config.host_url,'widget?user=%s&error=%s' 
-                                        % (to_user,e)
-                            )
-                    )
+                if session_cookie:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    'widget?user=%s&error=%s' % (to_user,e)
+                                )
+                        )
+                else:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    'widget?user=%s&error=%s&sid=%s' 
+                                            % (to_user,e,session_id)
+                                )
+                        )
             except BaseException, e:
                 return raise_internal_server_error(e,traceback.format_exc())
-            raise web.seeother(
-                    url_path_join(
-                            config.host_url,'widget?user=%s' % to_user
-                        )
-                )
+            if session_cookie:
+                raise web.seeother(
+                        url_path_join(
+                                config.host_url,'widget?user=%s' % to_user
+                            )
+                    )
+            else:
+                raise web.seeother(
+                        url_path_join(
+                                config.host_url,'widget?user=%s&sid=%s' 
+                                        % (to_user,session_id)
+                            )
+                    )
+            
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
     ## Method for a HTTP GET request. 
@@ -459,11 +630,23 @@ class reset_password:
             web.header('Content-Type','text/html;charset=utf-8')
             session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
-            content = templates.reset_password_form(nickname,error,success)
+            if session_cookie:
+                content = templates.reset_password_form(
+                        nickname,
+                        error = error,
+                        success = success
+                    )
+            else:
+                content = templates.reset_password_form(
+                        nickname,
+                        session_id = session_id,
+                        error = error,
+                        success = success
+                    )
             return templates.index(
                     content,
                     logged_in = False,
-                    login_block = True
+                    login_block = False
                 )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
@@ -476,7 +659,7 @@ class reset_password:
             i = web.input()
             try:
                 new_password, email_to = db_handler.reset_password(i.nickname)
-            except UserException, e:
+            except dbh.UserException, e:
                 nickname = web.input().get('nickname')
                 return self.show(nickname,e)
             email_from = 'password-reset@give.datalove.me'
@@ -506,6 +689,16 @@ class reset_password:
     ## Method for a HTTP POST request. 
     def POST(self):
         return self.reset_password_action()
+
+## Class for the <tt>/api/([^?$/\\#%\s]+)/random_user</tt> where the regular
+# expression stands for the username.
+#
+class random_nickname:
+    ## Method for a HTTP GET request.
+    #
+    def GET(self):
+        web.header('Content-Type','text/html;charset=utf-8')
+        return db_handler.random_nickname()
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.
@@ -591,15 +784,18 @@ class give_user_datalove_api:
 
 ## Class for the <tt>/history/tt> URL.
 class history:
+    
+    def alter_timestamp(self, timestamp):
+        timestamp = timestamp.strftime("%a %d %b,  %H:%M")
+        return timestamp
     ## Shows the page
-    # @param login_error Possible errors (as string) that happened during login.
-    # @return String in HTML code of what the side looks like
+    # @return String in HTML code of what the site looks like
     def show(self, login_error = None):
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
             session_id = get_session_id()
-            templates = web.template.render(os.path.join(abspath,'templates'))
+            templates = web.template.render(os.path.join(abspath,'templates'), globals={'alter_time':self.alter_timestamp})
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
                 content = templates.welcome()
@@ -608,10 +804,10 @@ class history:
                 nickname, _, available, received = db_handler.get_session(
                         session_id
                     )
-                recieved, sent = db_handler.get_history(
+                received, sent = db_handler.get_history(
                         nickname
                 )
-                content = templates.historypage(recieved, sent)
+                content = templates.historypage(received, sent)
                 return templates.index(
                         content,
                         logged_in = True,

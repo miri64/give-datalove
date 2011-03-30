@@ -1,4 +1,4 @@
-$def with (nickname, email, email_change_error = None, pw_change_error = None)
+$def with (nickname, email, session_id = None, email_change_error = None, pw_change_error = None)
 $# Is loaded as content on /manage_account (with index.html template).
         <style type="text/css">
             input {
@@ -21,10 +21,15 @@ $# Is loaded as content on /manage_account (with index.html template).
                 margin: 2px;
             }
         </style>
-        <p class="love">Manage Account [<a href='/'>$nickname</a>]</p>
+        $if session_id:
+            <p class="love">Manage Account [<a href='/?sid=$session_id'>$nickname</a>]</p>
+        $else:
+            <p class="love">Manage Account [<a href='/'>$nickname</a>]</p>
         <p class="abouth">Change email address:</p>
         <form method="post" action="#">
             <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
+                $if session_id:
+                    <input type="hidden" name="sid" value="$session_id">
                 Email address: <input type="text" name="email" value="$email" /> <br />
                 $if email_change_error:
                     <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
@@ -36,6 +41,8 @@ $# Is loaded as content on /manage_account (with index.html template).
         <p class="abouth">Change Password:</p>
         <form method="post" action="#">
             <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
+                $if session_id:
+                    <input type="hidden" name="sid" value="$session_id">
                 Old Password: <input type="password" name="old_password" /> <br />
                 New Password: <input type="password" name="new_password" /> <br />
                 Confirm New Password: <input type="password" name="new_password_conf" /> <br />
@@ -47,4 +54,7 @@ $# Is loaded as content on /manage_account (with index.html template).
             </div>
         </form>
         <p class="abouth">Delete account:</p>
-        <p class="about"><a href="/unregister">Do it!</a></p>
+        $if session_id:
+            <p class="about"><a href="/unregister?sid=$session_id">Do it!</a></p>
+        $else:
+            <p class="about"><a href="/unregister">Do it!</a></p>

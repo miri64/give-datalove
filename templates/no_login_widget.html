@@ -1,4 +1,4 @@
-$def with ()
+$def with (session_id = None)
 $# The standard frame for all pages.
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -40,7 +40,10 @@ $# The standard frame for all pages.
     <div class="widget">
         <div class="received_love">
             You are not logged in yet. 
-            <a href="/" target="_blank">Log in?</a>
+            $if session_id:
+                <a href="/?sid=$session_id" target="_blank">Log in?</a>
+            $else:
+                <a href="/" target="_blank">Log in?</a>
         </div>
     </div>
 </body>

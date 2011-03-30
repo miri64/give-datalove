@@ -1,49 +1,49 @@
-$def with (recieved, sent)
-<div>
-			<p>Recieved</p>
-
-        <table>
-		<tr>
-			<th>
-				From
-			</th>
-			<th>
-				Time
-			</th>
-		</tr>
-        $for i in recieved:
-			<tr>
-				<td>
-				$i.sender
-				</td>
-				<td>
-				$i.timestamp
-				</td>
-			</tr>
-        </table>
+$def with (received, sent)
+<style type="text/css">
+    .historydiv {
+        width:45%;
+        float:left;
+        margin-right:5%;
+        
+    }
+    .historytable {
+        border:2px solid white;
+        border-collapse:collapse;
+        width:100%;
+    }
+    .historytable tr td {
+        margin:0;
+        border:1px solid white;
+        padding:2px 7px;
+        font-size:14px;
+    }
+    .historytable tr th {
+       border-bottom:2px solid white;
+    }
+</style>
+<div style="overflow: hidden; min-height:400px;">
+<p class="love">History</p>
+<p class="about">The last 30 transactions</p>
+<div class="historydiv">
+    <p class="abouth">Received</p>
+    <table class="historytable">
+    <tr><th>From</th><th>Time</th></tr>
+    $for i in received:
+        <tr>
+            <td>$i.sender</td>
+            <td>$alter_time(i.timestamp)</td>
+        </tr>
+    </table>
 </div>
-<div>
-		<p>Sent</p>
-        <table>
-		<tr>
-			<th>
-				To
-			</th>
-			<th>
-				Time
-			</th>
-		</tr>
-        $for i in sent:
-			<tr>
-				<td>
-				$i.reciever
-				</td>
-				<td>
-				$i.timestamp
-				</td>
-			</tr>
-        </table>
+<div class="historydiv">
+    <p class="abouth">Sent</p>
+    <table class="historytable">
+    <tr><th>To</th><th>Time</th></tr>
+    $for i in sent:
+        <tr>
+            <td>$i.recipient</td>
+            <td>$alter_time(i.timestamp)</td>
+        </tr>
+    </table>
 </div>
-
-        <!--Place holder-->
-        <div style="height: 400px">&nbsp;</div>
+</div>

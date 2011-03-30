@@ -1,4 +1,4 @@
-$def with (user, received_love, error = None)
+$def with (user, session_id, received_love, error = None)
 $# The standard frame for all pages.
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -42,7 +42,7 @@ $# The standard frame for all pages.
 <title>~~~~=:) - give.datalove.me - (:=~~~~</title>
 </head>
 <body>
-<a href="give_${user}_datalove">
+<a href="give_${user}_datalove?sid=$session_id">
     <div class="widget">
         <div class="received_love">
             ${"%012d" % received_love}

@@ -600,7 +600,7 @@ class DBHandler:
         self.db.insert(
                 'history',
                 sender=from_nickname,
-                reciever=to_nickname
+                recipient=to_nickname
             )
         return actually_spend_love
     
@@ -626,6 +626,11 @@ class DBHandler:
                 # Raises UserException if user does not exist.
         return int(user.received_love)
     
+    ## Returns a random-ordered list of registered nicknames
+    def get_users(self):
+        users = self.db.select('users',order='RAND()',what='nickname,received_love')
+        return users
+    
     ## Checks the existance of a user.
     # @param nickname Some user's nickname.
     # @returns <tt><b>True</b></tt> if the user exists, <tt><b>False</b></tt> if 
@@ -638,6 +643,12 @@ class DBHandler:
                 vars=locals()
             )
         return len(rows) != 0
+    
+    ## Returns a random username
+    # @returns String containing a randomly picked username
+    def random_nickname(self):
+        user = self.db.select('users',what="nickname",order="RAND()",limit=1)
+        return user[0].nickname
     
     ## Checks the existance of a session.
     # @param session_id Some session's ID.
@@ -776,25 +787,25 @@ class DBHandler:
             raise UserException("User '"+nickname+"' does not exist.")
         return rows[0]
     
-    ## Gets user information is the session is associated to an user.
-    # @param session_id The ID of the web application session the user is 
-    #        currently assossiated with.
-    # @exception IllegalSessionException Is raised if the <i>session_id</i> is 
-    #            not associated to the user identified by <i>nickname</i>.
-    # @returns A tuple consisting of the nickname, the email address, the 
-    #          available love count, and the received love count of the user who
-    #          is associated to the session identified by the <i>session_id</i>
+    ## Gets the last 30 recieved and sent love of the current user
+    # @param nickname The nickname the user is currently assossiated with.
+    # @returns A tuple consisting of tuples with each the sent and received
+    #    love.
     def get_history(self, nickname):
         sent = self.db.query(
-                """SELECT * 
+                """SELECT recipient, timestamp
                    FROM history
-                   WHERE sender = $nickname""",
+                   WHERE sender = $nickname
+                   ORDER BY timestamp DESC
+                   LIMIT 30""",
                 vars=locals()
             )
-        recieved = self.db.query(
-                """SELECT 
+        received = self.db.query(
+                """SELECT sender, timestamp
                    FROM history
-                   WHERE reciever = $nickname""",
+                   WHERE recipient = $nickname
+                   ORDER BY timestamp DESC
+                   LIMIT 30""",
                 vars=locals()
             )
-        return recieved, sent
+        return received, sent

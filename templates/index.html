@@ -1,4 +1,4 @@
-$def with (content, login_block = True, logged_in = False, login_error = None)
+$def with (content, login_block = True, logged_in = False, session_id = None, login_error = None)
 $# The standard frame for all pages.
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -10,18 +10,29 @@ $# The standard frame for all pages.
 </head>
 <body>
 <div class="menu">
-<a href="http://datalove.me/index.html">Principles</a> | <a href="http://datalove.me/images.html">Images</a> | <a href="http://datalove.me/about.html">About</a> | <a href="http://give.datalove.me">give.datalove</a>
+<a href="http://datalove.me/index.html">Principles</a> | <a href="http://datalove.me/images.html">Images</a> | <a href="http://datalove.me/about.html">About</a> | 
+$if session_id:
+    <a href="http://give.datalove.me/?sid=$session_id">give.datalove</a>
+$else:
+    <a href="http://give.datalove.me/">give.datalove</a>
 
 </div>
 <div>
     <div id="sidebar">
         <ul>
-            $if logged_in:
+            $if logged_in and session_id:
+                <li><a href="logoff?sid=$session_id">Logoff</a></li>
+                <li><a href="manage_account?sid=$session_id">Manage account</a></li>
+            $if logged_in and not session_id:
                 <li><a href="logoff">Logoff</a></li>
                 <li><a href="manage_account">Manage account</a></li>
                 <li><a href="history">History</a></li>
             <li><a href="http://datalove.me/give/widget.html">Widget for website</a></li>
             <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
+            $if session_id:
+                <li><a href="users?sid=$session_id">Loverz</a></li>
+            $else:
+                <li><a href="users">Loverz</a></li>
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
             <li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
         </ul>
@@ -46,12 +57,16 @@ $# The standard frame for all pages.
                     color: #ffffff;
                     margin: 2px;
                 }
+                .historydiv {
+                    width:45%;
+                    float:left;
+                }
             </style>
-            <form     name="me.datalove.give.login_form" 
-                class="me.datalove.give.login_form" 
-                method="post" 
+            <form method="post" 
                 action="#">
                 <div class="about" style="text-align: right;">
+                    $if session_id:
+                        <input type="hidden" name="sid" value="$session_id">
                     <span class="input_label" style="font-size: 75%; text-align: right;">Nickname</span><br />
                     <input type="text" name="nickname" style="width: 100%;" /><br />
                     <span class="input_label" style="font-size: 75%; text-align: right;">Password</span><br />
@@ -60,8 +75,12 @@ $# The standard frame for all pages.
                         <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
                             $login_error
                         </div><br />
-                    <a href="register" style="font-size: 75%;">Register</a> |
-                    <a href="reset_password" style="font-size: 75%;">Forgot password?</a> 
+                    $if session_id: 
+                        <a href="register?sid=$session_id" style="font-size: 75%;">Register</a> |
+                        <a href="reset_password?sid=$session_id" style="font-size: 75%;">Forgot password?</a>
+                    $else:
+                        <a href="register" style="font-size: 75%;">Register</a> |
+                        <a href="reset_password" style="font-size: 75%;">Forgot password?</a>
                     <input class="button" type="submit" value="Login" /><br />
                 </div>
             </form>

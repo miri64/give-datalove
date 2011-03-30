@@ -382,7 +382,12 @@ class widget:
             nickname = i.user
             return templates.widget(nickname,0,e)
         except AttributeError:
-            raise web.seeother(config.host_url)
+            i = web.input()
+            return templates.widget(
+                    '',
+                    0,
+                    "No user given."
+                )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
 

@@ -621,6 +621,11 @@ class DBHandler:
                 # Raises UserException if user does not exist.
         return int(user.received_love)
     
+    ## Returns a random-ordered list of registered nicknames
+    def get_users(self):
+        users = self.db.select('users',order='RAND()',what='nickname,received_love')
+        return users
+    
     ## Checks the existance of a user.
     # @param nickname Some user's nickname.
     # @returns <tt><b>True</b></tt> if the user exists, <tt><b>False</b></tt> if 
@@ -633,6 +638,12 @@ class DBHandler:
                 vars=locals()
             )
         return len(rows) != 0
+    
+    ## Returns a random username
+    # @returns String containing a randomly picked username
+    def random_nickname(self):
+        user = self.db.select('users',what="nickname",order="RAND()",limit=1)
+        return user[0].nickname
     
     ## Checks the existance of a session.
     # @param session_id Some session's ID.

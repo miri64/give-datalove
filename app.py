@@ -34,6 +34,7 @@ urls = (
     '/', 'index',
     '/manage_account', 'manage_account',
     '/register', 'register',
+    '/users','users',
     '/widget', 'widget',
     r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
     '/logoff', 'logoff',
@@ -417,6 +418,18 @@ class register:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
 
+## Class for the <tt>/users</tt> URL
+class users:
+    ## Method for a HTTP GET request.
+    def GET(self):
+        web.header('Content-Type','text/html;charset=utf-8')
+        templates = web.template.render(os.path.join(abspath,'templates'))
+        try:
+            users = db_handler.get_users()
+            return templates.users(users)
+        except BaseException, e:
+            return raise_internal_server_error(e,traceback.format_exc())
+
 ## Class for the <tt>/widget</tt> URL.
 class widget:
     ## Method for a HTTP GET request. 
@@ -425,7 +438,11 @@ class widget:
         templates = web.template.render(os.path.join(abspath,'templates'))
         try:
             i = web.input()
-            nickname = i.user
+            nickname = ''
+            if(hasattr(i,'random')):    
+                nickname = random_nickname().GET()
+            else:
+                nickname = i.user
             error = i.get('error')
             received_love = db_handler.get_received_love(nickname)
             return templates.widget(nickname,received_love,error)
@@ -543,7 +560,7 @@ class reset_password:
             i = web.input()
             try:
                 new_password, email_to = db_handler.reset_password(i.nickname)
-            except UserException, e:
+            except dbh.UserException, e:
                 nickname = web.input().get('nickname')
                 return self.show(nickname,e)
             email_from = 'password-reset@give.datalove.me'
@@ -573,6 +590,16 @@ class reset_password:
     ## Method for a HTTP POST request. 
     def POST(self):
         return self.reset_password_action()
+
+## Class for the <tt>/api/([^?$/\\#%\s]+)/random_user</tt> where the regular
+# expression stands for the username.
+#
+class random_nickname:
+    ## Method for a HTTP GET request.
+    #
+    def GET(self):
+        web.header('Content-Type','text/html;charset=utf-8')
+        return db_handler.random_nickname()
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.

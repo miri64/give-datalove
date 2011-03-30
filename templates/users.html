@@ -3,10 +3,10 @@ $# A list of registered users
         <div id="content">
             <ul>
                 $for user in users:
-                    <li>${user.nickname} (haz ${user.received_love} datalovez) 
+                    <li><a href="/user/${user.nickname}">${user.nickname}</a> (haz ${user.received_love} datalovez) 
                     $if session_id:
-                        <a href="give_${user.nickname}_datalove?sid=$session_id">Give some love</a></li>
+                        <a href="/user_give_${user.nickname}_datalove?sid=$session_id">Give some love</a></li>
                     $else:
-                        <a href="give_${user.nickname}_datalove">Give some love</a></li>
+                        <a href="/user_give_${user.nickname}_datalove">Give some love</a></li>
             </ul>
         </div>

@@ -35,6 +35,8 @@ urls = (
     '/manage_account', 'manage_account',
     '/register', 'register',
     '/history', 'history',
+    r'/user/([^?$/\\#%\s]+)','user',
+    r'/user_give_([^?$/\\#%\s]+)_datalove', 'user_give_user_datalove',
     '/users','users',
     '/widget', 'widget',
     r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
@@ -268,7 +270,7 @@ class manage_account:
     # @param pw_change_error Possible errors (as string) that happened 
     #        during the change of the password.
     # @return String in HTML code of what the side looks like
-    def show(self, email_change_error = None, pw_change_error = None):
+    def show(self, email_change_error = None, pw_change_error = None, website_change_error = None):
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             session_id = get_session_id()
@@ -284,7 +286,8 @@ class manage_account:
                             nickname,
                             email,
                             email_change_error = email_change_error,
-                            pw_change_error = pw_change_error
+                            pw_change_error = pw_change_error,
+                            website_change_error = None
                         )
                     return templates.index(
                             content,
@@ -298,7 +301,8 @@ class manage_account:
                             email,
                             session_id = session_id,
                             email_change_error = email_change_error,
-                            pw_change_error = pw_change_error
+                            pw_change_error = pw_change_error,
+                            website_change_error = website_change_error
                         )
                     return templates.index(
                             content,
@@ -356,6 +360,7 @@ class manage_account:
             user, _, _, _ = db_handler.get_session(session_id)
             i = web.input()
             email = i.get('email')
+            website = i.get('website')
             old_password = i.get('old_password')
             new_password = i.get('new_password')
             new_password_conf = i.get('new_password_conf')
@@ -374,6 +379,14 @@ class manage_account:
                         new_password,
                         new_password_conf
                     )
+            elif website:
+                try:
+                    db_handler.change_website(user,session_id,website)
+                except dbh.LoginException, e:
+                    return self.show(website_change_error = e)
+                except AssertionError, e:
+                    return self.show(website_change_error = e)
+                    
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if session_cookie:
@@ -828,5 +841,129 @@ class history:
     ## Method for a HTTP GET request. 
     def GET(self):
         return self.show()
+
+## Class for the <tt>/user/([^?$/\\#%\s]+)/</tt> URL where the regular 
+#  expression stands for the user's name.
+class user:
+    def show(self, nickname, login_error = None):
+        try:
+            web.header('Content-Type','text/html;charset=utf-8')
+            if not db_handler.user_exists(nickname):
+                return raise_not_found(
+                        "User '%s' does not exist." % nickname
+                    )
+            #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
+            session_id = get_session_id()
+            templates = web.template.render(os.path.join(abspath,'templates'))
+            total_loverz = db_handler.get_total_loverz()
+            user = db_handler.get_profile(nickname)
+            i = web.input()
+            error = i.get('error')
+            if not session_id or \
+                    not db_handler.session_associated_to_any_user(session_id):
+                logged_in = False
+                login_block = True
+            else:
+                logged_in = True
+                login_block = False
+                
+            content = templates.profilepage(
+                    nickname,
+                    user,
+                    error,
+                    logged_in = logged_in,
+                    login_block = login_block,
+                    session_id = session_id)
+            
+            return templates.index(
+                    content,
+                    total_loverz = total_loverz,
+                    logged_in = logged_in,
+                    login_block = login_block
+                )
+        except BaseException, e:
+            return raise_internal_server_error(e,traceback.format_exc())
+    ## Method for a HTTP GET request. 
+    # @param nickname The user's nickname
+    def GET(self,nickname):
+        return self.show(nickname)
+
+## Class for the <tt>/give_([^?$/\\#%\s]+)_datalove</tt> URL where the regular 
+#  expression stands for the user's name.
+class user_give_user_datalove:
+    ## Method for a HTTP GET request. 
+    # @param to_user User the datalove should be given to.
+    def GET(self,to_user):
+        web.header('Content-Type','text/html;charset=utf-8')
+        try:
+            logged_in = True
+            if not db_handler.user_exists(to_user):
+                return "User does not exist."
+            session_id = get_session_id()
+            print session_id
+            if not db_handler.session_associated_to_any_user(session_id):
+                templates = web.template.render(
+                        os.path.join(abspath,'templates')
+                    )
+                
+                if to_user in session.spend_love:
+                    session.spend_love[to_user] += 1
+                else:
+                    session.spend_love[to_user] = 1
+                return templates.no_login_widget(session_id)
+            from_user, _, _, _ = db_handler.get_session(session_id)
+        except BaseException, e:
+            return raise_internal_server_error(e,traceback.format_exc())
+        if logged_in:
+            try:
+                db_handler.send_datalove(from_user,to_user,session_id)
+            except AssertionError,e:
+                if session_cookie:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    '/user/%s?error=%s' % (to_user,e)
+                                )
+                        )
+                else:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    '/user/%s?error=%s&sid=%s' 
+                                            % (to_user,e,session_id)
+                                )
+                        )
+            except dbh.NotEnoughDataloveException, e:
+                if session_cookie:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    '/user/%s?error=%s' % (to_user,e)
+                                )
+                        )
+                else:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    '/user/%s?error=%s&sid=%s' 
+                                            % (to_user,e,session_id)
+                                )
+                        )
+            except BaseException, e:
+                return raise_internal_server_error(e,traceback.format_exc())
+            if session_cookie:
+                raise web.seeother(
+                        url_path_join(
+                                config.host_url,'/user/%s' % to_user
+                            )
+                    )
+            else:
+                raise web.seeother(
+                        url_path_join(
+                                config.host_url,'/user/%s?sid=%s' 
+                                        % (to_user,session_id)
+                            )
+                    )
+            
 
 if __name__ == '__main__': app.run()

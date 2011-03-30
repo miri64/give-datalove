@@ -1,6 +1,6 @@
 $def with (nickname,received_datalove,available_datalove)
 $# Is loaded as content on / (with index.html template) if user is logged in.
-        <p class="love">Ohai $nickname,</p>
+        <p class="love">Ohai <a href="/user/$nickname">$nickname</a>,</p>
         <p class="about">
             U haz $received_datalove datalovez received and $available_datalove
             waiting to be spread.

@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS datalovers.history (
 CREATE TABLE IF NOT EXISTS datalovers.users (
     nickname        VARCHAR(23) NOT NULL,
     password        CHAR(64) NOT NULL,
-    email            VARCHAR(30) DEFAULT NULL,
+    email            VARCHAR(50) DEFAULT NULL,
+    website          VARCHAR(50) DEFAULT NULL,
     session_id        CHAR(128) DEFAULT NULL,
     available_love    BIGINT UNSIGNED NOT NULL,
     received_love    BIGINT UNSIGNED NOT NULL DEFAULT 0,

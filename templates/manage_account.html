@@ -1,4 +1,4 @@
-$def with (nickname, email, session_id = None, email_change_error = None, pw_change_error = None)
+$def with (nickname, email, session_id = None, email_change_error = None, pw_change_error = None, website_change_error = None)
 $# Is loaded as content on /manage_account (with index.html template).
         <style type="text/css">
             input {
@@ -49,6 +49,21 @@ $# Is loaded as content on /manage_account (with index.html template).
                 $if pw_change_error:
                     <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
                         $pw_change_error
+                    </div>
+                <input class="button" type="submit" value="Change password"/>
+            </div>
+        </form>
+        
+        <p class="abouth">Profile:</p>
+        <form method="post" action="#">
+            <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
+                $if session_id:
+                    <input type="hidden" name="sid" value="$session_id">
+                Website: <input type="text" name="website" /><br />
+                <span style="font-size: 75%;margin-bottom: 2px;text-align: left;">(The Website where your widget is placed)</span><br />
+                $if website_change_error:
+                    <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
+                        $website_change_error
                     </div>
                 <input class="button" type="submit" value="Change password"/>
             </div>

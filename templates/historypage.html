@@ -30,7 +30,7 @@ $def with (received, sent)
     <tr><th>From</th><th>Amount</th><th>Time</th></tr>
     $for i in received:
         <tr>
-            <td>$i.sender</td>
+            <td><a href="/user/$i.sender">$i.sender</a></td>
             <td style="text-align: center;">$i.amount</td>
             <td>$alter_time(i.timestamp)</td>
         </tr>
@@ -42,7 +42,7 @@ $def with (received, sent)
     <tr><th>To</th><th>Amount</th><th>Time</th></tr>
     $for i in sent:
         <tr>
-            <td>$i.recipient</td>
+            <td><a href="/user/$i.recipient">$i.recipient</a></td>
             <td style="text-align: center;">$i.amount</td>
             <td>$alter_time(i.timestamp)</td>
         </tr>

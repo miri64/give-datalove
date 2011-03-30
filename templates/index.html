@@ -21,19 +21,19 @@ $else:
     <div id="sidebar">
         <ul>
             $if logged_in and session_id:
-                <li><a href="logoff?sid=$session_id">Logoff</a></li>
-                <li><a href="manage_account?sid=$session_id">Manage account</a></li>
-                <li><a href="history">History</a></li>
+                <li><a href="/logoff?sid=$session_id">Logoff</a></li>
+                <li><a href="/manage_account?sid=$session_id">Manage account</a></li>
+                <li><a href="/history?sid=$session_id">History</a></li>
             $if logged_in and not session_id:
-                <li><a href="logoff">Logoff</a></li>
-                <li><a href="manage_account">Manage account</a></li>
-                <li><a href="history">History</a></li>
+                <li><a href="/logoff">Logoff</a></li>
+                <li><a href="/manage_account">Manage account</a></li>
+                <li><a href="/history">History</a></li>
             <li><a href="http://datalove.me/give/widget.html">Widget for website</a></li>
             <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
             $if session_id:
-                <li><a href="users?sid=$session_id">Loverz</a></li>
+                <li><a href="/users?sid=$session_id">Loverz</a></li>
             $else:
-                <li><a href="users">Loverz</a></li>
+                <li><a href="/users">Loverz</a></li>
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
             <li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
         </ul>

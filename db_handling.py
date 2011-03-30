@@ -399,7 +399,39 @@ class DBHandler:
                 vars = locals(),
                 email=email
             )
-    
+
+    ## Changes the website of an user.
+    # @param nickname The user's nickname.
+    # @param session_id The ID of the web application session the user is 
+    #        currently assossiated with.
+    # @param email The new email address.
+    # @exception UserException If there is no user with the given 
+    #            <i>nickname</i>.
+    # @exception IllegalSessionException If <tt>session_id</tt> is not 
+    #            associated to <tt>nickname</tt>.
+    # @exception AssertionError If <tt>email</tt> does not contain an '@' 
+    #            character.
+    def change_website(self, nickname, session_id, website):
+        nickname = nickname.lower()
+        if not self.user_exists(nickname):
+            raise UserException('User '+str(nickname)+' does not exist.')
+        if not self.__check_session_id__(nickname, session_id):
+            raise IllegalSessionException(
+                    "Session " + 
+                    str(session_id) + 
+                    " not associated to user " + 
+                    str(nickname) + 
+                    "."
+                )
+        if(not website.startswith('http://')):
+                website = 'http://' + website
+        self.db.update(
+                'users',
+                where="nickname = $nickname",
+                vars = locals(),
+                website=website
+            )
+
     ## Resets the password to a randomly generated 8 character string (using 
     #  the shell command <tt>pwgen -1</tt>)
     # @param nickname The user's nickname.
@@ -418,7 +450,7 @@ class DBHandler:
             # Raises UserException if user does not exist.
         if not user.email:
             raise UserException(
-                    "The user's email address is not know. " +
+                    "The user's email address is not known. " +
                     "Password reset is only possible with a valid " + 
                     "email address."
                 )
@@ -567,7 +599,7 @@ class DBHandler:
         if not from_user_available_love:
             raise NotEnoughDataloveException(
                     from_nickname + 
-                    " has not enough datalovepoints to spend."
+                    " doesn't have enough datalovepoints to spend."
                 )
         actually_spend_love = min(
                 from_user_available_love, 
@@ -819,3 +851,14 @@ class DBHandler:
                 vars=locals()
             )
         return amount[0].amount
+
+    def get_profile(self, nickname):
+        user = self.db.select(
+                'users',
+                what='available_love, received_love, website',
+                where='nickname = $nickname',
+                vars=locals()
+            )
+        if len(user) == 0:
+            raise UserException("User '"+nickname+"' does not exist.")
+        return user[0]

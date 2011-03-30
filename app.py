@@ -70,8 +70,6 @@ app = web.application(urls, globals())
 ## The Session store
 store = web.session.DBStore(db, 'sessions')
 
-if __name__ == '__main__': app.run()
-
 ## Session management that works with session IDs in URL to
 class CookieIndependentSession(web.session.Session):
     def __init__(self, app, store, initializer=None):
@@ -815,3 +813,5 @@ class history:
     ## Method for a HTTP GET request. 
     def GET(self):
         return self.show()
+
+if __name__ == '__main__': app.run()

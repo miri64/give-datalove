@@ -70,6 +70,8 @@ app = web.application(urls, globals())
 ## The Session store
 store = web.session.DBStore(db, 'sessions')
 
+if __name__ == '__main__': app.run()
+
 ## Session management that works with session IDs in URL to
 class CookieIndependentSession(web.session.Session):
     def __init__(self, app, store, initializer=None):
@@ -119,12 +121,6 @@ session = CookieIndependentSession(
 # spend_love counts the amount of love spend to a user when not logged in
 # if the user is logged in, this love is automatically spend.
 session_cookie = True
-
-## The mod_wsgi application function.
-#  @see <a href="https://code.google.com/p/modwsgi/wiki/WhereToGetHelp?tm=6">
-#       mod_wsga Documentation</a>
-application = app.wsgifunc()    # get web.py application as wsgi application
-    
 
 ## Get the session id from a cookie (or in later implementations the URL).
 #  @returns The current session's session ID.

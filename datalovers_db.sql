@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS datalovers.history (
     amount          INTEGER UNSIGNED NOT NULL DEFAULT 1,
     timestamp       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP 
                         ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (sender,recipient,timestamp),
     CONSTRAINT fk_sender
             FOREIGN KEY (sender)
             REFERENCES datalovers.users (nickname)

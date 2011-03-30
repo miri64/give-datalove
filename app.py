@@ -199,7 +199,7 @@ class index:
                             login_error = login_error,
                         )
             else:
-                nickname, _, available, received = db_handler.get_session(
+                nickname, _, available, received, _ = db_handler.get_session(
                         session_id
                     )
                 content = templates.userpage(nickname,received,available)
@@ -277,7 +277,7 @@ class manage_account:
             templates = web.template.render(os.path.join(abspath,'templates'))
             if session_id and \
                     db_handler.session_associated_to_any_user(session_id):
-                nickname, email, _, _ = db_handler.get_session(
+                nickname, email, _, _, website = db_handler.get_session(
                         session_id
                     )
                 total_loverz = db_handler.get_total_loverz()
@@ -285,6 +285,7 @@ class manage_account:
                     content = templates.manage_account(
                             nickname,
                             email,
+                            website,
                             email_change_error = email_change_error,
                             pw_change_error = pw_change_error,
                             website_change_error = None
@@ -299,6 +300,7 @@ class manage_account:
                     content = templates.manage_account(
                             nickname,
                             email,
+                            website,
                             session_id = session_id,
                             email_change_error = email_change_error,
                             pw_change_error = pw_change_error,
@@ -352,20 +354,19 @@ class manage_account:
     def POST(self):
         try:
             session_id = get_session_id()
-            nickname, _, _, _ = db_handler.get_session(session_id)
+            nickname, _, _, _, _ = db_handler.get_session(session_id)
             
             i = web.input() 
             
             session_id = get_session_id()
-            user, _, _, _ = db_handler.get_session(session_id)
+            user, _, _, _, _ = db_handler.get_session(session_id)
             i = web.input()
             email = i.get('email')
             website = i.get('website')
             old_password = i.get('old_password')
             new_password = i.get('new_password')
             new_password_conf = i.get('new_password_conf')
-            
-            if email:
+            if i.get('change_mail'):
                 try:
                     db_handler.change_email_address(user,session_id,email)
                 except dbh.LoginException, e:
@@ -379,7 +380,7 @@ class manage_account:
                         new_password,
                         new_password_conf
                     )
-            elif website:
+            elif i.get('profile'):
                 try:
                     db_handler.change_website(user,session_id,website)
                 except dbh.LoginException, e:
@@ -503,6 +504,50 @@ class users:
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:
+    ## Shows the page
+    # @param login_error Possible errors (as string) that happened during login.
+    # @return String in HTML code of what the side looks like
+    def show(self, login_error = None):
+        try:
+            web.header('Content-Type','text/html;charset=utf-8')
+            #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
+            session_id = get_session_id()
+            templates = web.template.render(os.path.join(abspath,'templates'))
+            total_loverz = db_handler.get_total_loverz()
+            if not session_id or \
+                    not db_handler.session_associated_to_any_user(session_id):
+                content = templates.welcome()
+                if session_cookie:
+                    return templates.index(content, total_loverz = total_loverz,login_error = login_error)
+                else:
+                    return templates.index(
+                            content,
+                            total_loverz = total_loverz,
+                            session_id = session_id,
+                            login_error = login_error,
+                        )
+            else:
+                nickname, _, available, received, _ = db_handler.get_session(
+                        session_id
+                    )
+                content = templates.widgetpage(nickname)
+                if session_cookie:
+                    return templates.index(
+                            content,
+                            total_loverz = total_loverz,
+                            logged_in = True,
+                            login_block = False
+                        )
+                else:
+                    return templates.index(
+                            content,
+                            total_loverz = total_loverz,
+                            session_id = session_id,
+                            logged_in = True,
+                            login_block = False
+                        )
+        except BaseException, e:
+            return raise_internal_server_error(e,traceback.format_exc())
     ## Method for a HTTP GET request. 
     def GET(self):
         web.header('Content-Type','text/html;charset=utf-8')
@@ -514,7 +559,10 @@ class widget:
             if(hasattr(i,'random')):    
                 nickname = random_nickname().GET()
             else:
-                nickname = i.user
+                try:
+                    nickname = i.user
+                except:
+                    return self.show()
             error = i.get('error')
             received_love = db_handler.get_received_love(nickname)
             return templates.widget(nickname,session_id,received_love,error)
@@ -555,7 +603,7 @@ class give_user_datalove:
                 else:
                     session.spend_love[to_user] = 1
                 return templates.no_login_widget(session_id)
-            from_user, _, _, _ = db_handler.get_session(session_id)
+            from_user, _, _, _, _ = db_handler.get_session(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
@@ -616,7 +664,7 @@ class logoff:
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             session_id = get_session_id()
-            nickname, _, _, _ = db_handler.get_session(session_id)
+            nickname, _, _, _, _ = db_handler.get_session(session_id)
             db_handler.user_logoff(nickname,session_id)
             session.kill()
         except BaseException, e:
@@ -631,7 +679,7 @@ class unregister:
             web.header('Content-Type','text/html;charset=utf-8')
             
             session_id = get_session_id()
-            user, _, _, _ = db_handler.get_session(session_id)
+            user, _, _, _, _ = db_handler.get_session(session_id)
             db_handler.drop_user(user,session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
@@ -786,7 +834,7 @@ class give_user_datalove_api:
                         "User '%s' does not exist." % nickname
                     )
             session_id = get_session_id()
-            from_user, _, _, _ = db_handler.get_session(session_id)
+            from_user, _, _, _, _ = db_handler.get_session(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
@@ -822,7 +870,7 @@ class history:
                 content = templates.welcome()
                 return templates.index(content, total_loverz = total_loverz, login_error = login_error)
             else:
-                nickname, _, available, received = db_handler.get_session(
+                nickname, _, available, received, _ = db_handler.get_session(
                         session_id
                     )
                 received, sent = db_handler.get_history(
@@ -911,7 +959,7 @@ class user_give_user_datalove:
                 else:
                     session.spend_love[to_user] = 1
                 return templates.no_login_widget(session_id)
-            from_user, _, _, _ = db_handler.get_session(session_id)
+            from_user, _, _, _, _ = db_handler.get_session(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:

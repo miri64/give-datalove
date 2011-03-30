@@ -1,4 +1,4 @@
-$def with (nickname, email, session_id = None, email_change_error = None, pw_change_error = None, website_change_error = None)
+$def with (nickname, email, website, session_id = None, email_change_error = None, pw_change_error = None, website_change_error = None)
 $# Is loaded as content on /manage_account (with index.html template).
         <style type="text/css">
             input {
@@ -30,12 +30,16 @@ $# Is loaded as content on /manage_account (with index.html template).
             <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
                 $if session_id:
                     <input type="hidden" name="sid" value="$session_id">
-                Email address: <input type="text" name="email" value="$email" /> <br />
+                Email address: 
+                $if email:
+                    <input type="text" name="email" value="$email"/><br />
+                $else:
+                    <input type="text" name="email"/><br />
                 $if email_change_error:
                     <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
                         $email_change_error
                     </div>
-                <input class="button" type="submit" value="Change email address" />
+                <input class="button" type="submit" name="change_mail" value="Change email address" />
             </div>
         </form>
         <p class="abouth">Change Password:</p>
@@ -59,13 +63,17 @@ $# Is loaded as content on /manage_account (with index.html template).
             <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
                 $if session_id:
                     <input type="hidden" name="sid" value="$session_id">
-                Website: <input type="text" name="website" /><br />
+                Website:
+                $if website:
+                    <input type="text" name="website" value="$website"/><br />
+                $else:
+                    <input type="text" name="website"/><br />
                 <span style="font-size: 75%;margin-bottom: 2px;text-align: left;">(The Website where your widget is placed)</span><br />
                 $if website_change_error:
                     <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
                         $website_change_error
                     </div>
-                <input class="button" type="submit" value="Update Profile"/>
+                <input class="button" type="submit" name="profile" value="Update Profile"/>
             </div>
         </form>
         <p class="abouth">Delete account:</p>

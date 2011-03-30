@@ -368,7 +368,7 @@ class DBHandler:
                     " not associated to a user."
                 )
         row = rows[0]
-        return row.nickname, row.email, row.available_love, row.received_love
+        return row.nickname, row.email, row.available_love, row.received_love, row.website
     
     ## Changes the email address of an user.
     # @param nickname The user's nickname.
@@ -393,22 +393,30 @@ class DBHandler:
                     str(nickname) + 
                     "."
                 )
-        if len(email) > MAX_MAIL_LEN:
-            raise AssertionError(
-                    "Email address to long. Must be at most " + 
-                    str(MAX_MAIL_LEN) + 
-                    " characters long."
+        if len(email) == 0:
+            self.db.update(
+                    'users',
+                    where="nickname = $nickname",
+                    vars = locals(),
+                    email=None
                 )
-        if('@' not in email):
+        else:
+            if len(email) > MAX_MAIL_LEN:
                 raise AssertionError(
-                        "Email address must contain an '@' character."
+                        "Email address to long. Must be at most " + 
+                        str(MAX_MAIL_LEN) + 
+                        " characters long."
                     )
-        self.db.update(
-                'users',
-                where="nickname = $nickname",
-                vars = locals(),
-                email=email
-            )
+            if('@' not in email):
+                    raise AssertionError(
+                            "Email address must contain an '@' character."
+                        )
+            self.db.update(
+                    'users',
+                    where="nickname = $nickname",
+                    vars = locals(),
+                    email=email
+                )
 
     ## Changes the website of an user.
     # @param nickname The user's nickname.
@@ -433,20 +441,29 @@ class DBHandler:
                     str(nickname) + 
                     "."
                 )
-        if len(website) > MAX_WEBSITE_LEN:
-            raise AssertionError(
-                    "Email address to long. Must be at most " + 
-                    str(MAX_WEBSITE_LEN) + 
-                    " characters long."
+        
+        if len(website) == 0:
+            self.db.update(
+                    'users',
+                    where="nickname = $nickname",
+                    vars = locals(),
+                    website=None
                 )
-        if(not website.startswith('http://')):
-                website = 'http://' + website
-        self.db.update(
-                'users',
-                where="nickname = $nickname",
-                vars = locals(),
-                website=website
-            )
+        else:
+            if len(website) > MAX_WEBSITE_LEN:
+                raise AssertionError(
+                        "Email address to long. Must be at most " + 
+                        str(MAX_WEBSITE_LEN) + 
+                        " characters long."
+                    )
+            if(not website.startswith('http://')):
+                    website = 'http://' + website
+            self.db.update(
+                    'users',
+                    where="nickname = $nickname",
+                    vars = locals(),
+                    website=website
+                )
 
     ## Resets the password to a randomly generated 8 character string (using 
     #  the shell command <tt>pwgen -1</tt>)
@@ -765,7 +782,7 @@ class DBHandler:
     #         the session identified by <i>session_id</i> is associated to, 
     #         <tt><b>False</b></tt> if not.
     def __check_session_id__(self, nickname, session_id):
-        nickname_in_db,_,_,_ = self.get_session(session_id)
+        nickname_in_db,_,_,_,_ = self.get_session(session_id)
         return nickname_in_db == nickname
     
     ## Checks if password has a length equal to <tt>\ref PW_HASH_LEN</tt>

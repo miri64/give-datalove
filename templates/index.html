@@ -28,7 +28,10 @@ $else:
                 <li><a href="manage_account">Manage account</a></li>
             <li><a href="http://datalove.me/give/widget.html">Widget for website</a></li>
             <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
-            <li><a href="users">Loverz</a></li>
+            $if session_id:
+                <li><a href="users?sid=$session_id">Loverz</a></li>
+            $else:
+                <li><a href="users">Loverz</a></li>
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
             <li><a href="http://datalove.me/give/api.html" target="_blank">API Documentation</a></li>
         </ul>

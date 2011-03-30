@@ -468,7 +468,11 @@ class users:
         templates = web.template.render(os.path.join(abspath,'templates'))
         try:
             users = db_handler.get_users()
-            content = templates.users(users)
+            if session_cookie:
+                content = templates.users(users)
+            else:
+                session_id = get_session_id()
+                content = templates.users(users,session_id)
             return templates.index(
                     content, 
                     login_block = False, 
@@ -520,6 +524,7 @@ class give_user_datalove:
             if not db_handler.user_exists(to_user):
                 return "User does not exist."
             session_id = get_session_id()
+            print session_id
             if not db_handler.session_associated_to_any_user(session_id):
                 templates = web.template.render(
                         os.path.join(abspath,'templates')

@@ -625,6 +625,12 @@ class DBHandler:
             )
         return len(rows) != 0
     
+    ## Returns a random username
+    # @returns String containing a randomly picked username
+    def random_nickname(self):
+        user = self.db.select('users',what="nickname",order="RAND()",limit=1)
+        return user[0].nickname
+    
     ## Checks the existance of a session.
     # @param session_id Some session's ID.
     # @returns <tt><b>True</b></tt> if the session exists, <tt><b>False</b></tt>

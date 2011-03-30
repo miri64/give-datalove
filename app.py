@@ -436,6 +436,7 @@ class widget:
     def GET(self):
         web.header('Content-Type','text/html;charset=utf-8')
         templates = web.template.render(os.path.join(abspath,'templates'))
+        session_id = get_session_id()
         try:
             i = web.input()
             nickname = ''
@@ -445,11 +446,11 @@ class widget:
                 nickname = i.user
             error = i.get('error')
             received_love = db_handler.get_received_love(nickname)
-            return templates.widget(nickname,received_love,error)
+            return templates.widget(nickname,session_id,received_love,error)
         except dbh.LoginException,e:
             i = web.input()
             nickname = i.user
-            return templates.widget(nickname,0,e)
+            return templates.widget(nickname,session_id,0,e)
         except AttributeError:
             raise web.seeother(config.host_url)
         except BaseException, e:
@@ -476,7 +477,7 @@ class give_user_datalove:
                     session.spend_love[to_user] += 1
                 else:
                     session.spend_love[to_user] = 1
-                return templates.no_login_widget()
+                return templates.no_login_widget(session_id)
             from_user, _, _, _ = db_handler.get_session(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
@@ -484,26 +485,53 @@ class give_user_datalove:
             try:
                 db_handler.send_datalove(from_user,to_user,session_id)
             except AssertionError,e:
-                raise web.seeother(
-                        url_path_join(
-                                config.host_url,'widget?user=%s&error=%s' 
-                                        % (to_user,e)
-                            )
-                    )
+                if session_cookie:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    'widget?user=%s&error=%s' % (to_user,e)
+                                )
+                        )
+                else:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    'widget?user=%s&error=%s&sid=%s' 
+                                            % (to_user,e,session_id)
+                                )
+                        )
             except dbh.NotEnoughDataloveException, e:
-                raise web.seeother(
-                        url_path_join(
-                                config.host_url,'widget?user=%s&error=%s' 
-                                        % (to_user,e)
-                            )
-                    )
+                if session_cookie:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    'widget?user=%s&error=%s' % (to_user,e)
+                                )
+                        )
+                else:
+                    raise web.seeother(
+                            url_path_join(
+                                    config.host_url,
+                                    'widget?user=%s&error=%s&sid=%s' 
+                                            % (to_user,e,session_id)
+                                )
+                        )
             except BaseException, e:
                 return raise_internal_server_error(e,traceback.format_exc())
-            raise web.seeother(
-                    url_path_join(
-                            config.host_url,'widget?user=%s' % to_user
-                        )
-                )
+            if session_cookie:
+                raise web.seeother(
+                        url_path_join(
+                                config.host_url,'widget?user=%s' % to_user
+                            )
+                    )
+            else:
+                raise web.seeother(
+                        url_path_join(
+                                config.host_url,'widget?user=%s&sid=%s' 
+                                        % (to_user,session_id)
+                            )
+                    )
+            
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
     ## Method for a HTTP GET request. 

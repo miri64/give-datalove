@@ -27,7 +27,7 @@ MAX_MAIL_LEN = 30
 
 ## The maximum length of a user's <tt>website</tt> address as defined in 
 #  datalovers_db.sql
-MAX_MAIL_LEN = 50
+MAX_WEBSITE_LEN = 50
 
 ## The length of the password's hash. With SHA-256 as used in this module, 
 #  it is 64 characters.

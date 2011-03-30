@@ -25,6 +25,10 @@ MAX_NICK_LEN = 23
 #  datalovers_db.sql
 MAX_MAIL_LEN = 30
 
+## The maximum length of a user's <tt>website</tt> address as defined in 
+#  datalovers_db.sql
+MAX_MAIL_LEN = 50
+
 ## The length of the password's hash. With SHA-256 as used in this module, 
 #  it is 64 characters.
 PW_HASH_LEN = 64
@@ -389,6 +393,12 @@ class DBHandler:
                     str(nickname) + 
                     "."
                 )
+        if len(email) > MAX_MAIL_LEN:
+            raise AssertionError(
+                    "Email address to long. Must be at most " + 
+                    str(MAX_MAIL_LEN) + 
+                    " characters long."
+                )
         if('@' not in email):
                 raise AssertionError(
                         "Email address must contain an '@' character."
@@ -422,6 +432,12 @@ class DBHandler:
                     " not associated to user " + 
                     str(nickname) + 
                     "."
+                )
+        if len(website) > MAX_WEBSITE_LEN:
+            raise AssertionError(
+                    "Email address to long. Must be at most " + 
+                    str(MAX_WEBSITE_LEN) + 
+                    " characters long."
                 )
         if(not website.startswith('http://')):
                 website = 'http://' + website

@@ -1,6 +1,7 @@
 $def with (users, session_id = None)
 $# A list of registered users
         <div id="content">
+        	<p>Currently we have <span style="color:#f00">$len(users)</span> loverz!</p>
             <ul>
                 $for user in users:
                     <li><a href="/user/${user.nickname}">${user.nickname}</a> (haz ${user.received_love} datalovez) 

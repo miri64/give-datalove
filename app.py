@@ -491,7 +491,7 @@ class reset_password:
             i = web.input()
             try:
                 new_password, email_to = db_handler.reset_password(i.nickname)
-            except UserException, e:
+            except dbh.UserException, e:
                 nickname = web.input().get('nickname')
                 return self.show(nickname,e)
             email_from = 'password-reset@give.datalove.me'

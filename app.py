@@ -34,7 +34,8 @@ urls = (
     '/', 'index',
     '/manage_account', 'manage_account',
     '/register', 'register',
-    '/widget', 'widget',
+    '/history', 'history',
+    '/widge', 'widget',
     r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
     '/logoff', 'logoff',
     '/unregister', 'unregister',
@@ -44,6 +45,7 @@ urls = (
     r'/api/([^?$/\\#%\s]+)/available_datalove', 'get_users_available_love',
     r'/api/([^?$/\\#%\s]+)/received_datalove', 'get_users_received_love',
     r'/api/([^?$/\\#%\s]+)/give_datalove', 'give_user_datalove_api',
+    
 )
 
 ## The absolute path of this script.
@@ -586,3 +588,38 @@ class give_user_datalove_api:
             return 'SEND'
         else:
             raise web.seeother(config.host_url)
+
+## Class for the <tt>/history/tt> URL.
+class history:
+    ## Shows the page
+    # @param login_error Possible errors (as string) that happened during login.
+    # @return String in HTML code of what the side looks like
+    def show(self, login_error = None):
+        try:
+            web.header('Content-Type','text/html;charset=utf-8')
+            #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
+            session_id = get_session_id()
+            templates = web.template.render(os.path.join(abspath,'templates'))
+            if not session_id or \
+                    not db_handler.session_associated_to_any_user(session_id):
+                content = templates.welcome()
+                return templates.index(content,login_error = login_error)
+            else:
+                nickname, _, available, received = db_handler.get_session(
+                        session_id
+                    )
+                recieved, sent = db_handler.get_history(
+                        nickname
+                )
+                content = templates.historypage(recieved, sent)
+                return templates.index(
+                        content,
+                        logged_in = True,
+                        login_block = False
+                    )
+        except BaseException, e:
+            return raise_internal_server_error(e,traceback.format_exc())
+
+    ## Method for a HTTP GET request. 
+    def GET(self):
+        return self.show()

@@ -1,0 +1,49 @@
+$def with (recieved, sent)
+<div>
+			<p>Recieved</p>
+
+        <table>
+		<tr>
+			<th>
+				From
+			</th>
+			<th>
+				Time
+			</th>
+		</tr>
+        $for i in recieved:
+			<tr>
+				<td>
+				$i.sender
+				</td>
+				<td>
+				$i.timestamp
+				</td>
+			</tr>
+        </table>
+</div>
+<div>
+		<p>Sent</p>
+        <table>
+		<tr>
+			<th>
+				To
+			</th>
+			<th>
+				Time
+			</th>
+		</tr>
+        $for i in sent:
+			<tr>
+				<td>
+				$i.reciever
+				</td>
+				<td>
+				$i.timestamp
+				</td>
+			</tr>
+        </table>
+</div>
+
+        <!--Place holder-->
+        <div style="height: 400px">&nbsp;</div>

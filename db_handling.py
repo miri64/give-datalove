@@ -597,6 +597,11 @@ class DBHandler:
                 available_love=to_user.available_love,
                 received_love=to_user.received_love
             )
+        self.db.insert(
+                'history',
+                sender=from_nickname,
+                reciever=to_nickname
+            )
         return actually_spend_love
     
     ## Returns the user's amount of available datalove points.
@@ -771,3 +776,25 @@ class DBHandler:
             raise UserException("User '"+nickname+"' does not exist.")
         return rows[0]
     
+    ## Gets user information is the session is associated to an user.
+    # @param session_id The ID of the web application session the user is 
+    #        currently assossiated with.
+    # @exception IllegalSessionException Is raised if the <i>session_id</i> is 
+    #            not associated to the user identified by <i>nickname</i>.
+    # @returns A tuple consisting of the nickname, the email address, the 
+    #          available love count, and the received love count of the user who
+    #          is associated to the session identified by the <i>session_id</i>
+    def get_history(self, nickname):
+        sent = self.db.query(
+                """SELECT * 
+                   FROM history
+                   WHERE sender = $nickname""",
+                vars=locals()
+            )
+        recieved = self.db.query(
+                """SELECT 
+                   FROM history
+                   WHERE reciever = $nickname""",
+                vars=locals()
+            )
+        return recieved, sent

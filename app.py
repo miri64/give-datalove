@@ -128,14 +128,11 @@ application = app.wsgifunc()    # get web.py application as wsgi application
 def get_session_id():
     global session_cookie
     session_id = web.cookies().get(web.config.session_parameters['cookie_name'])
-    print session_id
     if not session_id:
         session_cookie = False
         session_id = web.input().get('sid')
-        print(web.input())
     if not session_id:
         session_id = session.session_id
-    print session_id
     return session_id
 
 ## Joins two fragments of an URL path with an '/' (if needed).

@@ -18,7 +18,7 @@ import web,os,config,traceback
 
 import db_handling as dbh
 
-web.config.debug = True
+web.config.debug = False
 web.config.session_parameters['cookie_name'] = 'give_datalove_session_id'
 web.config.session_parameters['timeout'] = 2 * 7 * 24 * 60 * 60
         # 2 weeks in seconds
@@ -34,6 +34,7 @@ urls = (
     '/', 'index',
     '/manage_account', 'manage_account',
     '/register', 'register',
+    '/users','users',
     '/widget', 'widget',
     r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
     '/logoff', 'logoff',
@@ -347,6 +348,18 @@ class register:
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
+
+## Class for the <tt>/users</tt> URL
+class users:
+    ## Method for a HTTP GET request.
+    def GET(self):
+        web.header('Content-Type','text/html;charset=utf-8')
+        templates = web.template.render(os.path.join(abspath,'templates'))
+        try:
+            users = db_handler.get_users()
+            return templates.users(users)
+        except BaseException, e:
+            return raise_internal_server_error(e,traceback.format_exc())
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:

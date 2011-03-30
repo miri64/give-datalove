@@ -621,6 +621,11 @@ class DBHandler:
                 # Raises UserException if user does not exist.
         return int(user.received_love)
     
+    ## Returns a random-ordered list of registered nicknames
+    def get_users(self):
+        users = self.db.select('users',order='RAND()',what='nickname,received_love')
+        return users
+    
     ## Checks the existance of a user.
     # @param nickname Some user's nickname.
     # @returns <tt><b>True</b></tt> if the user exists, <tt><b>False</b></tt> if 

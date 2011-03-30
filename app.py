@@ -628,11 +628,23 @@ class reset_password:
             web.header('Content-Type','text/html;charset=utf-8')
             session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
-            content = templates.reset_password_form(nickname,error,success)
+            if session_cookie:
+                content = templates.reset_password_form(
+                        nickname,
+                        error = error,
+                        success = success
+                    )
+            else:
+                content = templates.reset_password_form(
+                        nickname,
+                        session_id = session_id,
+                        error = error,
+                        success = success
+                    )
             return templates.index(
                     content,
                     logged_in = False,
-                    login_block = True
+                    login_block = False
                 )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())

@@ -973,7 +973,8 @@ class user:
                         logged_in = logged_in,
                         login_block = login_block
                     )
-            else:content = templates.profilepage(
+            else:
+                content = templates.profilepage(
                         nickname,
                         user,
                         error,

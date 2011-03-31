@@ -32,7 +32,7 @@ $def with (received, sent, session_id = None)
         <tr>
             $if session_id:
                 <td><a href="/user/$i.sender?sid=$session_id">$i.sender</a></td>
-            $else
+            $else:
                 <td><a href="/user/$i.sender">$i.sender</a></td>
             <td style="text-align: center;">$i.amount</td>
             <td>$alter_time(i.timestamp)</td>
@@ -45,7 +45,10 @@ $def with (received, sent, session_id = None)
     <tr><th>To</th><th>Amount</th><th>Time</th></tr>
     $for i in sent:
         <tr>
-            <td><a href="/user/$i.recipient">$i.recipient</a></td>
+            $if session_id:
+                <td><a href="/user/$i.recipient?sid=$session_id">$i.recipient</a></td>
+            $else:
+                <td><a href="/user/$i.recipient">$i.recipient</a></td>
             <td style="text-align: center;">$i.amount</td>
             <td>$alter_time(i.timestamp)</td>
         </tr>

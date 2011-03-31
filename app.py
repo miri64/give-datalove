@@ -506,7 +506,7 @@ class users:
                 return templates.index(
                         content,
                         total_loverz = total_loverz,
-                        login_block = !logged_in, 
+                        login_block = not logged_in, 
                         logged_in = logged_in
                     )
             else:
@@ -515,7 +515,7 @@ class users:
                         content,
                         total_loverz = total_loverz,
                         session_id = session_id,
-                        login_block = !logged_in, 
+                        login_block = not logged_in, 
                         logged_in = logged_in
                     )
         except BaseException, e:

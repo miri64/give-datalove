@@ -130,6 +130,8 @@ def get_session_id():
     if not session_id:
         session_cookie = False
         session_id = web.input().get('sid')
+    else:
+        session_cookie = True
     if not session_id:
         session_id = session.session_id
     return session_id

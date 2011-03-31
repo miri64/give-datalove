@@ -1,4 +1,4 @@
-$def with (received, sent)
+$def with (received, sent, session_id = None)
 <style type="text/css">
     .historydiv {
         width:45%;
@@ -30,7 +30,10 @@ $def with (received, sent)
     <tr><th>From</th><th>Amount</th><th>Time</th></tr>
     $for i in received:
         <tr>
-            <td><a href="/user/$i.sender">$i.sender</a></td>
+            $if session_id:
+                <td><a href="/user/$i.sender?sid=$session_id">$i.sender</a></td>
+            $else
+                <td><a href="/user/$i.sender">$i.sender</a></td>
             <td style="text-align: center;">$i.amount</td>
             <td>$alter_time(i.timestamp)</td>
         </tr>

@@ -419,6 +419,11 @@ class register:
                         email, 
                         registration_error = registration_error
                     )
+                return templates.index(
+                        content, 
+                        total_loverz = total_loverz, 
+                        login_block = False
+                    )
             else:
                 session_id = get_session_id()
                 content = templates.register_form(
@@ -427,7 +432,12 @@ class register:
                         session_id = session_id,
                         registration_error = registration_error
                     )
-            return templates.index(content, total_loverz = total_loverz,login_block = False)
+                return templates.index(
+                        content, 
+                        total_loverz = total_loverz, 
+                        session_id = session_id,
+                        login_block = False
+                    )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         print 'show', session_cookie
@@ -490,15 +500,23 @@ class users:
             
             if session_cookie:
                 content = templates.users(users)
+                return templates.index(
+                        content,
+                        total_loverz = total_loverz,
+                        login_block = False, 
+                        logged_in = True
+                    )
             else:
                 session_id = get_session_id()
                 content = templates.users(users,session_id)
-            return templates.index(
-                    content,
-                    total_loverz = total_loverz,
-                    login_block = False, 
-                    logged_in = True
-                )
+                return templates.index(
+                        content,
+                        total_loverz = total_loverz,
+                        session_id = session_id,
+                        login_block = False, 
+                        logged_in = True
+                    )
+
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
 
@@ -703,6 +721,12 @@ class reset_password:
                         error = error,
                         success = success
                     )
+                return templates.index(
+                        content,
+                        total_loverz = total_loverz,
+                        logged_in = False,
+                        login_block = False
+                    )
             else:
                 content = templates.reset_password_form(
                         nickname,
@@ -710,12 +734,13 @@ class reset_password:
                         error = error,
                         success = success
                     )
-            return templates.index(
-                    content,
-                    total_loverz = total_loverz,
-                    logged_in = False,
-                    login_block = False
-                )
+                return templates.index(
+                        content,
+                        total_loverz = total_loverz,
+                        session_id = session_id,
+                        logged_in = False,
+                        login_block = False
+                    )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
@@ -852,7 +877,6 @@ class give_user_datalove_api:
 
 ## Class for the <tt>/history/tt> URL.
 class history:
-    
     def alter_timestamp(self, timestamp):
         timestamp = timestamp.strftime("%a %d %b,  %H:%M")
         return timestamp
@@ -863,12 +887,22 @@ class history:
             web.header('Content-Type','text/html;charset=utf-8')
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
             session_id = get_session_id()
-            templates = web.template.render(os.path.join(abspath,'templates'), globals={'alter_time':self.alter_timestamp})
+            templates = web.template.render(
+                                os.path.join(abspath,'templates'), 
+                                globals={'alter_time':self.alter_timestamp}
+                            )
             total_loverz = db_handler.get_total_loverz()
-            if not session_id or \
+            if not session_id and \
                     not db_handler.session_associated_to_any_user(session_id):
                 content = templates.welcome()
-                return templates.index(content, total_loverz = total_loverz, login_error = login_error)
+                if session_cookie:
+                    return templates.index(content, total_loverz = total_loverz)
+                else:
+                    return templates.index(
+                            content, 
+                            session_id = session_id,
+                            total_loverz = total_loverz
+                        )
             else:
                 nickname, _, available, received, _ = db_handler.get_session(
                         session_id
@@ -876,13 +910,23 @@ class history:
                 received, sent = db_handler.get_history(
                         nickname
                 )
-                content = templates.historypage(received, sent)
-                return templates.index(
-                        content,
-                        total_loverz = total_loverz,
-                        logged_in = True,
-                        login_block = False
-                    )
+                if session_cookie:
+                    content = templates.historypage(received, sent)
+                    return templates.index(
+                            content,
+                            total_loverz = total_loverz,
+                            logged_in = True,
+                            login_block = False
+                        )
+                else:
+                    content = templates.historypage(received, sent, session_id)
+                    return templates.index(
+                            content,
+                            total_loverz = total_loverz,
+                            session_id = session_id,
+                            logged_in = True,
+                            login_block = False
+                        )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
 
@@ -914,21 +958,36 @@ class user:
             else:
                 logged_in = True
                 login_block = False
-                
-            content = templates.profilepage(
-                    nickname,
-                    user,
-                    error,
-                    logged_in = logged_in,
-                    login_block = login_block,
-                    session_id = session_id)
             
-            return templates.index(
-                    content,
-                    total_loverz = total_loverz,
-                    logged_in = logged_in,
-                    login_block = login_block
-                )
+            if session_cookie:
+                content = templates.profilepage(
+                        nickname,
+                        user,
+                        error,
+                        logged_in = logged_in,
+                        login_block = login_block,
+                    )
+                return templates.index(
+                        content,
+                        total_loverz = total_loverz,
+                        logged_in = logged_in,
+                        login_block = login_block
+                    )
+            else:content = templates.profilepage(
+                        nickname,
+                        user,
+                        error,
+                        logged_in = logged_in,
+                        login_block = login_block,
+                        session_id = session_id
+                    )
+                return templates.index(
+                        content,
+                        total_loverz = total_loverz,
+                        session_id = session_id,
+                        logged_in = logged_in,
+                        login_block = login_block
+                    )
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
     ## Method for a HTTP GET request. 

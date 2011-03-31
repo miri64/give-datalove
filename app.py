@@ -493,30 +493,31 @@ class users:
     ## Method for a HTTP GET request.
     def GET(self):
         web.header('Content-Type','text/html;charset=utf-8')
-        templates = web.template.render(os.path.join(abspath,'templates'))
-        total_loverz = db_handler.get_total_loverz()
         try:
+            session_id = get_session_id()
             users = db_handler.get_users()
+            templates = web.template.render(os.path.join(abspath,'templates'))
+            total_loverz = db_handler.get_total_loverz()
+            
+            logged_in = db_handler.session_associated_to_any_user(session_id)
             
             if session_cookie:
                 content = templates.users(users)
                 return templates.index(
                         content,
                         total_loverz = total_loverz,
-                        login_block = False, 
-                        logged_in = True
+                        login_block = !logged_in, 
+                        logged_in = logged_in
                     )
             else:
-                session_id = get_session_id()
                 content = templates.users(users,session_id)
                 return templates.index(
                         content,
                         total_loverz = total_loverz,
                         session_id = session_id,
-                        login_block = False, 
-                        logged_in = True
+                        login_block = !logged_in, 
+                        logged_in = logged_in
                     )
-
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
 

@@ -366,22 +366,18 @@ class manage_account:
             session_id = get_session_id()
             user, _, _, _, _ = db_handler.get_session(session_id)
             i = web.input()
-            email = i.get('email')
-            websites = i.get('websites')
-            old_password = i.get('old_password')
-            new_password = i.get('new_password')
-            new_password_conf = i.get('new_password_conf')
-            
-            websites = websites.split('\n')
-            
             if i.get('change_mail'):
+                email = i.get('email')
                 try:
                     db_handler.change_email_address(user,session_id,email)
                 except dbh.LoginException, e:
                     return self.show(email_change_error = e)
                 except AssertionError, e:
                     return self.show(email_change_error = e)
-            elif old_password and new_password and new_password_conf:
+            elif i.get('change_pw'):
+                old_password = i.get('old_password')
+                new_password = i.get('new_password')
+                new_password_conf = i.get('new_password_conf')
                 self.change_password_action(
                         nickname,
                         old_password, 
@@ -389,6 +385,8 @@ class manage_account:
                         new_password_conf
                     )
             elif i.get('profile'):
+                websites = i.get('websites')
+                websites = websites.split('\n')
                 try:
                     db_handler.change_website(user,session_id,websites)
                 except dbh.LoginException, e:

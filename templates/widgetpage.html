@@ -1,11 +1,23 @@
-$def with (nickname)
+$def with (nickname = None)
 		<p class="love">give.datalove widget</p>
 		<p class="abouth">What to do with this widget?</p>
 		<p class="about">We provide one widget to integrate into your website or into your blog and enter your username at the end. It looks like this:</p>
-		<p class="about"><iframe src="http://give.datalove.me:8080/widget?user=$nickname" width="70" height="71"></iframe></p>
+		<p class="about">
+			$if nickname:
+				<iframe src="http://give.datalove.me:8080/widget?user=$nickname" width="70" height="71"></iframe>
+			$else:
+				<iframe src="http://give.datalove.me:8080/widget?random" width="70" height="71"></iframe>
+		</p>
 		<p class="abouth">How do I integrate this widget?</p>
 		<p class="about">Is is very easy. Just put this one line of code into your website or on your blog:</p>
-		<p class="about"><pre>&lt;iframe src="http://give.datalove.me:8080/widget?user=$nickname" width="70" height="71"&gt;&lt;/iframe&gt;</pre></p>
+		<p class="about">
+			$if nickname:
+				<pre>&lt;iframe src="http://give.datalove.me:8080/widget?user=$nickname" width="70" height="71"&gt;&lt;/iframe&gt;</pre>
+			$else:
+				<pre>&lt;iframe src="http://give.datalove.me:8080/widget?user=&lt;your_nickname&gt;" width="70" height="71"&gt;&lt;/iframe&gt;</pre>
+		</p>
+		$if not nickname:
+			<p class="about">Where you have to replace <tt>&lt;your nickname&gt;</tt> with your own nickname, of cause, after you have <a href="/register">registered</a>.</p>
 		<p class="abouth">Are there more widgets?</p>
 		<p class="about">Not yet, but we hope that people create some so that we can upload them here and provide them to the users.</p>
 		<p class="abouth">I created one! How do I get it here?</p>

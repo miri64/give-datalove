@@ -537,7 +537,7 @@ class widget:
             total_loverz = db_handler.get_total_loverz()
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
-                content = templates.welcome()
+                content = templates.widgetpage()
                 if session_cookie:
                     return templates.index(content, total_loverz = total_loverz,login_error = login_error)
                 else:

@@ -458,6 +458,8 @@ class DBHandler:
                         str(MAX_WEBSITE_LEN) + 
                         " characters long."
                     )
+            if len(website) == 0:
+                continue
             if(not website.startswith('http://')):
                     website = 'http://' + website
             values.append(website)

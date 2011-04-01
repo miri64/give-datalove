@@ -47,13 +47,13 @@ CREATE TABLE IF NOT EXISTS datalovers.user_sessions (
 
 CREATE TABLE IF NOT EXISTS datalovers.user_websites (
     nickname        VARCHAR(23) NOT NULL,
-    website         VARCHAR(50) DEFAULT NULL,
-    PRIMARY KEY (nickname),
+    website         VARCHAR(50) NOT NULL,
+    PRIMARY KEY (nickname,website),
     CONSTRAINT fk_users_user_websites
         FOREIGN KEY (nickname)
         REFERENCES datalovers.users(nickname)
         ON DELETE CASCADE
-        ON UPDATE RESTRICT,
+        ON UPDATE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS datalovers.users (

@@ -350,9 +350,9 @@ class DBHandler:
     # @returns A tuple consisting of the nickname, the email address, the 
     #          available love count, and the received love count of the user who
     #          is associated to the session identified by the <i>session_id</i>
-    def get_session(self, session_id):
+    def get_session_user(self, session_id):
         user_rows = self.db.query(
-                """SELECT * 
+                """SELECT nickname, email, available_love, received_love
                    FROM users NATURAL JOIN user_sessions
                    WHERE session_id = $session_id""",
                 vars=locals()
@@ -373,7 +373,7 @@ class DBHandler:
                     " not associated to a user."
                 )
         user = user_rows[0]
-        websites = [row.website for row in website_rows]
+        user['websites'] = [row.website for row in website_rows]
         return user.nickname, user.email, user.available_love, \
                 user.received_love, websites
     

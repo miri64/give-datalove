@@ -201,7 +201,7 @@ class index:
                             login_error = login_error,
                         )
             else:
-                nickname, _, available, received, _ = db_handler.get_session(
+                nickname, _, available, received, _ = db_handler.get_session_user(
                         session_id
                     )
                 content = templates.userpage(nickname,received,available)
@@ -279,7 +279,7 @@ class manage_account:
             templates = web.template.render(os.path.join(abspath,'templates'))
             if session_id and \
                     db_handler.session_associated_to_any_user(session_id):
-                nickname, email, _, _, websites = db_handler.get_session(
+                nickname, email, _, _, websites = db_handler.get_session_user(
                         session_id
                     )
                 websites_str = ''
@@ -359,12 +359,12 @@ class manage_account:
     def POST(self):
         try:
             session_id = get_session_id()
-            nickname, _, _, _, _ = db_handler.get_session(session_id)
+            nickname, _, _, _, _ = db_handler.get_session_user(session_id)
             
             i = web.input() 
             
             session_id = get_session_id()
-            user, _, _, _, _ = db_handler.get_session(session_id)
+            user, _, _, _, _ = db_handler.get_session_user(session_id)
             i = web.input()
             if i.get('change_mail'):
                 email = i.get('email')
@@ -552,7 +552,7 @@ class widget:
                             login_error = login_error,
                         )
             else:
-                nickname, _, available, received, _ = db_handler.get_session(
+                nickname, _, available, received, _ = db_handler.get_session_user(
                         session_id
                     )
                 content = templates.widgetpage(nickname)
@@ -628,7 +628,7 @@ class give_user_datalove:
                 else:
                     session.spend_love[to_user] = 1
                 return templates.no_login_widget(session_id)
-            from_user, _, _, _, _ = db_handler.get_session(session_id)
+            from_user, _, _, _, _ = db_handler.get_session_user(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
@@ -689,7 +689,7 @@ class logoff:
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             session_id = get_session_id()
-            nickname, _, _, _, _ = db_handler.get_session(session_id)
+            nickname, _, _, _, _ = db_handler.get_session_user(session_id)
             db_handler.user_logoff(nickname,session_id)
             session.kill()
         except BaseException, e:
@@ -704,7 +704,7 @@ class unregister:
             web.header('Content-Type','text/html;charset=utf-8')
             
             session_id = get_session_id()
-            user, _, _, _, _ = db_handler.get_session(session_id)
+            user, _, _, _, _ = db_handler.get_session_user(session_id)
             db_handler.drop_user(user,session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
@@ -866,7 +866,7 @@ class give_user_datalove_api:
                         "User '%s' does not exist." % nickname
                     )
             session_id = get_session_id()
-            from_user, _, _, _, _ = db_handler.get_session(session_id)
+            from_user, _, _, _, _ = db_handler.get_session_user(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
@@ -911,7 +911,7 @@ class history:
                             total_loverz = total_loverz
                         )
             else:
-                nickname, _, available, received, _ = db_handler.get_session(
+                nickname, _, available, received, _ = db_handler.get_session_user(
                         session_id
                     )
                 received, sent = db_handler.get_history(
@@ -1026,7 +1026,7 @@ class user_give_user_datalove:
                 else:
                     session.spend_love[to_user] = 1
                 return templates.no_login_widget(session_id)
-            from_user, _, _, _, _ = db_handler.get_session(session_id)
+            from_user, _, _, _, _ = db_handler.get_session_user(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:

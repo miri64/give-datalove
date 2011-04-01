@@ -362,7 +362,8 @@ class DBHandler:
                 """SELECT website
                    FROM users   NATURAL JOIN user_sessions 
                                 NATURAL JOIN user_websites 
-                   WHERE session_id = $session_id"""
+                   WHERE session_id = $session_id""",
+                vars=locals()
             )
         
         if len(user_rows) == 0:
@@ -371,7 +372,7 @@ class DBHandler:
                     str(session_id) + 
                     " not associated to a user."
                 )
-        user = user_users[0]
+        user = user_rows[0]
         websites = [row.website for row in website_rows]
         return user.nickname, user.email, user.available_love, \
                 user.received_love, websites
@@ -450,7 +451,7 @@ class DBHandler:
         
         values = []
         
-        for website in websites:
+        for website in set(websites):
             if len(website) > MAX_WEBSITE_LEN:
                 raise AssertionError(
                         "Website address is to long. Must be at most " + 
@@ -459,7 +460,11 @@ class DBHandler:
                     )
             if(not website.startswith('http://')):
                     website = 'http://' + website
-            values.append({"nickname": nickname, "website": website})
+            values.append(website)
+        
+        # Eliminate duplicates
+        values = [{"nickname": nickname, "website": website} 
+                        for website in set(values)]
         
         ta = self.db.transaction()
         try:

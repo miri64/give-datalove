@@ -388,7 +388,7 @@ class manage_account:
                 websites = i.get('websites')
                 websites = websites.split('\n')
                 try:
-                    db_handler.change_website(user,session_id,websites)
+                    db_handler.change_websites(user,session_id,websites)
                 except dbh.LoginException, e:
                     return self.show(website_change_error = e)
                 except AssertionError, e:

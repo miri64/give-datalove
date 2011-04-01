@@ -436,7 +436,7 @@ class DBHandler:
     #            associated to <tt>nickname</tt>.
     # @exception AssertionError If <tt>email</tt> does not contain an '@' 
     #            character.
-    def change_website(self, nickname, session_id, websites):
+    def change_websites(self, nickname, session_id, websites):
         nickname = nickname.lower()
         if not self.user_exists(nickname):
             raise UserException('User '+str(nickname)+' does not exist.')

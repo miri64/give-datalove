@@ -280,7 +280,7 @@ class DBHandler:
             raise AssertionError(
                     "There is already a user logged in with this session. " +
                     "Only one user per session is allowed."
-                )
+                )        
         if not pw_as_hash:
             password = hash_password(nickname,password)
         else:
@@ -309,10 +309,9 @@ class DBHandler:
                     nickname + 
                     " is wrong."
                 )
-        
-        self.db.update('users',
-                where="nickname = $nickname",
-                vars = locals(),
+        print "Joaaa...."
+        self.db.insert('user_sessions',
+                nickname=nickname,
                 session_id=session_id
             )
     
@@ -338,11 +337,10 @@ class DBHandler:
                     nickname + 
                     "."
                 )
-        self.db.update(
-                'users',
-                where="nickname = $nickname",
-                vars = locals(),
-                session_id=None
+        self.db.delete(
+                'user_sessions',
+                where="nickname = $nickname AND session_id = $session_id",
+                vars=locals()
             )
     
     ## Gets user information is the session is associated to an user.
@@ -356,7 +354,7 @@ class DBHandler:
     def get_session(self, session_id):
         rows = self.db.query(
                 """SELECT * 
-                   FROM users NATURAL JOIN sessions
+                   FROM users NATURAL JOIN user_sessions
                    WHERE session_id = $session_id""",
                 vars=locals()
             )
@@ -368,7 +366,8 @@ class DBHandler:
                     " not associated to a user."
                 )
         row = rows[0]
-        return row.nickname, row.email, row.available_love, row.received_love, row.website
+        return row.nickname, row.email, row.available_love, \
+                row.received_love, row.website
     
     ## Changes the email address of an user.
     # @param nickname The user's nickname.
@@ -735,7 +734,7 @@ class DBHandler:
     def session_associated_to_any_user(self,session_id):
         rows = self.db.query(
                 """SELECT * 
-                   FROM users NATURAL JOIN sessions
+                   FROM user_sessions NATURAL JOIN sessions
                    WHERE session_id = $session_id""",
                 vars=locals()
             )

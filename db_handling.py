@@ -280,7 +280,7 @@ class DBHandler:
             raise AssertionError(
                     "There is already a user logged in with this session. " +
                     "Only one user per session is allowed."
-                )        
+                )
         if not pw_as_hash:
             password = hash_password(nickname,password)
         else:
@@ -309,7 +309,6 @@ class DBHandler:
                     nickname + 
                     " is wrong."
                 )
-        print "Joaaa...."
         self.db.insert('user_sessions',
                 nickname=nickname,
                 session_id=session_id

@@ -247,6 +247,7 @@ class DBHandler:
                     str(session_id) + 
                     " not associated to user "+str(nickname)+"."
                 )
+        self.user_logoff(nickname,session_id)
         q = self.db.delete('users', where='nickname = $nickname', vars=locals())
     
     ## Defines the login process for a user in the database layer.
@@ -803,8 +804,8 @@ class DBHandler:
     #         the session identified by <i>session_id</i> is associated to, 
     #         <tt><b>False</b></tt> if not.
     def __check_session_id__(self, nickname, session_id):
-        nickname_in_db,_,_,_,_ = self.get_session_user(session_id)
-        return nickname_in_db == nickname
+        user = self.get_session_user(session_id)
+        return user.nickname == nickname
     
     ## Checks if password has a length equal to <tt>\ref PW_HASH_LEN</tt>
     # @param password The password to be checked.

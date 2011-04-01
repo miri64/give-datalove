@@ -201,10 +201,8 @@ class index:
                             login_error = login_error,
                         )
             else:
-                nickname, _, available, received, _ = db_handler.get_session_user(
-                        session_id
-                    )
-                content = templates.userpage(nickname,received,available)
+                user = db_handler.get_session_user(session_id)
+                content = templates.userpage(user)
                 if session_cookie:
                     return templates.index(
                             content,
@@ -279,18 +277,15 @@ class manage_account:
             templates = web.template.render(os.path.join(abspath,'templates'))
             if session_id and \
                     db_handler.session_associated_to_any_user(session_id):
-                nickname, email, _, _, websites = db_handler.get_session_user(
-                        session_id
-                    )
-                websites_str = ''
-                for website in websites:
-                    websites_str += website + '\n'
+                user = db_handler.get_session_user(session_id)
+                websites = ''
+                for website in user.websites:
+                    websites += website + '\n'
+                user.websites = websites
                 total_loverz = db_handler.get_total_loverz()
                 if session_cookie:
                     content = templates.manage_account(
-                            nickname,
-                            email,
-                            websites_str,
+                            user,
                             email_change_error = email_change_error,
                             pw_change_error = pw_change_error,
                             website_change_error = None
@@ -303,9 +298,7 @@ class manage_account:
                         )
                 else:
                     content = templates.manage_account(
-                            nickname,
-                            email,
-                            websites_str,
+                            user,
                             session_id = session_id,
                             email_change_error = email_change_error,
                             pw_change_error = pw_change_error,
@@ -359,17 +352,16 @@ class manage_account:
     def POST(self):
         try:
             session_id = get_session_id()
-            nickname, _, _, _, _ = db_handler.get_session_user(session_id)
-            
-            i = web.input() 
-            
-            session_id = get_session_id()
-            user, _, _, _, _ = db_handler.get_session_user(session_id)
+            user = db_handler.get_session_user(session_id)
             i = web.input()
             if i.get('change_mail'):
                 email = i.get('email')
                 try:
-                    db_handler.change_email_address(user,session_id,email)
+                    db_handler.change_email_address(
+                            user.nickname,
+                            session_id,
+                            email
+                        )
                 except dbh.LoginException, e:
                     return self.show(email_change_error = e)
                 except AssertionError, e:
@@ -379,7 +371,7 @@ class manage_account:
                 new_password = i.get('new_password')
                 new_password_conf = i.get('new_password_conf')
                 self.change_password_action(
-                        nickname,
+                        user.nickname,
                         old_password, 
                         new_password,
                         new_password_conf
@@ -388,7 +380,11 @@ class manage_account:
                 websites = i.get('websites')
                 websites = websites.split('\n')
                 try:
-                    db_handler.change_websites(user,session_id,websites)
+                    db_handler.change_websites(
+                            user.nickname,
+                            session_id,
+                            websites
+                        )
                 except dbh.LoginException, e:
                     return self.show(website_change_error = e)
                 except AssertionError, e:
@@ -552,10 +548,10 @@ class widget:
                             login_error = login_error,
                         )
             else:
-                nickname, _, available, received, _ = db_handler.get_session_user(
+                user = db_handler.get_session_user(
                         session_id
                     )
-                content = templates.widgetpage(nickname)
+                content = templates.widgetpage(user.nickname)
                 if session_cookie:
                     return templates.index(
                             content,
@@ -628,12 +624,12 @@ class give_user_datalove:
                 else:
                     session.spend_love[to_user] = 1
                 return templates.no_login_widget(session_id)
-            from_user, _, _, _, _ = db_handler.get_session_user(session_id)
+            from_user = db_handler.get_session_user(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
             try:
-                db_handler.send_datalove(from_user,to_user,session_id)
+                db_handler.send_datalove(from_user.nickname,to_user,session_id)
             except AssertionError,e:
                 if session_cookie:
                     raise web.seeother(
@@ -689,8 +685,8 @@ class logoff:
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             session_id = get_session_id()
-            nickname, _, _, _, _ = db_handler.get_session_user(session_id)
-            db_handler.user_logoff(nickname,session_id)
+            user = db_handler.get_session_user(session_id)
+            db_handler.user_logoff(user.nickname,session_id)
             session.kill()
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
@@ -704,8 +700,8 @@ class unregister:
             web.header('Content-Type','text/html;charset=utf-8')
             
             session_id = get_session_id()
-            user, _, _, _, _ = db_handler.get_session_user(session_id)
-            db_handler.drop_user(user,session_id)
+            user = db_handler.get_session_user(session_id)
+            db_handler.drop_user(user.nickname,session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         raise web.seeother(config.host_url)
@@ -857,21 +853,21 @@ class get_users_received_love:
 class give_user_datalove_api:
     ## Method for a HTTP GET request. 
     # @param to_user User the datalove should be given to.
-    def GET(self,nickname):
+    def GET(self,to_user):
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             logged_in = True
-            if not db_handler.user_exists(nickname):
+            if not db_handler.user_exists(to_user):
                 return raise_not_found(
-                        "User '%s' does not exist." % nickname
+                        "User '%s' does not exist." % to_user
                     )
             session_id = get_session_id()
-            from_user, _, _, _, _ = db_handler.get_session_user(session_id)
+            from_user = db_handler.get_session_user(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
             try:
-                db_handler.send_datalove(from_user,nickname,session_id)
+                db_handler.send_datalove(from_user.nickname,to_user,session_id)
             except AssertionError,e:
                 return e
             except dbh.NotEnoughDataloveException, e:
@@ -911,11 +907,11 @@ class history:
                             total_loverz = total_loverz
                         )
             else:
-                nickname, _, available, received, _ = db_handler.get_session_user(
+                user = db_handler.get_session_user(
                         session_id
                     )
                 received, sent = db_handler.get_history(
-                        nickname
+                        user.nickname
                 )
                 if session_cookie:
                     content = templates.historypage(received, sent)
@@ -1026,12 +1022,12 @@ class user_give_user_datalove:
                 else:
                     session.spend_love[to_user] = 1
                 return templates.no_login_widget(session_id)
-            from_user, _, _, _, _ = db_handler.get_session_user(session_id)
+            from_user = db_handler.get_session_user(session_id)
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
             try:
-                db_handler.send_datalove(from_user,to_user,session_id)
+                db_handler.send_datalove(from_user.nickname,to_user,session_id)
             except AssertionError,e:
                 if session_cookie:
                     raise web.seeother(

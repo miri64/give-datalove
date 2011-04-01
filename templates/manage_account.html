@@ -1,4 +1,4 @@
-$def with (nickname, email, websites, session_id = None, email_change_error = None, pw_change_error = None, website_change_error = None)
+$def with (user, session_id = None, email_change_error = None, pw_change_error = None, website_change_error = None)
 $# Is loaded as content on /manage_account (with index.html template).
         <style type="text/css">
             input, textarea {
@@ -22,17 +22,17 @@ $# Is loaded as content on /manage_account (with index.html template).
             }
         </style>
         $if session_id:
-            <p class="love">Manage Account [<a href='/?sid=$session_id'>$nickname</a>]</p>
+            <p class="love">Manage Account [<a href='/?sid=$session_id'>$user.nickname</a>]</p>
         $else:
-            <p class="love">Manage Account [<a href='/'>$nickname</a>]</p>
+            <p class="love">Manage Account [<a href='/'>$user.nickname</a>]</p>
         <p class="abouth">Change email address:</p>
         <form method="post" action="#">
             <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
                 $if session_id:
                     <input type="hidden" name="sid" value="$session_id">
                 Email address: 
-                $if email:
-                    <input type="text" name="email" value="$email"/><br />
+                $if user.email:
+                    <input type="text" name="email" value="$user.email"/><br />
                 $else:
                     <input type="text" name="email"/><br />
                 $if email_change_error:
@@ -64,7 +64,7 @@ $# Is loaded as content on /manage_account (with index.html template).
                 $if session_id:
                     <input type="hidden" name="sid" value="$session_id">
                 Websites (one per line):
-                <textarea name="websites" cols="50" rows="10">$websites</textarea><br />
+                <textarea name="websites" cols="50" rows="10">$user.websites</textarea><br />
                 <span style="font-size: 75%;margin-bottom: 2px;text-align: left;">(The Website where your widget is placed)</span><br />
                 $if website_change_error:
                     <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">

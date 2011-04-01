@@ -712,7 +712,8 @@ class DBHandler:
                 # Raises UserException if user does not exist.
         return int(user.received_love)
     
-    ## Returns a random-ordered list of registered nicknames
+    ## Returns a random-ordered list of registered nicknames.
+    # @returns A random-ordered list of registered nicknames.
     def get_users(self):
         users = self.db.select('users',order='RAND()',what='nickname,received_love')
         return users
@@ -730,8 +731,8 @@ class DBHandler:
             )
         return len(rows) != 0
     
-    ## Returns a random username
-    # @returns String containing a randomly picked username
+    ## Returns a random username.
+    # @returns String containing a randomly picked username.
     def random_nickname(self):
         user = self.db.select('users',what="nickname",order="RAND()",limit=1)
         return user[0].nickname
@@ -895,7 +896,9 @@ class DBHandler:
                 vars=locals()
             )
         return received, sent
-
+    
+    ## Returns the overall number of users currently registered.
+    # @returns The overall number of users currently registered.
     def get_total_loverz(self):
         amount = self.db.query(
                 """SELECT count(nickname) AS amount
@@ -904,7 +907,13 @@ class DBHandler:
                 vars=locals()
             )
         return amount[0].amount
-
+    
+    ## Gets profile information of a user.
+    # @param nickname The user's nickname.
+    # @exception UserException Is raised if there is no user with the given 
+    #            <i>nickname</i>.
+    # @returns A dictionary containing the user's available and received love 
+    #          and his or hers websites.
     def get_profile(self, nickname):
         users = self.db.select(
                 'users',

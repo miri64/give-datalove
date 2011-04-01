@@ -351,22 +351,30 @@ class DBHandler:
     #          available love count, and the received love count of the user who
     #          is associated to the session identified by the <i>session_id</i>
     def get_session(self, session_id):
-        rows = self.db.query(
+        user_rows = self.db.query(
                 """SELECT * 
                    FROM users NATURAL JOIN user_sessions
                    WHERE session_id = $session_id""",
                 vars=locals()
             )
         
-        if len(rows) == 0:
+        website_rows = self.db.query(
+                """SELECT website
+                   FROM users   NATURAL JOIN user_sessions 
+                                NATURAL JOIN user_websites 
+                   WHERE session_id = $session_id"""
+            )
+        
+        if len(user_rows) == 0:
             raise IllegalSessionException(
                     "Session " + 
                     str(session_id) + 
                     " not associated to a user."
                 )
-        row = rows[0]
-        return row.nickname, row.email, row.available_love, \
-                row.received_love, row.website
+        user = user_users[0]
+        websites = [row.website for row in website_rows]
+        return user.nickname, user.email, user.available_love, \
+                user.received_love, websites
     
     ## Changes the email address of an user.
     # @param nickname The user's nickname.
@@ -420,14 +428,14 @@ class DBHandler:
     # @param nickname The user's nickname.
     # @param session_id The ID of the web application session the user is 
     #        currently assossiated with.
-    # @param email The new email address.
+    # @param websites An iteralable object of websites.
     # @exception UserException If there is no user with the given 
     #            <i>nickname</i>.
     # @exception IllegalSessionException If <tt>session_id</tt> is not 
     #            associated to <tt>nickname</tt>.
     # @exception AssertionError If <tt>email</tt> does not contain an '@' 
     #            character.
-    def change_website(self, nickname, session_id, website):
+    def change_website(self, nickname, session_id, websites):
         nickname = nickname.lower()
         if not self.user_exists(nickname):
             raise UserException('User '+str(nickname)+' does not exist.')
@@ -440,28 +448,35 @@ class DBHandler:
                     "."
                 )
         
-        if len(website) == 0:
-            self.db.update(
-                    'users',
-                    where="nickname = $nickname",
-                    vars = locals(),
-                    website=None
-                )
-        else:
+        values = []
+        
+        for website in websites:
             if len(website) > MAX_WEBSITE_LEN:
                 raise AssertionError(
-                        "Email address to long. Must be at most " + 
+                        "Website address is to long. Must be at most " + 
                         str(MAX_WEBSITE_LEN) + 
                         " characters long."
                     )
             if(not website.startswith('http://')):
                     website = 'http://' + website
-            self.db.update(
-                    'users',
+            values.append({"nickname": nickname, "website": website})
+        
+        ta = self.db.transaction()
+        try:
+            self.db.delete(
+                    'user_websites',
                     where="nickname = $nickname",
-                    vars = locals(),
-                    website=website
+                    vars = locals()
                 )
+            self.db.multiple_insert(
+                    'user_websites',
+                    values
+                )
+        except:
+            ta.rollback()
+            raise
+        else:
+            ta.commit()
 
     ## Resets the password to a randomly generated 8 character string (using 
     #  the shell command <tt>pwgen -1</tt>)
@@ -884,12 +899,25 @@ class DBHandler:
         return amount[0].amount
 
     def get_profile(self, nickname):
-        user = self.db.select(
+        users = self.db.select(
                 'users',
-                what='available_love, received_love, website',
+                what='available_love, received_love',
                 where='nickname = $nickname',
                 vars=locals()
             )
-        if len(user) == 0:
+        
+        if len(users) == 0:
             raise UserException("User '"+nickname+"' does not exist.")
-        return user[0]
+            
+        websites = [row.website for row in self.db.select(
+                'user_websites',
+                what='website',
+                where='nickname = $nickname',
+                vars=locals()
+            )]
+        
+        user = users[0]
+        
+        user['websites'] = websites
+        
+        return user

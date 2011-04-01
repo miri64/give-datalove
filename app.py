@@ -279,15 +279,18 @@ class manage_account:
             templates = web.template.render(os.path.join(abspath,'templates'))
             if session_id and \
                     db_handler.session_associated_to_any_user(session_id):
-                nickname, email, _, _, website = db_handler.get_session(
+                nickname, email, _, _, websites = db_handler.get_session(
                         session_id
                     )
+                websites_str = ''
+                for website in websites:
+                    websites_str += website + '\n'
                 total_loverz = db_handler.get_total_loverz()
                 if session_cookie:
                     content = templates.manage_account(
                             nickname,
                             email,
-                            website,
+                            websites_str,
                             email_change_error = email_change_error,
                             pw_change_error = pw_change_error,
                             website_change_error = None
@@ -302,7 +305,7 @@ class manage_account:
                     content = templates.manage_account(
                             nickname,
                             email,
-                            website,
+                            websites_str,
                             session_id = session_id,
                             email_change_error = email_change_error,
                             pw_change_error = pw_change_error,
@@ -382,9 +385,10 @@ class manage_account:
                         new_password_conf
                     )
             elif i.get('profile'):
-                website = i.get('website')
+                websites = i.get('websites')
+                websites = websites.split('\n')
                 try:
-                    db_handler.change_website(user,session_id,website)
+                    db_handler.change_website(user,session_id,websites)
                 except dbh.LoginException, e:
                     return self.show(website_change_error = e)
                 except AssertionError, e:

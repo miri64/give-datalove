@@ -347,9 +347,10 @@ class DBHandler:
     #        currently assossiated with.
     # @exception IllegalSessionException Is raised if the <i>session_id</i> is 
     #            not associated to the user identified by <i>nickname</i>.
-    # @returns A tuple consisting of the nickname, the email address, the 
-    #          available love count, and the received love count of the user who
-    #          is associated to the session identified by the <i>session_id</i>
+    # @returns A dictionary containing the nickname, the email address, the 
+    #          available love count, the received love count and the websites
+    #          of the user who is associated to the session identified by the 
+    #          <i>session_id</i>
     def get_session_user(self, session_id):
         user_rows = self.db.query(
                 """SELECT nickname, email, available_love, received_love
@@ -374,8 +375,7 @@ class DBHandler:
                 )
         user = user_rows[0]
         user['websites'] = [row.website for row in website_rows]
-        return user.nickname, user.email, user.available_love, \
-                user.received_love, websites
+        return user
     
     ## Changes the email address of an user.
     # @param nickname The user's nickname.
@@ -803,7 +803,7 @@ class DBHandler:
     #         the session identified by <i>session_id</i> is associated to, 
     #         <tt><b>False</b></tt> if not.
     def __check_session_id__(self, nickname, session_id):
-        nickname_in_db,_,_,_,_ = self.get_session(session_id)
+        nickname_in_db,_,_,_,_ = self.get_session_users(session_id)
         return nickname_in_db == nickname
     
     ## Checks if password has a length equal to <tt>\ref PW_HASH_LEN</tt>

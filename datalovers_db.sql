@@ -45,11 +45,21 @@ CREATE TABLE IF NOT EXISTS datalovers.user_sessions (
         ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS datalovers.user_websites (
+    nickname        VARCHAR(23) NOT NULL,
+    website         VARCHAR(50) DEFAULT NULL,
+    PRIMARY KEY (nickname),
+    CONSTRAINT fk_users_user_websites
+        FOREIGN KEY (nickname)
+        REFERENCES datalovers.users(nickname)
+        ON DELETE CASCADE
+        ON UPDATE RESTRICT,
+);
+
 CREATE TABLE IF NOT EXISTS datalovers.users (
     nickname        VARCHAR(23) NOT NULL,
     password        CHAR(64) NOT NULL,
     email           VARCHAR(50) DEFAULT NULL,
-    website         VARCHAR(50) DEFAULT NULL,
     available_love  BIGINT UNSIGNED NOT NULL,
     received_love   BIGINT UNSIGNED NOT NULL DEFAULT 0,
     last_changed    TIMESTAMP DEFAULT CURRENT_TIMESTAMP 

@@ -803,7 +803,7 @@ class DBHandler:
     #         the session identified by <i>session_id</i> is associated to, 
     #         <tt><b>False</b></tt> if not.
     def __check_session_id__(self, nickname, session_id):
-        nickname_in_db,_,_,_,_ = self.get_session_users(session_id)
+        nickname_in_db,_,_,_,_ = self.get_session_user(session_id)
         return nickname_in_db == nickname
     
     ## Checks if password has a length equal to <tt>\ref PW_HASH_LEN</tt>

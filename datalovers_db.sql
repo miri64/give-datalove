@@ -19,32 +19,42 @@ CREATE TABLE IF NOT EXISTS datalovers.history (
     CONSTRAINT fk_sender
             FOREIGN KEY (sender)
             REFERENCES datalovers.users (nickname)
-            ON DELETE SET NULL
-            ON UPDATE CASCADE,
+            ON DELETE CASCADE
+            ON UPDATE RESTRICT,
     CONSTRAINT fk_recipient
             FOREIGN KEY (recipient)
             REFERENCES datalovers.users (nickname)
-            ON DELETE SET NULL
-            ON UPDATE CASCADE
+            ON DELETE CASCADE
+            ON UPDATE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS datalovers.user_sessions (
+    nickname        VARCHAR(23) NOT NULL,
+    session_id      CHAR(128) NOT NULL,
+    PRIMARY KEY (nickname,session_id),
+    UNIQUE INDEX (session_id ASC),
+    CONSTRAINT fk_users_user_sessions
+        FOREIGN KEY (nickname)
+        REFERENCES datalovers.users (nickname)
+        ON DELETE CASCADE
+        ON UPDATE RESTRICT,
+    CONSTRAINT fk_sessions_user_sessions
+        FOREIGN KEY (session_id)
+        REFERENCES datalovers.sessions (session_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS datalovers.users (
     nickname        VARCHAR(23) NOT NULL,
     password        CHAR(64) NOT NULL,
-    email            VARCHAR(50) DEFAULT NULL,
-    website          VARCHAR(50) DEFAULT NULL,
-    session_id        CHAR(128) DEFAULT NULL,
-    available_love    BIGINT UNSIGNED NOT NULL,
-    received_love    BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    email           VARCHAR(50) DEFAULT NULL,
+    website         VARCHAR(50) DEFAULT NULL,
+    available_love  BIGINT UNSIGNED NOT NULL,
+    received_love   BIGINT UNSIGNED NOT NULL DEFAULT 0,
     last_changed    TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
                         ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE INDEX (nickname ASC),
-    PRIMARY KEY (nickname),
-    UNIQUE INDEX fk_users_sessions (session_id ASC),
-    CONSTRAINT fk_users_sessions
-        FOREIGN KEY (session_id)
-        REFERENCES datalovers.sessions (session_id)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE
+    PRIMARY KEY (nickname)
 );
 

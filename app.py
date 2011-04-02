@@ -863,18 +863,23 @@ class give_user_datalove_api:
                     )
             session_id = get_session_id()
             from_user = db_handler.get_session_user(session_id)
+        except dbh.IllegalSessionException:
+            web.ctx.status = '401 Unauthorized'
+            return 'You are not logged in yet.'
         except BaseException, e:
             return raise_internal_server_error(e,traceback.format_exc())
         if logged_in:
             try:
                 db_handler.send_datalove(from_user.nickname,to_user,session_id)
             except AssertionError,e:
+                web.ctx.status = '412 Precondition Failed'
                 return e
             except dbh.NotEnoughDataloveException, e:
+                web.ctx.status = '412 Precondition Failed'
                 return e
             except BaseException, e:
                 return raise_internal_server_error(e,traceback.format_exc())
-            return 'SEND'
+            return ''
         else:
             raise web.seeother(config.host_url)
 

@@ -375,6 +375,7 @@ class DBHandler:
                     " not associated to a user."
                 )
         user = user_rows[0]
+        user['available_love'] = self.__update_love__(user.nickname)
         user['websites'] = [row.website for row in website_rows]
         return user
     
@@ -630,12 +631,16 @@ class DBHandler:
             raise AssertionError(
                     "Share datalove with other users, not yourself."
                 )
+            
         if(datalove_points < 0):
             raise ValueError(
                     "datalove_points must be positive. It is " + 
                     datalove_points + 
                     " currently."
                 )
+        
+        if not self.user_exists(from_nickname):
+            raise UserException("User '"+nickname+"' does not exist.")
         
         if not self.__check_session_id__(from_nickname,session_id):
             raise IllegalSessionException(

@@ -23,11 +23,7 @@ web.config.debug = False
 web.config.session_parameters['cookie_name'] = 'give_datalove_session_id'
 web.config.session_parameters['timeout'] = 2 * 7 * 24 * 60 * 60
         # 2 weeks in seconds
-web.config.session_parameters['ignore_expiry'] = False 
-
-## Text for a test cookie to implement cookie-less, URL-based Session Management
-#  later on for users that do not want to use cookies.
-test_cookie_text = 'Do you accept cookies?' 
+web.config.session_parameters['ignore_expiry'] = False
 
 ## URL-Map that maps the urls to the respective classes 
 # @see <a href="http://webpy.org/docs/0.3/">Web.py Documentation</a>
@@ -54,6 +50,12 @@ urls = (
 
 ## The absolute path of this script.
 abspath = os.path.dirname(__file__)
+
+ses_templates = web.template.render(os.path.join(abspath,'templates'))
+content = ses_templates.session_expired(get_session_id())
+web.config.session_parameters['expired_message'] = \
+        str(ses_templates.index(content))
+ses_templates = None
 
 ## The web.py <tt>web.db.DB</tt> object to connect to the applications database.
 db = web.database(
@@ -173,29 +175,32 @@ def url_path_join(a, b):
             path += '/' + b
     return path
 
-## Sends the client a HTTP 500 Internal Server Error with a message and an
-#  error stack.
+## HTTP 500 Internal Server Error with a message and an error stack.
 # @param msg (optional) The error message to this error.
 # @param error_stack (optional) The error stack of 
 # @return The content of the HTTP 500 Internal Server Error message.
-def raise_internal_server_error(msg = None, error_stack = None):
+def internalerror(msg = None):
+    error_stack = str(traceback.format_exc())
     log.critical(
-            "%s Internal Server Error \"%s\" on '%s' Cause:\n %s",
+            "%s Internal Server Error on '%s' Cause:\n %s",
             get_ctx(),
-            str(msg),
             web.ctx.path,
-            str(error_stack)
+            error_stack
         )
     web.header('Content-Type','text/html;charset=utf-8')
     web.ctx.status = '500 Internal Server Error'
     templates = web.template.render(os.path.join(abspath,'templates'))
-    return templates.internal_server_error(str(msg),str(error_stack))
+    return web.internalerror(
+            templates.internal_server_error(msg,error_stack)
+        )
 
-## Sends the client a HTTP 404 Not Found with a message.
+## HTTP 404 Not Found with a message.
 # @param msg (optional) A message that explains how the searched item was not
 #        found.
 # @return The content of the HTTP 404 Not Found message.
-def raise_not_found(msg = None):
+def notfound(msg = None):
+    if not msg:
+        msg = "Oops... maybe you shold check what you've typed in."
     log.warning(
             "%s '%s' not found (%s)",
             get_ctx(),
@@ -205,7 +210,10 @@ def raise_not_found(msg = None):
     web.header('Content-Type','text/html;charset=utf-8')
     web.ctx.status = '404 Not Found'
     templates = web.template.render(os.path.join(abspath,'templates'))
-    return templates.not_found(str(msg))
+    return web.notfound(templates.not_found(msg))
+
+app.internalerror = internalerror
+app.notfound = notfound
 
 ## Class for the <tt>/index</tt> URL.
 class index:
@@ -265,7 +273,7 @@ class index:
                             login_block = False
                         )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
     
     ## Handles what happens on login
     def login_action(self):
@@ -320,7 +328,7 @@ class index:
                     'Password not associated to nickname.'
                 )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         if session_cookie:
             raise web.seeother(config.host_url)
         else:
@@ -378,7 +386,7 @@ class manage_account:
                             login_block = False
                         )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         raise web.seeother(config.host_url)
     
     ## Handles what happens on password change
@@ -457,7 +465,7 @@ class manage_account:
                     return self.show(website_change_error = e)
                     
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         if session_cookie:
             raise web.seeother(url_path_join(config.host_url,'manage_account'))
         else:
@@ -507,7 +515,7 @@ class register:
                         login_block = False
                     )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         print 'show', session_cookie
         if session_cookie:
             raise web.seeother(config.host_url)
@@ -548,7 +556,7 @@ class register:
             email = i.email
             return self.show(nickname,email,e)
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         print 'POST', session_cookie
         if session_cookie:
             raise web.seeother(config.host_url)
@@ -587,7 +595,7 @@ class users:
                         logged_in = logged_in
                     )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:
@@ -634,7 +642,7 @@ class widget:
                             login_block = False
                         )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
     ## Method for a HTTP GET request. 
     def GET(self):
         web.header('Content-Type','text/html;charset=utf-8')
@@ -665,7 +673,7 @@ class widget:
                     "No user given."
                 )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
 
 ## Class for the <tt>/give_([^?$/\\#%\s]+)_datalove</tt> URL where the regular 
 #  expression stands for the user's name.
@@ -692,7 +700,7 @@ class give_user_datalove:
                 return templates.no_login_widget(session_id)
             from_user = db_handler.get_session_user(session_id)
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         if logged_in:
             try:
                 db_handler.send_datalove(from_user.nickname,to_user,session_id)
@@ -729,7 +737,7 @@ class give_user_datalove:
                                 )
                         )
             except BaseException, e:
-                return raise_internal_server_error(e,traceback.format_exc())
+                raise internalerror(e)
             if session_cookie:
                 raise web.seeother(
                         url_path_join(
@@ -755,7 +763,7 @@ class logoff:
             db_handler.user_logoff(user.nickname,session_id)
             session.kill()
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         raise web.seeother(config.host_url)
 
 ## Class for the <tt>/unregister</tt> URL.
@@ -769,7 +777,7 @@ class unregister:
             user = db_handler.get_session_user(session_id)
             db_handler.drop_user(user.nickname,session_id)
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         raise web.seeother(config.host_url)
 
 ## Class for the <tt>/reset_password_form</tt> URL.
@@ -811,7 +819,7 @@ class reset_password:
                         login_block = False
                     )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         raise web.seeother(config.host_url)
     
     def reset_password_action(self):
@@ -842,7 +850,7 @@ class reset_password:
             
             return self.show(success = True)
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
     
     ## Method for a HTTP GET request. 
     def GET(self):
@@ -871,14 +879,14 @@ class get_users_love:
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             if not db_handler.user_exists(nickname):
-                return raise_not_found(
+                raise notfound(
                         "User '%s' does not exist." % nickname
                     )
             available_love = db_handler.get_available_love(nickname)
             received_love = db_handler.get_received_love(nickname)
             return str(available_love) + ',' + str(received_love)
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/available_datalove</tt> URL where the 
 #  regular expression stands for the user's name.
@@ -889,13 +897,13 @@ class get_users_available_love:
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             if not db_handler.user_exists(nickname):
-                return raise_not_found(
+                raise notfound(
                         "User '%s' does not exist." % nickname
                     )
             available_love = db_handler.get_available_love(nickname)
             return str(available_love)
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/received_datalove</tt> URL where the 
 #  regular expression stands for the user's name.
@@ -906,13 +914,13 @@ class get_users_received_love:
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             if not db_handler.user_exists(nickname):
-                return raise_not_found(
+                raise notfound(
                         "User '%s' does not exist." % nickname
                     )
             received_love = db_handler.get_received_love(nickname)
             return str(received_love)
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/give_datalove</tt> URL where the 
 #  regular expression stands for the user's name.
@@ -924,7 +932,7 @@ class give_user_datalove_api:
         try:
             logged_in = True
             if not db_handler.user_exists(to_user):
-                return raise_not_found(
+                raise notfound(
                         "User '%s' does not exist." % to_user
                     )
             session_id = get_session_id()
@@ -933,7 +941,7 @@ class give_user_datalove_api:
             web.ctx.status = '401 Unauthorized'
             return 'You are not logged in yet.'
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         if logged_in:
             try:
                 db_handler.send_datalove(from_user.nickname,to_user,session_id)
@@ -944,7 +952,7 @@ class give_user_datalove_api:
                 web.ctx.status = '412 Precondition Failed'
                 return e
             except BaseException, e:
-                return raise_internal_server_error(e,traceback.format_exc())
+                raise internalerror(e)
             return ''
         else:
             raise web.seeother(config.host_url)
@@ -1002,7 +1010,7 @@ class history:
                             login_block = False
                         )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
 
     ## Method for a HTTP GET request. 
     def GET(self):
@@ -1015,7 +1023,7 @@ class user:
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             if not db_handler.user_exists(nickname):
-                return raise_not_found(
+                raise notfound(
                         "User '%s' does not exist." % nickname
                     )
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
@@ -1064,7 +1072,7 @@ class user:
                         login_block = login_block
                     )
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
     ## Method for a HTTP GET request. 
     # @param nickname The user's nickname
     def GET(self,nickname):
@@ -1095,7 +1103,7 @@ class user_give_user_datalove:
                 return templates.no_login_widget(session_id)
             from_user = db_handler.get_session_user(session_id)
         except BaseException, e:
-            return raise_internal_server_error(e,traceback.format_exc())
+            raise internalerror(e)
         if logged_in:
             try:
                 db_handler.send_datalove(from_user.nickname,to_user,session_id)
@@ -1132,7 +1140,7 @@ class user_give_user_datalove:
                                 )
                         )
             except BaseException, e:
-                return raise_internal_server_error(e,traceback.format_exc())
+                raise internalerror(e)
             if session_cookie:
                 raise web.seeother(
                         url_path_join(

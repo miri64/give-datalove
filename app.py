@@ -51,9 +51,6 @@ urls = (
 ## The absolute path of this script.
 abspath = os.path.dirname(__file__)
 
-## The web.py <tt>web.db.DB</tt> object to connect to the applications database.
-db = None
-
 ## The db_handling.DBHandler to wrap the applications database operations.
 db_handler = None
 

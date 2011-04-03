@@ -15,7 +15,7 @@
 #  No Copyright, no license, comes as it is
 
 import web,os,config,traceback
-
+from log import log
 import db_handling as dbh
 
 web.config.debug = False

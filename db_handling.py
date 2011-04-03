@@ -8,6 +8,7 @@
 
 import web
 from datetime import datetime
+from log import log
 import hashlib
 
 ## The default value for the amount of datalove a user gets on account creation

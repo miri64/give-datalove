@@ -9,6 +9,7 @@
 import web
 from datetime import datetime
 from log import log
+from log import get_ctx
 import hashlib
 
 ## The default value for the amount of datalove a user gets on account creation
@@ -277,6 +278,7 @@ class DBHandler:
     #            is set <tt><b>True</b></tt> or if the <i>password</i> is just 
     #            wrong.
     def user_login(self, nickname, password, session_id, pw_as_hash = True):
+        log.debug("%s Try user login.",get_ctx())
         nickname = nickname.lower()
         if self.session_associated_to_any_user(session_id):
             raise AssertionError(
@@ -354,6 +356,8 @@ class DBHandler:
     #          of the user who is associated to the session identified by the 
     #          <i>session_id</i>
     def get_session_user(self, session_id):
+        log.debug("%s Try to get user of session_id '%s'", 
+                    get_ctx(), session_id)
         user_rows = self.db.query(
                 """SELECT nickname, email, available_love, received_love
                    FROM users NATURAL JOIN user_sessions
@@ -907,12 +911,8 @@ class DBHandler:
     ## Returns the overall number of users currently registered.
     # @returns The overall number of users currently registered.
     def get_total_loverz(self):
-        amount = self.db.query(
-                """SELECT count(nickname) AS amount
-                   FROM users
-                   """,
-                vars=locals()
-            )
+        log.debug("%s Get total loverz from DB.",get_ctx())
+        amount = self.db.select('users', what='COUNT(nickname) AS amount')
         return amount[0].amount
     
     ## Gets profile information of a user.

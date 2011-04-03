@@ -16,6 +16,7 @@
 
 import web,os,config,traceback
 from log import log
+from log import get_ctx
 import db_handling as dbh
 
 web.config.debug = False
@@ -125,15 +126,32 @@ session_cookie = True
 ## Get the session id from a cookie (or in later implementations the URL).
 #  @returns The current session's session ID.
 def get_session_id():
+    log.debug("%s Try to get session_id", get_ctx())
     global session_cookie
     session_id = web.cookies().get(web.config.session_parameters['cookie_name'])
     if not session_id:
         session_cookie = False
         session_id = web.input().get('sid')
+        log.info(
+                "%s Get session_id = '%s' from %s query",
+                get_ctx(),
+                session_id,
+                web.ctx.method
+            )
     else:
         session_cookie = True
+        log.info(
+                "%s Get session_id = '%s' from cookie",
+                get_ctx(),
+                session_id
+            )
     if not session_id:
         session_id = session.session_id
+        log.info(
+                "%s Get session_id = '%s' from local session",
+                get_ctx(),
+                session_id
+            )
     return session_id
 
 ## Joins two fragments of an URL path with an '/' (if needed).
@@ -161,6 +179,13 @@ def url_path_join(a, b):
 # @param error_stack (optional) The error stack of 
 # @return The content of the HTTP 500 Internal Server Error message.
 def raise_internal_server_error(msg = None, error_stack = None):
+    log.critical(
+            "%s Internal Server Error \"%s\" on '%s' Cause:\n %s",
+            get_ctx(),
+            str(msg),
+            web.ctx.path,
+            str(error_stack)
+        )
     web.header('Content-Type','text/html;charset=utf-8')
     web.ctx.status = '500 Internal Server Error'
     templates = web.template.render(os.path.join(abspath,'templates'))
@@ -170,7 +195,13 @@ def raise_internal_server_error(msg = None, error_stack = None):
 # @param msg (optional) A message that explains how the searched item was not
 #        found.
 # @return The content of the HTTP 404 Not Found message.
-def raise_not_found(msg):
+def raise_not_found(msg = None):
+    log.warning(
+            "%s '%s' not found (%s)",
+            get_ctx(),
+            web.ctx.path,
+            str(msg)
+        )
     web.header('Content-Type','text/html;charset=utf-8')
     web.ctx.status = '404 Not Found'
     templates = web.template.render(os.path.join(abspath,'templates'))
@@ -182,17 +213,31 @@ class index:
     # @param login_error Possible errors (as string) that happened during login.
     # @return String in HTML code of what the side looks like
     def show(self, login_error = None):
+        log.debug(
+                "%s Show index with with login_error = %s",
+                get_ctx(),
+                repr(login_error)
+            )
         try:
             web.header('Content-Type','text/html;charset=utf-8')
-            #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
             session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
             total_loverz = db_handler.get_total_loverz()
+            log.debug(
+                    "%s Got total_loverz = %d",
+                    get_ctx(),
+                    total_loverz
+                )
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
+                log.debug("%s not logged in.",get_ctx())
                 content = templates.welcome()
                 if session_cookie:
-                    return templates.index(content, total_loverz = total_loverz,login_error = login_error)
+                    return templates.index(
+                            content, 
+                            total_loverz = total_loverz,
+                            login_error = login_error
+                        )
                 else:
                     return templates.index(
                             content,
@@ -202,6 +247,7 @@ class index:
                         )
             else:
                 user = db_handler.get_session_user(session_id)
+                log.debug("%s Got user for session %s", get_ctx(), session_id)
                 content = templates.userpage(user)
                 if session_cookie:
                     return templates.index(
@@ -223,26 +269,46 @@ class index:
     
     ## Handles what happens on login
     def login_action(self):
+        log.info("%s User login.",get_ctx())
         import hashlib
         i = web.input()
         session_id = get_session_id()
         nickname = i.nickname
         password = dbh.hash_password(nickname,i.password)
         db_handler.user_login(nickname,password,session_id)
+        log.debug("%s User login successful.",get_ctx())
         # spend love that was spend, while not logged in
-        for to_user,datalovez in session.spend_love.items():
+        while len(session.spend_love):
+            to_user, nickname = session.spend_love.popitem()
             if not db_handler.get_available_love(nickname):
                 break
             if to_user != nickname:
+                log.debug(
+                        "%s Give love which was given by now: %s -> %d",
+                        get_ctx(),
+                        to_user,
+                        datalovez
+                    )
                 db_handler.send_datalove(nickname,to_user,session_id,datalovez)
-            session.spend_love[to_user] = 0
         
     ## Method for a HTTP GET request. 
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL'])
         return self.show()
     
     ## Method for a HTTP POST request. 
     def POST(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL'])
         try:
             self.login_action()
         except AssertionError, e:

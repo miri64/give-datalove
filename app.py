@@ -51,12 +51,6 @@ urls = (
 ## The absolute path of this script.
 abspath = os.path.dirname(__file__)
 
-ses_templates = web.template.render(os.path.join(abspath,'templates'))
-content = ses_templates.session_expired(get_session_id())
-web.config.session_parameters['expired_message'] = \
-        str(ses_templates.index(content))
-ses_templates = None
-
 ## The web.py <tt>web.db.DB</tt> object to connect to the applications database.
 db = web.database(
         dbn=config.db_engine, 
@@ -67,6 +61,14 @@ db = web.database(
 
 ## The db_handling.DBHandler to wrap the applications database operations.
 db_handler = dbh.DBHandler(db)
+
+ses_templates = web.template.render(os.path.join(abspath,'templates'))
+content = ses_templates.session_expired()
+total_loverz = db_handler.get_total_loverz()
+web.config.session_parameters['expired_message'] = \
+        str(ses_templates.index(content,total_loverz))
+ses_templates = None
+total_loverz = None
 
 ## The web.py <a href="http://webpy.org/docs/0.3/api#web.application"><tt>
 #  application</tt></a> object.

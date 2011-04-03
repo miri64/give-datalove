@@ -96,26 +96,44 @@ function toggleVisibility(linkObj) {
 <h1>app.give_user_datalove_api Class Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="app::give_user_datalove_api" -->
-<p>Class for the <code>/api/([^?$/\#%]+)/give_datalove</code> URL where the regular expression stands for the user's name.  
+<!-- doxytag: class="app::give_user_datalove_api" --><!-- doxytag: inherits="app::give_user_datalove" -->
+<p>Implementation of <a class="el" href="classapp_1_1give__user__datalove.html">give_user_datalove</a> for the <code>/api/([^?$/\#%]+)/give_datalove</code> URL where the regular expression stands for the user's name.  
 <a href="#_details">More...</a></p>
+<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png"/> Inheritance diagram for app.give_user_datalove_api:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
+ <div class="center">
+  <img src="classapp_1_1give__user__datalove__api.png" usemap="#app.give_user_datalove_api_map" alt=""/>
+  <map id="app.give_user_datalove_api_map" name="app.give_user_datalove_api_map">
+<area href="classapp_1_1give__user__datalove.html" alt="app.give_user_datalove" shape="rect" coords="0,0,172,24"/>
+</map>
+</div>
 
 <p><a href="classapp_1_1give__user__datalove__api-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__api.html#af40fdc5c2e52a6f1f18c3692a5fd8995">GET</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Method for a HTTP GET request.  <a href="#af40fdc5c2e52a6f1f18c3692a5fd8995"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__api.html#aceed6b8ef93ad2a9179618fa10f51791">error_handling</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Is called if an error occures.  <a href="#aceed6b8ef93ad2a9179618fa10f51791"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__api.html#a8830a4d3862f701f53fde635a026967a">end_action</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Describes to which URL to return to, after the love is given.  <a href="#a8830a4d3862f701f53fde635a026967a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__api.html#a5ce315621de8e9b1222b74aca8e03dbd">not_logged_in_page</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Describes what happens, if user is not logged in.  <a href="#a5ce315621de8e9b1222b74aca8e03dbd"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__api.html#a1aa9f0da33b1cb2a997d479be8728cfe">user_not_exists_page</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Describes what happens, if user does not exist.  <a href="#a1aa9f0da33b1cb2a997d479be8728cfe"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
-<p>Class for the <code>/api/([^?$/\#%]+)/give_datalove</code> URL where the regular expression stands for the user's name. </p>
+<p>Implementation of <a class="el" href="classapp_1_1give__user__datalove.html">give_user_datalove</a> for the <code>/api/([^?$/\#%]+)/give_datalove</code> URL where the regular expression stands for the user's name. </p>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="classapp_1_1give__user__datalove.html" title="Abstract class for the /give_([^?$/\#%]+)_datalove_&lt;x&gt; URL where the regular expression stands ...">give_user_datalove</a> </dd></dl>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="af40fdc5c2e52a6f1f18c3692a5fd8995"></a><!-- doxytag: member="app::give_user_datalove_api::GET" ref="af40fdc5c2e52a6f1f18c3692a5fd8995" args="" -->
+<a class="anchor" id="a8830a4d3862f701f53fde635a026967a"></a><!-- doxytag: member="app::give_user_datalove_api::end_action" ref="a8830a4d3862f701f53fde635a026967a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def app.give_user_datalove_api.GET </td>
+          <td class="memname">def app.give_user_datalove_api.end_action </td>
           <td>(</td>
           <td class="paramtype">&nbsp;</td>
           <td class="paramname"> <em>self</em>, </td>
@@ -124,7 +142,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>to_user</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>recipient</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>session_id</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -135,13 +159,136 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Method for a HTTP GET request. </p>
+<p>Describes to which URL to return to, after the love is given. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>to_user</em>&nbsp;</td><td>User the datalove should be given to. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>recipient</em>&nbsp;</td><td>The recipient's nickname, where the recipient is the user who is given in the URL via the reges </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>session_id</em>&nbsp;</td><td>The current session_id </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="classapp_1_1give__user__datalove.html" title="Abstract class for the /give_([^?$/\#%]+)_datalove_&lt;x&gt; URL where the regular expression stands ...">give_user_datalove</a> </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classapp_1_1give__user__datalove.html#a44ec6a0872b5c7a3c22bb7171ed48028">app.give_user_datalove</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aceed6b8ef93ad2a9179618fa10f51791"></a><!-- doxytag: member="app::give_user_datalove_api::error_handling" ref="aceed6b8ef93ad2a9179618fa10f51791" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def app.give_user_datalove_api.error_handling </td>
+          <td>(</td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>error_msg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>recipient</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>session_id</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Is called if an error occures. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>error_msg</em>&nbsp;</td><td>The error message. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>recipient</em>&nbsp;</td><td>The recipient's nickname, where the recipient is the user who is given in the URL via the regex </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>session_id</em>&nbsp;</td><td>The current session_id </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="classapp_1_1give__user__datalove.html" title="Abstract class for the /give_([^?$/\#%]+)_datalove_&lt;x&gt; URL where the regular expression stands ...">give_user_datalove</a> </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classapp_1_1give__user__datalove.html#a4aea3cb56be5c35738108bbb5ef794ad">app.give_user_datalove</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5ce315621de8e9b1222b74aca8e03dbd"></a><!-- doxytag: member="app::give_user_datalove_api::not_logged_in_page" ref="a5ce315621de8e9b1222b74aca8e03dbd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def app.give_user_datalove_api.not_logged_in_page </td>
+          <td>(</td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>session_id</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Describes what happens, if user is not logged in. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>session_id</em>&nbsp;</td><td>The current session_id </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="classapp_1_1give__user__datalove.html" title="Abstract class for the /give_([^?$/\#%]+)_datalove_&lt;x&gt; URL where the regular expression stands ...">give_user_datalove</a> </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classapp_1_1give__user__datalove.html#aef9315329fc70f9c5732d8e8a070d494">app.give_user_datalove</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1aa9f0da33b1cb2a997d479be8728cfe"></a><!-- doxytag: member="app::give_user_datalove_api::user_not_exists_page" ref="a1aa9f0da33b1cb2a997d479be8728cfe" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def app.give_user_datalove_api.user_not_exists_page </td>
+          <td>(</td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>nickname</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Describes what happens, if user does not exist. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>nickname</em>&nbsp;</td><td>The not existent nickname </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="classapp_1_1give__user__datalove.html" title="Abstract class for the /give_([^?$/\#%]+)_datalove_&lt;x&gt; URL where the regular expression stands ...">give_user_datalove</a> </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classapp_1_1give__user__datalove.html#a5ff76f5574b890a842a61b8687debd8e">app.give_user_datalove</a>.</p>
 
 </div>
 </div>
@@ -163,7 +310,7 @@ Public Member Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Fri Apr 1 2011 18:42:00 for give.datalove.me by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Apr 4 2011 00:01:39 for give.datalove.me by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

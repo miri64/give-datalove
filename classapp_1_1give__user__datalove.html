@@ -97,19 +97,148 @@ function toggleVisibility(linkObj) {
 </div>
 <div class="contents">
 <!-- doxytag: class="app::give_user_datalove" -->
-<p>Class for the <code>/give_([^?$/\#%]+)_datalove</code> URL where the regular expression stands for the user's name.  
+<p>Abstract class for the <code>/give_([^?$/\#%]+)_datalove_&lt;x&gt;</code> URL where the regular expression stands for the user's name and &lt;x&gt; is in <code>{api, profile, widget}</code>.  
 <a href="#_details">More...</a></p>
+<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png"/> Inheritance diagram for app.give_user_datalove:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
+ <div class="center">
+  <img src="classapp_1_1give__user__datalove.png" usemap="#app.give_user_datalove_map" alt=""/>
+  <map id="app.give_user_datalove_map" name="app.give_user_datalove_map">
+<area href="classapp_1_1give__user__datalove__api.html" alt="app.give_user_datalove_api" shape="rect" coords="0,56,191,80"/>
+<area href="classapp_1_1give__user__datalove__list.html" alt="app.give_user_datalove_list" shape="rect" coords="201,56,392,80"/>
+<area href="classapp_1_1give__user__datalove__profile.html" alt="app.give_user_datalove_profile" shape="rect" coords="402,56,593,80"/>
+<area href="classapp_1_1give__user__datalove__widget.html" alt="app.give_user_datalove_widget" shape="rect" coords="603,56,794,80"/>
+</map>
+</div>
 
 <p><a href="classapp_1_1give__user__datalove-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove.html#a4aea3cb56be5c35738108bbb5ef794ad">error_handling</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Is called if an error occures.  <a href="#a4aea3cb56be5c35738108bbb5ef794ad"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove.html#a44ec6a0872b5c7a3c22bb7171ed48028">end_action</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Describes what happens after the love was given.  <a href="#a44ec6a0872b5c7a3c22bb7171ed48028"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove.html#aef9315329fc70f9c5732d8e8a070d494">not_logged_in_page</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Describes what happens, if user is not logged in.  <a href="#aef9315329fc70f9c5732d8e8a070d494"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove.html#a5ff76f5574b890a842a61b8687debd8e">user_not_exists_page</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Describes what happens, if user does not exist.  <a href="#a5ff76f5574b890a842a61b8687debd8e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove.html#a6dbd73b464e000e762f908b24d8fcd50">GET</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Method for a HTTP GET request.  <a href="#a6dbd73b464e000e762f908b24d8fcd50"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
-<p>Class for the <code>/give_([^?$/\#%]+)_datalove</code> URL where the regular expression stands for the user's name. </p>
+<p>Abstract class for the <code>/give_([^?$/\#%]+)_datalove_&lt;x&gt;</code> URL where the regular expression stands for the user's name and &lt;x&gt; is in <code>{api, profile, widget}</code>. </p>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a44ec6a0872b5c7a3c22bb7171ed48028"></a><!-- doxytag: member="app::give_user_datalove::end_action" ref="a44ec6a0872b5c7a3c22bb7171ed48028" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def app.give_user_datalove.end_action </td>
+          <td>(</td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>recipient</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>session_id</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Describes what happens after the love was given. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>recipient</em>&nbsp;</td><td>The recipient's nickname, where the recipient is the user who is given in the URL via the reges </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>session_id</em>&nbsp;</td><td>The current session_id </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Exceptions:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>NotImplementedError</em>&nbsp;</td><td>Since this method should be implemented by a subclass </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classapp_1_1give__user__datalove__widget.html#a2c0d0580925e65e348aa48e9bf0be23d">app.give_user_datalove_widget</a>, <a class="el" href="classapp_1_1give__user__datalove__list.html#afa7b2959690c65cbcb3325a07e82f362">app.give_user_datalove_list</a>, <a class="el" href="classapp_1_1give__user__datalove__api.html#a8830a4d3862f701f53fde635a026967a">app.give_user_datalove_api</a>, and <a class="el" href="classapp_1_1give__user__datalove__profile.html#ae46a9b0d745ec56474dcf15dd67955fe">app.give_user_datalove_profile</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4aea3cb56be5c35738108bbb5ef794ad"></a><!-- doxytag: member="app::give_user_datalove::error_handling" ref="a4aea3cb56be5c35738108bbb5ef794ad" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def app.give_user_datalove.error_handling </td>
+          <td>(</td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>error_msg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>recipient</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>session_id</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Is called if an error occures. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>error_msg</em>&nbsp;</td><td>The error message. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>recipient</em>&nbsp;</td><td>The recipient's nickname, where the recipient is the user who is given in the URL via the regex </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>session_id</em>&nbsp;</td><td>The current session_id </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Exceptions:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>NotImplementedError</em>&nbsp;</td><td>Since this method should be implemented by a subclass </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classapp_1_1give__user__datalove__widget.html#a65ed484abf9aea5b736a2ae9827cbe3c">app.give_user_datalove_widget</a>, <a class="el" href="classapp_1_1give__user__datalove__list.html#ae9e385c7d82e7b73a51f0e4ec36260e7">app.give_user_datalove_list</a>, <a class="el" href="classapp_1_1give__user__datalove__api.html#aceed6b8ef93ad2a9179618fa10f51791">app.give_user_datalove_api</a>, and <a class="el" href="classapp_1_1give__user__datalove__profile.html#a6421434d4e3e009313f476167056a3ef">app.give_user_datalove_profile</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a6dbd73b464e000e762f908b24d8fcd50"></a><!-- doxytag: member="app::give_user_datalove::GET" ref="a6dbd73b464e000e762f908b24d8fcd50" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -145,6 +274,83 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aef9315329fc70f9c5732d8e8a070d494"></a><!-- doxytag: member="app::give_user_datalove::not_logged_in_page" ref="aef9315329fc70f9c5732d8e8a070d494" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def app.give_user_datalove.not_logged_in_page </td>
+          <td>(</td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>session_id</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Describes what happens, if user is not logged in. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>session_id</em>&nbsp;</td><td>The current session_id </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Exceptions:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>NotImplementedError</em>&nbsp;</td><td>Since this method should be implemented by a subclass </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classapp_1_1give__user__datalove__widget.html#a9356f74eac9c16a66a5e3649aa31f42f">app.give_user_datalove_widget</a>, <a class="el" href="classapp_1_1give__user__datalove__list.html#afa9c08f0af26232649d812fca68290fa">app.give_user_datalove_list</a>, <a class="el" href="classapp_1_1give__user__datalove__api.html#a5ce315621de8e9b1222b74aca8e03dbd">app.give_user_datalove_api</a>, and <a class="el" href="classapp_1_1give__user__datalove__profile.html#ab4cc948c7598baadbe5ded49c196875f">app.give_user_datalove_profile</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5ff76f5574b890a842a61b8687debd8e"></a><!-- doxytag: member="app::give_user_datalove::user_not_exists_page" ref="a5ff76f5574b890a842a61b8687debd8e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def app.give_user_datalove.user_not_exists_page </td>
+          <td>(</td>
+          <td class="paramtype">&nbsp;</td>
+          <td class="paramname"> <em>nickname</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Describes what happens, if user does not exist. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>nickname</em>&nbsp;</td><td>The not existent nickname </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Exceptions:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>NotImplementedError</em>&nbsp;</td><td>Since this method should be implemented by a subclass </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classapp_1_1give__user__datalove__widget.html#ab1ee90c30a992f3eaad3a0c67a66b831">app.give_user_datalove_widget</a>, <a class="el" href="classapp_1_1give__user__datalove__list.html#a98847fc91a399ec3fdb7aaa035979310">app.give_user_datalove_list</a>, and <a class="el" href="classapp_1_1give__user__datalove__api.html#a1aa9f0da33b1cb2a997d479be8728cfe">app.give_user_datalove_api</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>app.py</li>
 </ul>
@@ -163,7 +369,7 @@ Public Member Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Fri Apr 1 2011 18:42:00 for give.datalove.me by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Apr 4 2011 00:01:39 for give.datalove.me by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

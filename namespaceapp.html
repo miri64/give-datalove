@@ -109,7 +109,11 @@ Classes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1widget.html">widget</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Class for the <code>/widget</code> URL.  <a href="classapp_1_1widget.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove.html">give_user_datalove</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Class for the <code>/give_([^?$/\#%]+)_datalove</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1give__user__datalove.html#_details">More...</a><br/></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Abstract class for the <code>/give_([^?$/\#%]+)_datalove_&lt;x&gt;</code> URL where the regular expression stands for the user's name and &lt;x&gt; is in <code>{api, profile, widget}</code>.  <a href="classapp_1_1give__user__datalove.html#_details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__widget.html">give_user_datalove_widget</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implementation of <a class="el" href="classapp_1_1give__user__datalove.html">give_user_datalove</a> for the <code>/give_([^?$/\#%]+)_datalove_widget</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1give__user__datalove__widget.html#_details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__list.html">give_user_datalove_list</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implementation of <a class="el" href="classapp_1_1give__user__datalove.html">give_user_datalove</a> for the <code>/users/give_([^?$/\#%]+)_datalove</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1give__user__datalove__list.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1logoff.html">logoff</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Class for the <code>/logoff</code> URL.  <a href="classapp_1_1logoff.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1unregister.html">unregister</a></td></tr>
@@ -125,44 +129,46 @@ Classes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1get__users__received__love.html">get_users_received_love</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Class for the <code>/api/([^?$/\#%]+)/received_datalove</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1get__users__received__love.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__api.html">give_user_datalove_api</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Class for the <code>/api/([^?$/\#%]+)/give_datalove</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1give__user__datalove__api.html#_details">More...</a><br/></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implementation of <a class="el" href="classapp_1_1give__user__datalove.html">give_user_datalove</a> for the <code>/api/([^?$/\#%]+)/give_datalove</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1give__user__datalove__api.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1history.html">history</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Class for the <code>/history/tt&gt; URL. </code> <a href="classapp_1_1history.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1user.html">user</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Class for the <code>/user/([^?$/\#%]+)/</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1user.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1user__give__user__datalove.html">user_give_user_datalove</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Class for the <code>/give_([^?$/\#%]+)_datalove</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1user__give__user__datalove.html#_details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapp_1_1give__user__datalove__profile.html">give_user_datalove_profile</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implementation of <a class="el" href="classapp_1_1give__user__datalove.html">give_user_datalove</a> for the <code>/user/([^?$/\#%]+)/give_datalove</code> URL where the regular expression stands for the user's name.  <a href="classapp_1_1give__user__datalove__profile.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#a7e3f576cb6de46a9f5259ea33a1fab6b">get_session_id</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the session id from a cookie (or in later implementations the URL).  <a href="#a7e3f576cb6de46a9f5259ea33a1fab6b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#ab767b4beb1a24558cf808b44d92601d6">url_path_join</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Joins two fragments of an URL path with an '/' (if needed).  <a href="#ab767b4beb1a24558cf808b44d92601d6"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#ac06aecf2d3edf03ace05206e84d1486b">raise_internal_server_error</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends the client a HTTP 500 Internal Server Error with a message and an error stack.  <a href="#ac06aecf2d3edf03ace05206e84d1486b"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#af03268e126baee807ff5818e79958189">raise_not_found</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends the client a HTTP 404 Not Found with a message.  <a href="#af03268e126baee807ff5818e79958189"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#aa502d7af922c7f1240af8b21375f8b6b">internalerror</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">HTTP 500 Internal Server Error with a message and an error stack.  <a href="#aa502d7af922c7f1240af8b21375f8b6b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#a7cba1bd5597d3bd44747345e202505d2">notfound</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">HTTP 404 Not Found with a message.  <a href="#a7cba1bd5597d3bd44747345e202505d2"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#ae9d02aa9e820f15ed59718ee9f96c88b">test_cookie_text</a> = 'Do you accept cookies?'</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Text for a test cookie to implement cookie-less, URL-based Session Management later on for users that do not want to use cookies.  <a href="#ae9d02aa9e820f15ed59718ee9f96c88b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#af502a6cc4eef7de60de488c3509f8300">urls</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">URL-Map that maps the urls to the respective classes.  <a href="#af502a6cc4eef7de60de488c3509f8300"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#a611674320c4c0a25e67fd57da8fcd395">abspath</a> = os.path.dirname(__file__)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The absolute path of this script.  <a href="#a611674320c4c0a25e67fd57da8fcd395"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#ab520233be545dd9aa0e4abc18ef57c93">db</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The web.py <code>web.db.DB</code> object to connect to the applications database.  <a href="#ab520233be545dd9aa0e4abc18ef57c93"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#ad2cbbb7414c057a1dc7e59be2e35a095">db_handler</a> = dbh.DBHandler(<a class="el" href="namespaceapp.html#ab520233be545dd9aa0e4abc18ef57c93">db</a>)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The <a class="el" href="classdb__handling_1_1_d_b_handler.html" title="This class is the wrapper for all database operations of the web application.">db_handling.DBHandler</a> to wrap the applications database operations.  <a href="#ad2cbbb7414c057a1dc7e59be2e35a095"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#ad99fc99ce705625c1aeb16c02f80650e">db_handler</a> = None</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The <a class="el" href="classdb__handling_1_1_d_b_handler.html" title="This class is the wrapper for all database operations of the web application.">db_handling.DBHandler</a> to wrap the applications database operations.  <a href="#ad99fc99ce705625c1aeb16c02f80650e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#ad3afa162eb284cf3d0ed835917982bc9">app</a> = web.application(<a class="el" href="namespaceapp.html#af502a6cc4eef7de60de488c3509f8300">urls</a>, globals())</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The web.py <a href="http://webpy.org/docs/0.3/api#web.application"><code> application</code></a> object.  <a href="#ad3afa162eb284cf3d0ed835917982bc9"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a04420db5351f8035f19ebd43f9c887c7"></a><!-- doxytag: member="app::store" ref="a04420db5351f8035f19ebd43f9c887c7" args="" -->
-tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#a04420db5351f8035f19ebd43f9c887c7">store</a> = web.session.DBStore(<a class="el" href="namespaceapp.html#ab520233be545dd9aa0e4abc18ef57c93">db</a>, 'sessions')</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The Session store. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#acfce2e9f97f56c1bbe2b384796d8194a">session</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The applications session object.  <a href="#acfce2e9f97f56c1bbe2b384796d8194a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceapp.html#a84910334b8284222c43b97a1e61586e6">session</a> = None</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The applications session object.  <a href="#a84910334b8284222c43b97a1e61586e6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac021da02d212e6d05ba2560cac6d8457"></a><!-- doxytag: member="app::session_cookie" ref="ac021da02d212e6d05ba2560cac6d8457" args="" -->
 &nbsp;</td><td class="memItemRight" valign="bottom"><b>session_cookie</b> = True</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><b>db</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a243b011f6d3e3fba9a09c723f8a27f89"></a><!-- doxytag: member="app::ses_templates" ref="a243b011f6d3e3fba9a09c723f8a27f89" args="" -->
+tuple&nbsp;</td><td class="memItemRight" valign="bottom"><b>ses_templates</b> = web.template.render(os.path.join(<a class="el" href="namespaceapp.html#a611674320c4c0a25e67fd57da8fcd395">abspath</a>,'templates'))</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa6b0bef174826d1baf165e33e3ee36b"></a><!-- doxytag: member="app::content" ref="aaa6b0bef174826d1baf165e33e3ee36b" args="" -->
+tuple&nbsp;</td><td class="memItemRight" valign="bottom"><b>content</b> = ses_templates.session_expired()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa710b47f29d48f096f117cf0f2b72f85"></a><!-- doxytag: member="app::total_loverz" ref="aa710b47f29d48f096f117cf0f2b72f85" args="" -->
+tuple&nbsp;</td><td class="memItemRight" valign="bottom"><b>total_loverz</b> = db_handler.get_total_loverz()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a04420db5351f8035f19ebd43f9c887c7"></a><!-- doxytag: member="app::store" ref="a04420db5351f8035f19ebd43f9c887c7" args="" -->
+tuple&nbsp;</td><td class="memItemRight" valign="bottom"><b>store</b> = web.session.DBStore(db, 'sessions')</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Application script for web.py/wsgi. </p>
@@ -190,32 +196,23 @@ tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 
 </div>
 </div>
-<a class="anchor" id="ac06aecf2d3edf03ace05206e84d1486b"></a><!-- doxytag: member="app::raise_internal_server_error" ref="ac06aecf2d3edf03ace05206e84d1486b" args="" -->
+<a class="anchor" id="aa502d7af922c7f1240af8b21375f8b6b"></a><!-- doxytag: member="app::internalerror" ref="aa502d7af922c7f1240af8b21375f8b6b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def app.raise_internal_server_error </td>
+          <td class="memname">def app.internalerror </td>
           <td>(</td>
           <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>msg</em> = <code>None</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"> <em>msg</em> = <code>None</code></td>
+          <td>&nbsp;)&nbsp;</td>
           <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>error_stack</em> = <code>None</code></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Sends the client a HTTP 500 Internal Server Error with a message and an error stack. </p>
+<p>HTTP 500 Internal Server Error with a message and an error stack. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>msg</em>&nbsp;</td><td>(optional) The error message to this error. </td></tr>
@@ -227,15 +224,15 @@ tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 
 </div>
 </div>
-<a class="anchor" id="af03268e126baee807ff5818e79958189"></a><!-- doxytag: member="app::raise_not_found" ref="af03268e126baee807ff5818e79958189" args="" -->
+<a class="anchor" id="a7cba1bd5597d3bd44747345e202505d2"></a><!-- doxytag: member="app::notfound" ref="a7cba1bd5597d3bd44747345e202505d2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def app.raise_not_found </td>
+          <td class="memname">def app.notfound </td>
           <td>(</td>
           <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>msg</em></td>
+          <td class="paramname"> <em>msg</em> = <code>None</code></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
         </tr>
@@ -243,7 +240,7 @@ tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 </div>
 <div class="memdoc">
 
-<p>Sends the client a HTTP 404 Not Found with a message. </p>
+<p>HTTP 404 Not Found with a message. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>msg</em>&nbsp;</td><td>(optional) A message that explains how the searched item was not found. </td></tr>
@@ -327,28 +324,26 @@ tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">tuple <a class="el" href="namespaceapp.html#ab520233be545dd9aa0e4abc18ef57c93">app.db</a></td>
+          <td class="memname">tuple app.db</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 <b>Initial value:</b><div class="fragment"><pre class="fragment"><a name="l00001"></a><a class="code" href="namespaceapp.html">00001</a> web.database(
-<a name="l00002"></a>00002         dbn=config.db_engine, 
-<a name="l00003"></a>00003         db=config.db_name, 
-<a name="l00004"></a>00004         user=config.db_username, 
-<a name="l00005"></a>00005         pw=config.db_password
-<a name="l00006"></a>00006     )
+<a name="l00002"></a>00002             dbn=config.db_engine, 
+<a name="l00003"></a>00003             db=config.db_name, 
+<a name="l00004"></a>00004             user=config.db_username, 
+<a name="l00005"></a>00005             pw=config.db_password
+<a name="l00006"></a>00006         )
 </pre></div>
-<p>The web.py <code>web.db.DB</code> object to connect to the applications database. </p>
-
 </div>
 </div>
-<a class="anchor" id="ad2cbbb7414c057a1dc7e59be2e35a095"></a><!-- doxytag: member="app::db_handler" ref="ad2cbbb7414c057a1dc7e59be2e35a095" args="" -->
+<a class="anchor" id="ad99fc99ce705625c1aeb16c02f80650e"></a><!-- doxytag: member="app::db_handler" ref="ad99fc99ce705625c1aeb16c02f80650e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">tuple <a class="el" href="namespaceapp.html#ad2cbbb7414c057a1dc7e59be2e35a095">app.db_handler</a> = dbh.DBHandler(<a class="el" href="namespaceapp.html#ab520233be545dd9aa0e4abc18ef57c93">db</a>)</td>
+          <td class="memname">tuple <a class="el" href="namespaceapp.html#ad99fc99ce705625c1aeb16c02f80650e">app::db_handler</a> = None</td>
         </tr>
       </table>
 </div>
@@ -358,38 +353,18 @@ tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 
 </div>
 </div>
-<a class="anchor" id="acfce2e9f97f56c1bbe2b384796d8194a"></a><!-- doxytag: member="app::session" ref="acfce2e9f97f56c1bbe2b384796d8194a" args="" -->
+<a class="anchor" id="a84910334b8284222c43b97a1e61586e6"></a><!-- doxytag: member="app::session" ref="a84910334b8284222c43b97a1e61586e6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">tuple <a class="el" href="namespaceapp.html#acfce2e9f97f56c1bbe2b384796d8194a">app.session</a></td>
+          <td class="memname">tuple <a class="el" href="namespaceapp.html#a84910334b8284222c43b97a1e61586e6">app::session</a> = None</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<b>Initial value:</b><div class="fragment"><pre class="fragment"><a name="l00001"></a><a class="code" href="namespaceapp.html">00001</a> CookieIndependentSession(
-<a name="l00002"></a>00002         app, 
-<a name="l00003"></a>00003         store, 
-<a name="l00004"></a>00004         initializer={<span class="stringliteral">&#39;spend_love&#39;</span>: dict()}
-<a name="l00005"></a>00005     )
-</pre></div>
+
 <p>The applications session object. </p>
-
-</div>
-</div>
-<a class="anchor" id="ae9d02aa9e820f15ed59718ee9f96c88b"></a><!-- doxytag: member="app::test_cookie_text" ref="ae9d02aa9e820f15ed59718ee9f96c88b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">string <a class="el" href="namespaceapp.html#ae9d02aa9e820f15ed59718ee9f96c88b">app.test_cookie_text</a> = 'Do you accept cookies?'</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Text for a test cookie to implement cookie-less, URL-based Session Management later on for users that do not want to use cookies. </p>
 
 </div>
 </div>
@@ -409,20 +384,21 @@ tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 <a name="l00004"></a>00004     <span class="stringliteral">&#39;/register&#39;</span>, <span class="stringliteral">&#39;register&#39;</span>,
 <a name="l00005"></a>00005     <span class="stringliteral">&#39;/history&#39;</span>, <span class="stringliteral">&#39;history&#39;</span>,
 <a name="l00006"></a>00006     <span class="stringliteral">r&#39;/user/([^?$/\\#%\s]+)&#39;</span>,<span class="stringliteral">&#39;user&#39;</span>,
-<a name="l00007"></a>00007     <span class="stringliteral">r&#39;/user_give_([^?$/\\#%\s]+)_datalove&#39;</span>, <span class="stringliteral">&#39;user_give_user_datalove&#39;</span>,
+<a name="l00007"></a>00007     <span class="stringliteral">r&#39;/user/([^?$/\\#%\s]+)/give_datalove&#39;</span>, <span class="stringliteral">&#39;give_user_datalove_profile&#39;</span>,
 <a name="l00008"></a>00008     <span class="stringliteral">&#39;/users&#39;</span>,<span class="stringliteral">&#39;users&#39;</span>,
-<a name="l00009"></a>00009     <span class="stringliteral">&#39;/widget&#39;</span>, <span class="stringliteral">&#39;widget&#39;</span>,
-<a name="l00010"></a>00010     <span class="stringliteral">r&#39;/give_([^?$/\\#%\s]+)_datalove&#39;</span>, <span class="stringliteral">&#39;give_user_datalove&#39;</span>,
-<a name="l00011"></a>00011     <span class="stringliteral">&#39;/logoff&#39;</span>, <span class="stringliteral">&#39;logoff&#39;</span>,
-<a name="l00012"></a>00012     <span class="stringliteral">&#39;/unregister&#39;</span>, <span class="stringliteral">&#39;unregister&#39;</span>,
-<a name="l00013"></a>00013     <span class="stringliteral">&#39;/reset_password&#39;</span>, <span class="stringliteral">&#39;reset_password&#39;</span>,
-<a name="l00014"></a>00014     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)&#39;</span>,<span class="stringliteral">&#39;get_users_love&#39;</span>,
-<a name="l00015"></a>00015     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)/&#39;</span>,<span class="stringliteral">&#39;get_users_love&#39;</span>,
-<a name="l00016"></a>00016     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)/available_datalove&#39;</span>, <span class="stringliteral">&#39;get_users_available_love&#39;</span>,
-<a name="l00017"></a>00017     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)/received_datalove&#39;</span>, <span class="stringliteral">&#39;get_users_received_love&#39;</span>,
-<a name="l00018"></a>00018     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)/give_datalove&#39;</span>, <span class="stringliteral">&#39;give_user_datalove_api&#39;</span>,
-<a name="l00019"></a>00019     
-<a name="l00020"></a>00020 )
+<a name="l00009"></a>00009     <span class="stringliteral">r&#39;/users/give_([^?$/\\#%\s]+)_datalove&#39;</span>,<span class="stringliteral">&#39;give_user_datalove_list&#39;</span>,
+<a name="l00010"></a>00010     <span class="stringliteral">&#39;/widget&#39;</span>, <span class="stringliteral">&#39;widget&#39;</span>,
+<a name="l00011"></a>00011     <span class="stringliteral">r&#39;/give_([^?$/\\#%\s]+)_datalove&#39;</span>, <span class="stringliteral">&#39;give_user_datalove_widget&#39;</span>,
+<a name="l00012"></a>00012     <span class="stringliteral">&#39;/logoff&#39;</span>, <span class="stringliteral">&#39;logoff&#39;</span>,
+<a name="l00013"></a>00013     <span class="stringliteral">&#39;/unregister&#39;</span>, <span class="stringliteral">&#39;unregister&#39;</span>,
+<a name="l00014"></a>00014     <span class="stringliteral">&#39;/reset_password&#39;</span>, <span class="stringliteral">&#39;reset_password&#39;</span>,
+<a name="l00015"></a>00015     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)&#39;</span>,<span class="stringliteral">&#39;get_users_love&#39;</span>,
+<a name="l00016"></a>00016     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)/&#39;</span>,<span class="stringliteral">&#39;get_users_love&#39;</span>,
+<a name="l00017"></a>00017     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)/available_datalove&#39;</span>, <span class="stringliteral">&#39;get_users_available_love&#39;</span>,
+<a name="l00018"></a>00018     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)/received_datalove&#39;</span>, <span class="stringliteral">&#39;get_users_received_love&#39;</span>,
+<a name="l00019"></a>00019     <span class="stringliteral">r&#39;/api/([^?$/\\#%\s]+)/give_datalove&#39;</span>, <span class="stringliteral">&#39;give_user_datalove_api&#39;</span>,
+<a name="l00020"></a>00020     
+<a name="l00021"></a>00021 )
 </pre></div>
 <p>URL-Map that maps the urls to the respective classes. </p>
 <dl class="see"><dt><b>See also:</b></dt><dd><a href="http://webpy.org/docs/0.3/">Web.py Documentation</a> </dd></dl>
@@ -444,7 +420,7 @@ tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Fri Apr 1 2011 18:42:00 for give.datalove.me by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Apr 4 2011 00:01:39 for give.datalove.me by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

@@ -325,6 +325,14 @@ class manage_account:
     #        during the change of the password.
     # @return String in HTML code of what the side looks like
     def show(self, email_change_error = None, pw_change_error = None, website_change_error = None):
+        log.debug(
+                "%s Show manage_account with with (email_change_error = %s, " + 
+                "pw_change_error = %s, website_change_error = %s)",
+                get_ctx(),
+                repr(email_change_error),
+                repr(pw_change_error),
+                repr(website_change_error)
+            )
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             session_id = get_session_id()
@@ -332,11 +340,17 @@ class manage_account:
             if session_id and \
                     db_handler.session_associated_to_any_user(session_id):
                 user = db_handler.get_session_user(session_id)
+                log.debug("%s Got user for session %s", get_ctx(), session_id)
                 websites = ''
                 for website in user.websites:
                     websites += website + '\n'
                 user.websites = websites
                 total_loverz = db_handler.get_total_loverz()
+                log.debug(
+                    "%s Got total_loverz = %d",
+                    get_ctx(),
+                    total_loverz
+                )
                 if session_cookie:
                     content = templates.manage_account(
                             user,
@@ -367,6 +381,7 @@ class manage_account:
                         )
         except BaseException, e:
             raise internalerror(e)
+        log.debug("%s not logged in.",get_ctx())
         raise web.seeother(config.host_url)
     
     ## Handles what happens on password change
@@ -400,10 +415,24 @@ class manage_account:
     
     ## Method for a HTTP GET request. 
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         return self.show()
     
     ## Method for a HTTP POST request. 
     def POST(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         try:
             session_id = get_session_id()
             user = db_handler.get_session_user(session_id)
@@ -505,10 +534,24 @@ class register:
         
     ## Method for a HTTP GET request. 
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         return self.show()
             
     ## Method for a HTTP POST request. 
     def POST(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             import hashlib
@@ -548,6 +591,13 @@ class register:
 class users:
     ## Method for a HTTP GET request.
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             session_id = get_session_id()
@@ -589,7 +639,12 @@ class widget:
     ## Shows the page
     # @param login_error Possible errors (as string) that happened during login.
     # @return String in HTML code of what the side looks like
-    def show(self, login_error = None):
+    def show(self, login_error = None):log.debug(
+        log.debug(
+                "%s Show index with with login_error = %s",
+                get_ctx(),
+                repr(login_error)
+            )
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)
@@ -632,6 +687,13 @@ class widget:
             raise internalerror(e)
     ## Method for a HTTP GET request. 
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         templates = web.template.render(os.path.join(abspath,'templates'))
         session_id = get_session_id()
@@ -664,7 +726,7 @@ class widget:
 
 ## Abstract class for the <tt>/give_([^?$/\\#%\s]+)_datalove_<x></tt> URL where 
 #  the regular expression stands for the user's name and <x> is in 
-#  <tt>{api, profile, widget}</tt>.
+#  <tt>{api, profile, widget, list}</tt>.
 class give_user_datalove:
     ## Is called if an error occures.
     # @param error_msg The error message.
@@ -702,6 +764,13 @@ class give_user_datalove:
     ## Method for a HTTP GET request. 
     # @param to_user User the datalove should be given to.
     def GET(self,to_user):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             if not db_handler.user_exists(to_user):
@@ -850,6 +919,13 @@ class give_user_datalove_list(give_user_datalove):
 class logoff:
     ## Method for a HTTP GET request. 
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             session_id = get_session_id()
@@ -864,6 +940,13 @@ class logoff:
 class unregister:
     ## Method for a HTTP GET request. 
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             
@@ -948,10 +1031,24 @@ class reset_password:
     
     ## Method for a HTTP GET request. 
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         return self.show()
     
     ## Method for a HTTP POST request. 
     def POST(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         return self.reset_password_action()
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/random_user</tt> where the regular
@@ -961,6 +1058,13 @@ class random_nickname:
     ## Method for a HTTP GET request.
     #
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         return db_handler.random_nickname()
 
@@ -970,6 +1074,13 @@ class get_users_love:
     ## Method for a HTTP GET request. 
     # @param nickname The user's nickname
     def GET(self,nickname):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             if not db_handler.user_exists(nickname):
@@ -988,6 +1099,13 @@ class get_users_available_love:
     ## Method for a HTTP GET request. 
     # @param nickname The user's nickname
     def GET(self,nickname):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             if not db_handler.user_exists(nickname):
@@ -1005,6 +1123,13 @@ class get_users_received_love:
     ## Method for a HTTP GET request. 
     # @param nickname The user's nickname
     def GET(self,nickname):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         web.header('Content-Type','text/html;charset=utf-8')
         try:
             if not db_handler.user_exists(nickname):
@@ -1111,12 +1236,25 @@ class history:
 
     ## Method for a HTTP GET request. 
     def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         return self.show()
 
 ## Class for the <tt>/user/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.
 class user:
     def show(self, nickname, login_error = None):
+        log.debug(
+                "%s Show index with with (nickname = %s, login_error = %s)",
+                get_ctx(),
+                repr(nickname),
+                repr(login_error)
+            )
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             if not db_handler.user_exists(nickname):
@@ -1173,6 +1311,13 @@ class user:
     ## Method for a HTTP GET request. 
     # @param nickname The user's nickname
     def GET(self,nickname):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
         return self.show(nickname)
 
 ## Implementation of @ref give_user_datalove for the 

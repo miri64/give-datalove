@@ -211,14 +211,9 @@ class index:
             session_id = get_session_id()
             templates = web.template.render(os.path.join(abspath,'templates'))
             total_loverz = db_handler.get_total_loverz()
-            log.debug(
-                    "%s Got total_loverz = %d",
-                    get_ctx(),
-                    total_loverz
-                )
             if not session_id or \
                     not db_handler.session_associated_to_any_user(session_id):
-                log.debug("%s not logged in.",get_ctx())
+                log.info("%s not logged in.",get_ctx())
                 content = templates.welcome()
                 if session_cookie:
                     return templates.index(
@@ -235,7 +230,6 @@ class index:
                         )
             else:
                 user = db_handler.get_session_user(session_id)
-                log.debug("%s Got user for session %s", get_ctx(), session_id)
                 content = templates.userpage(user)
                 if session_cookie:
                     return templates.index(
@@ -264,7 +258,6 @@ class index:
         nickname = i.nickname
         password = dbh.hash_password(nickname,i.password)
         db_handler.user_login(nickname,password,session_id)
-        log.debug("%s User login successful.",get_ctx())
         # spend love that was spend, while not logged in
         while len(session.spend_love):
             to_user, nickname = session.spend_love.popitem()
@@ -272,7 +265,7 @@ class index:
                 break
             if to_user != nickname:
                 log.debug(
-                        "%s Give love which was given by now: %s -> %d",
+                        "%s Give love which was given before login: %s -> %d",
                         get_ctx(),
                         to_user,
                         datalovez
@@ -340,17 +333,11 @@ class manage_account:
             if session_id and \
                     db_handler.session_associated_to_any_user(session_id):
                 user = db_handler.get_session_user(session_id)
-                log.debug("%s Got user for session %s", get_ctx(), session_id)
                 websites = ''
                 for website in user.websites:
                     websites += website + '\n'
                 user.websites = websites
                 total_loverz = db_handler.get_total_loverz()
-                log.debug(
-                    "%s Got total_loverz = %d",
-                    get_ctx(),
-                    total_loverz
-                )
                 if session_cookie:
                     content = templates.manage_account(
                             user,
@@ -493,6 +480,14 @@ class register:
     #        happened during registration.
     # @return String in HTML code of what the side looks like
     def show(self, nickname = None, email = None, registration_error = None):
+        log.debug(
+                "%s Show register with with (nickname = %s, email = %s" + 
+                "registration_error = %s)",
+                get_ctx(),
+                repr(nickname),
+                repr(email),
+                repr(registration_error)
+            )
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             templates = web.template.render(os.path.join(abspath,'templates'))
@@ -639,9 +634,9 @@ class widget:
     ## Shows the page
     # @param login_error Possible errors (as string) that happened during login.
     # @return String in HTML code of what the side looks like
-    def show(self, login_error = None):log.debug(
+    def show(self, login_error = None):
         log.debug(
-                "%s Show index with with login_error = %s",
+                "%s Show widget with with login_error = %s",
                 get_ctx(),
                 repr(login_error)
             )
@@ -776,17 +771,16 @@ class give_user_datalove:
             if not db_handler.user_exists(to_user):
                 return self.user_not_exists_page(to_user)
             session_id = get_session_id()
-            print session_id
-            if not db_handler.session_associated_to_any_user(session_id):
-                if to_user in session.spend_love:
-                    session.spend_love[to_user] += 1
-                else:
-                    session.spend_love[to_user] = 1
-                return self.not_logged_in_page(session_id)
-            from_user = db_handler.get_session_user(session_id)
         except BaseException, e:
             raise internalerror(e)
+        if not db_handler.session_associated_to_any_user(session_id):
+            if to_user in session.spend_love:
+                session.spend_love[to_user] += 1
+            else:
+                 session.spend_love[to_user] = 1
+            return self.not_logged_in_page(session_id)
         try:
+            from_user = db_handler.get_session_user(session_id)
             db_handler.send_datalove(from_user.nickname,to_user,session_id)
         except AssertionError,e:
             return self.error_handling(e,to_user,session_id)
@@ -964,6 +958,14 @@ class reset_password:
     # @param error Possible errors during reset.
     # @return String in HTML code of what the side looks like
     def show(self, nickname = None, error = None, success = False):
+        log.debug(
+                "%s Show reset_password with with (nickname = %s, error = %s" + 
+                "success = %s)",
+                get_ctx(),
+                repr(nickname),
+                repr(error),
+                repr(success)
+            )
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             session_id = get_session_id()
@@ -1187,6 +1189,11 @@ class history:
     ## Shows the page
     # @return String in HTML code of what the site looks like
     def show(self, login_error = None):
+        log.debug(
+                "%s Show history with with login_error = %s",
+                get_ctx(),
+                repr(login_error)
+            )
         try:
             web.header('Content-Type','text/html;charset=utf-8')
             #web.setcookie(name='test_cookie',value=test_cookie_test, expires=60*60)

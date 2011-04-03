@@ -33,10 +33,11 @@ urls = (
     '/register', 'register',
     '/history', 'history',
     r'/user/([^?$/\\#%\s]+)','user',
-    r'/user_give_([^?$/\\#%\s]+)_datalove', 'user_give_user_datalove',
+    r'/user/([^?$/\\#%\s]+)/give_datalove', 'give_user_datalove_profile',
     '/users','users',
+    r'/users/give_([^?$/\\#%\s]+)_datalove','give_user_datalove_list',
     '/widget', 'widget',
-    r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove',
+    r'/give_([^?$/\\#%\s]+)_datalove', 'give_user_datalove_widget',
     '/logoff', 'logoff',
     '/unregister', 'unregister',
     '/reset_password', 'reset_password',
@@ -556,8 +557,10 @@ class users:
             
             logged_in = db_handler.session_associated_to_any_user(session_id)
             
+            error = web.input().get('error')
+            
             if session_cookie:
-                content = templates.users(users)
+                content = templates.users(users,error)
                 return templates.index(
                         content,
                         total_loverz = total_loverz,
@@ -565,7 +568,12 @@ class users:
                         logged_in = logged_in
                     )
             else:
-                content = templates.users(users,session_id)
+                content = templates.users(
+                        users,
+                        errornous_nickname,
+                        error,
+                        session_id
+                    )
                 return templates.index(
                         content,
                         total_loverz = total_loverz,
@@ -654,83 +662,190 @@ class widget:
         except BaseException, e:
             raise internalerror(e)
 
-## Class for the <tt>/give_([^?$/\\#%\s]+)_datalove</tt> URL where the regular 
-#  expression stands for the user's name.
+## Abstract class for the <tt>/give_([^?$/\\#%\s]+)_datalove_<x></tt> URL where 
+#  the regular expression stands for the user's name and <x> is in 
+#  <tt>{api, profile, widget}</tt>.
 class give_user_datalove:
+    ## Is called if an error occures.
+    # @param error_msg The error message.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the regex
+    # @param session_id The current session_id
+    # @exception NotImplementedError Since this method should be implemented by
+    #            a subclass
+    def error_handling(self, error_msg, recipient, session_id):
+        raise NotImplementedError
+    
+    ## Describes what happens after the love was given.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the reges
+    # @param session_id The current session_id
+    # @exception NotImplementedError Since this method should be implemented by
+    #            a subclass
+    def end_action(self, recipient, session_id):
+        raise NotImplementedError()
+    
+    ## Describes what happens, if user is not logged in
+    # @param session_id The current session_id
+    # @exception NotImplementedError Since this method should be implemented by
+    #            a subclass
+    def not_logged_in_page(self, session_id):
+        raise NotImplementedError()
+    
+    ## Describes what happens, if user does not exist
+    # @param nickname The not existent nickname
+    # @exception NotImplementedError Since this method should be implemented by
+    #            a subclass
+    def user_not_exists_page(nickname):
+        raise NotImplementedError()
+    
     ## Method for a HTTP GET request. 
     # @param to_user User the datalove should be given to.
     def GET(self,to_user):
         web.header('Content-Type','text/html;charset=utf-8')
         try:
-            logged_in = True
             if not db_handler.user_exists(to_user):
-                return "User does not exist."
+                return self.user_not_exists_page(to_user)
             session_id = get_session_id()
             print session_id
             if not db_handler.session_associated_to_any_user(session_id):
-                templates = web.template.render(
-                        os.path.join(abspath,'templates')
-                    )
-                
                 if to_user in session.spend_love:
                     session.spend_love[to_user] += 1
                 else:
                     session.spend_love[to_user] = 1
-                return templates.no_login_widget(session_id)
+                return self.not_logged_in_page(session_id)
             from_user = db_handler.get_session_user(session_id)
         except BaseException, e:
             raise internalerror(e)
-        if logged_in:
-            try:
-                db_handler.send_datalove(from_user.nickname,to_user,session_id)
-            except AssertionError,e:
-                if session_cookie:
-                    raise web.seeother(
-                            url_path_join(
-                                    config.host_url,
-                                    'widget?user=%s&error=%s' % (to_user,e)
-                                )
+        try:
+            db_handler.send_datalove(from_user.nickname,to_user,session_id)
+        except AssertionError,e:
+            return self.error_handling(e,to_user,session_id)
+        except dbh.NotEnoughDataloveException, e:
+            return self.error_handling(e,to_user,session_id)
+        except BaseException, e:
+            raise internalerror(e)
+        return self.end_action(to_user,session_id)
+
+## Implementation of @ref give_user_datalove for the 
+#  <tt>/give_([^?$/\\#%\s]+)_datalove_widget</tt> URL where 
+#  the regular expression stands for the user's name.
+# @see give_user_datalove
+class give_user_datalove_widget(give_user_datalove):
+    ## Is called if an error occures.
+    # @param error_msg The error message.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the regex
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def error_handling(self, error_msg, recipient, session_id):
+        if session_cookie:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,
+                            'widget?user=%s&error=%s' % (recipient, error_msg)
                         )
-                else:
-                    raise web.seeother(
-                            url_path_join(
-                                    config.host_url,
-                                    'widget?user=%s&error=%s&sid=%s' 
-                                            % (to_user,e,session_id)
-                                )
+                )
+        else:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,
+                            'widget?user=%s&error=%s&sid=%s' 
+                                    % (recipient, error_msg, session_id)
                         )
-            except dbh.NotEnoughDataloveException, e:
-                if session_cookie:
-                    raise web.seeother(
-                            url_path_join(
-                                    config.host_url,
-                                    'widget?user=%s&error=%s' % (to_user,e)
-                                )
+                )
+    
+    ## Describes to which URL to return to, after the love is given.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the reges
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def end_action(self, recipient, session_id):
+        if session_cookie:
+            raise web.seeother(url_path_join(
+                    config.host_url,'widget?user=%s' % recipient
+                ))
+        else:
+            raise web.seeother(url_path_join(
+                    config.host_url,'widget?user=%s&sid=%s' 
+                            % (recipient, session_id)
+                ))
+    
+    ## Describes what happens, if user is not logged in
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def not_logged_in_page(self, session_id):
+        templates = web.template.render(
+                os.path.join(abspath,'templates')
+            )
+        return templates.no_login_widget(session_id)
+    
+    ## Describes what happens, if user does not exist
+    # @param nickname The not existent nickname
+    # @see give_user_datalove
+    def user_not_exists_page(nickname):
+        return self.error_handling('User %s does not exist')
+
+## Implementation of @ref give_user_datalove for the 
+#  <tt>/users/give_([^?$/\\#%\s]+)_datalove</tt> URL where 
+#  the regular expression stands for the user's name.
+# @see give_user_datalove
+class give_user_datalove_list(give_user_datalove):
+    ## Is called if an error occures.
+    # @param error_msg The error message.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the regex
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def error_handling(self, error_msg, recipient, session_id):
+        if session_cookie:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,
+                            '/users?error=%s' % error_msg
                         )
-                else:
-                    raise web.seeother(
-                            url_path_join(
-                                    config.host_url,
-                                    'widget?user=%s&error=%s&sid=%s' 
-                                            % (to_user,e,session_id)
-                                )
+                )
+        else:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,
+                            '/users?error=%s&sid=%s' 
+                                    % (error_msg, session_id)
                         )
-            except BaseException, e:
-                raise internalerror(e)
-            if session_cookie:
-                raise web.seeother(
-                        url_path_join(
-                                config.host_url,'widget?user=%s' % to_user
-                            )
-                    )
-            else:
-                raise web.seeother(
-                        url_path_join(
-                                config.host_url,'widget?user=%s&sid=%s' 
-                                        % (to_user,session_id)
-                            )
-                    )
-            
+                )
+    
+    ## Describes to which URL to return to, after the love is given.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the reges
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def end_action(self, recipient, session_id):
+        if session_cookie:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,'/users'
+                        )
+                )
+        else:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,'/users?sid=%s' 
+                                    % session_id
+                        )
+                )
+    
+    ## Describes what happens, if user is not logged in
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def not_logged_in_page(self, session_id):
+        return self.error_handling('Not logged in yet!',None,None)
+    
+    ## Describes what happens, if user does not exist
+    # @param nickname The not existent nickname
+    # @see give_user_datalove
+    def user_not_exists_page(nickname):
+        return self.error_handling('User %s does not exist.',None,None)
+
 ## Class for the <tt>/logoff</tt> URL.
 class logoff:
     ## Method for a HTTP GET request. 
@@ -901,40 +1016,43 @@ class get_users_received_love:
         except BaseException, e:
             raise internalerror(e)
 
-## Class for the <tt>/api/([^?$/\\#%\s]+)/give_datalove</tt> URL where the 
-#  regular expression stands for the user's name.
-class give_user_datalove_api:
-    ## Method for a HTTP GET request. 
-    # @param to_user User the datalove should be given to.
-    def GET(self,to_user):
-        web.header('Content-Type','text/html;charset=utf-8')
-        try:
-            logged_in = True
-            if not db_handler.user_exists(to_user):
-                raise notfound(
-                        "User '%s' does not exist." % to_user
-                    )
-            session_id = get_session_id()
-            from_user = db_handler.get_session_user(session_id)
-        except dbh.IllegalSessionException:
-            web.ctx.status = '401 Unauthorized'
-            return 'You are not logged in yet.'
-        except BaseException, e:
-            raise internalerror(e)
-        if logged_in:
-            try:
-                db_handler.send_datalove(from_user.nickname,to_user,session_id)
-            except AssertionError,e:
-                web.ctx.status = '412 Precondition Failed'
-                return e
-            except dbh.NotEnoughDataloveException, e:
-                web.ctx.status = '412 Precondition Failed'
-                return e
-            except BaseException, e:
-                raise internalerror(e)
-            return ''
-        else:
-            raise web.seeother(config.host_url)
+## Implementation of @ref give_user_datalove for the 
+#  <tt>/api/([^?$/\\#%\s]+)/give_datalove</tt> URL where 
+#  the regular expression stands for the user's name.
+# @see give_user_datalove
+class give_user_datalove_api(give_user_datalove):
+    ## Is called if an error occures.
+    # @param error_msg The error message.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the regex
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def error_handling(self, error_msg, recipient, session_id):
+        web.ctx.status = '412 Precondition Failed'
+        return error_msg
+    
+    ## Describes to which URL to return to, after the love is given.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the reges
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def end_action(self, recipient, session_id):
+        return ''
+    
+    ## Describes what happens, if user is not logged in
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def not_logged_in_page(self, session_id):
+        web.ctx.status = '401 Unauthorized'
+        return 'You are not logged in yet.'
+    
+    ## Describes what happens, if user does not exist
+    # @param nickname The not existent nickname
+    # @see give_user_datalove
+    def user_not_exists_page(nickname):
+        raise notfound(
+                "User '%s' does not exist." % to_user
+            )
 
 ## Class for the <tt>/history/tt> URL.
 class history:
@@ -1057,83 +1175,65 @@ class user:
     def GET(self,nickname):
         return self.show(nickname)
 
-## Class for the <tt>/give_([^?$/\\#%\s]+)_datalove</tt> URL where the regular 
-#  expression stands for the user's name.
-class user_give_user_datalove:
-    ## Method for a HTTP GET request. 
-    # @param to_user User the datalove should be given to.
-    def GET(self,to_user):
-        web.header('Content-Type','text/html;charset=utf-8')
-        try:
-            logged_in = True
-            if not db_handler.user_exists(to_user):
-                return "User does not exist."
-            session_id = get_session_id()
-            print session_id
-            if not db_handler.session_associated_to_any_user(session_id):
-                templates = web.template.render(
-                        os.path.join(abspath,'templates')
-                    )
-                
-                if to_user in session.spend_love:
-                    session.spend_love[to_user] += 1
-                else:
-                    session.spend_love[to_user] = 1
-                return templates.no_login_widget(session_id)
-            from_user = db_handler.get_session_user(session_id)
-        except BaseException, e:
-            raise internalerror(e)
-        if logged_in:
-            try:
-                db_handler.send_datalove(from_user.nickname,to_user,session_id)
-            except AssertionError,e:
-                if session_cookie:
-                    raise web.seeother(
-                            url_path_join(
-                                    config.host_url,
-                                    '/user/%s?error=%s' % (to_user,e)
-                                )
+## Implementation of @ref give_user_datalove for the 
+#  <tt>/user/([^?$/\\#%\s]+)/give_datalove</tt> URL where 
+#  the regular expression stands for the user's name.
+# @see give_user_datalove
+class give_user_datalove_profile(give_user_datalove):
+    ## Is called if an error occures.
+    # @param error_msg The error message.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the regex
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def error_handling(self, error_msg, recipient, session_id):
+        if session_cookie:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,
+                            '/user/%s?error=%s' % (recipient, error_msg)
                         )
-                else:
-                    raise web.seeother(
-                            url_path_join(
-                                    config.host_url,
-                                    '/user/%s?error=%s&sid=%s' 
-                                            % (to_user,e,session_id)
-                                )
+                )
+        else:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,
+                            '/user/%s?user=%s&error=%s&sid=%s' 
+                                    % (recipient, error_msg, session_id)
                         )
-            except dbh.NotEnoughDataloveException, e:
-                if session_cookie:
-                    raise web.seeother(
-                            url_path_join(
-                                    config.host_url,
-                                    '/user/%s?error=%s' % (to_user,e)
-                                )
+                )
+    
+    ## Describes to which URL to return to, after the love is given.
+    # @param recipient The recipient's nickname, where the recipient is the user
+    #        who is given in the URL via the reges
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def end_action(self, recipient, session_id):
+        if session_cookie:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,'/user/%s' % recipient
                         )
-                else:
-                    raise web.seeother(
-                            url_path_join(
-                                    config.host_url,
-                                    '/user/%s?error=%s&sid=%s' 
-                                            % (to_user,e,session_id)
-                                )
+                )
+        else:
+            raise web.seeother(
+                    url_path_join(
+                            config.host_url,'/user/%s?sid=%s' 
+                                    % (recipient,session_id)
                         )
-            except BaseException, e:
-                raise internalerror(e)
-            if session_cookie:
-                raise web.seeother(
-                        url_path_join(
-                                config.host_url,'/user/%s' % to_user
-                            )
-                    )
-            else:
-                raise web.seeother(
-                        url_path_join(
-                                config.host_url,'/user/%s?sid=%s' 
-                                        % (to_user,session_id)
-                            )
-                    )
-            
+                )
+    
+    ## Describes what happens, if user is not logged in
+    # @param session_id The current session_id
+    # @see give_user_datalove
+    def not_logged_in_page(self, session_id):
+        raise web.seeother(config.host_url)
+    
+    ## Describes what happens, if user does not exist
+    # @param nickname The not existent nickname
+    # @see give_user_datalove
+    def user_not_exists_page(self, nickname):
+        return self.error_handling('User %s does not exist')
 
 if __name__ == '__main__': 
     db = web.database(

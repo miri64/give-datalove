@@ -1,6 +1,6 @@
 import logging
 import logging.handlers
-import web
+from web import ctx
 
 LOG_FILENAME = 'give_datalove.log'
 LOG_LEVEL = logging.DEBUG
@@ -19,3 +19,6 @@ handler = logging.handlers.RotatingFileHandler(
     )
 handler.setFormatter(formatter)
 log.addHandler(handler)
+
+def get_ctx():
+    return "('%s' for %s)" % (str(ctx.get('path')),str(ctx.get('ip')))

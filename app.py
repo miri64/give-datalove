@@ -52,30 +52,14 @@ urls = (
 abspath = os.path.dirname(__file__)
 
 ## The web.py <tt>web.db.DB</tt> object to connect to the applications database.
-db = web.database(
-        dbn=config.db_engine, 
-        db=config.db_name, 
-        user=config.db_username, 
-        pw=config.db_password
-    )
+db = None
 
 ## The db_handling.DBHandler to wrap the applications database operations.
-db_handler = dbh.DBHandler(db)
-
-ses_templates = web.template.render(os.path.join(abspath,'templates'))
-content = ses_templates.session_expired()
-total_loverz = db_handler.get_total_loverz()
-web.config.session_parameters['expired_message'] = \
-        str(ses_templates.index(content,total_loverz))
-ses_templates = None
-total_loverz = None
+db_handler = None
 
 ## The web.py <a href="http://webpy.org/docs/0.3/api#web.application"><tt>
 #  application</tt></a> object.
 app = web.application(urls, globals())
-
-## The Session store
-store = web.session.DBStore(db, 'sessions')
 
 ## Session management that works with session IDs in URL to
 class CookieIndependentSession(web.session.Session):
@@ -118,11 +102,7 @@ class CookieIndependentSession(web.session.Session):
         self.ip = web.ctx.ip
 
 ## The applications session object.
-session = CookieIndependentSession(
-        app, 
-        store, 
-        initializer={'spend_love': dict()}
-    )
+session = None
 # spend_love counts the amount of love spend to a user when not logged in
 # if the user is logged in, this love is automatically spend.
 session_cookie = True
@@ -1158,4 +1138,28 @@ class user_give_user_datalove:
                     )
             
 
-if __name__ == '__main__': app.run()
+if __name__ == '__main__': 
+    db = web.database(
+       	    dbn=config.db_engine, 
+            db=config.db_name, 
+            user=config.db_username, 
+            pw=config.db_password
+        )
+    
+    db_handler = dbh.DBHandler(db)
+    
+    ses_templates = web.template.render(os.path.join(abspath,'templates'))
+    content = ses_templates.session_expired()
+    total_loverz = db_handler.get_total_loverz()
+    web.config.session_parameters['expired_message'] = \
+            str(ses_templates.index(content,total_loverz))
+
+    store = web.session.DBStore(db, 'sessions')
+    
+    session = CookieIndependentSession(
+        app, 
+        store, 
+        initializer={'spend_love': dict()}
+    )
+    
+    app.run()

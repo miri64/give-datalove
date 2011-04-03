@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS datalovers;
 CREATE DATABASE IF NOT EXISTS datalovers;
 
 CREATE TABLE IF NOT EXISTS datalovers.sessions (
-    session_id      CHAR(128) NOT NULL,
+    session_id      CHAR(128) NOT NULL UNIQUE,
     atime           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data            TEXT,
     UNIQUE INDEX    (session_id ASC),
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS datalovers.history (
 
 CREATE TABLE IF NOT EXISTS datalovers.user_sessions (
     nickname        VARCHAR(23) NOT NULL,
-    session_id      CHAR(128) NOT NULL,
+    session_id      CHAR(128) NOT NULL UNIQUE,
     PRIMARY KEY (nickname,session_id),
     UNIQUE INDEX (session_id ASC),
     CONSTRAINT fk_users_user_sessions

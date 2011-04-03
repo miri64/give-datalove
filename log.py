@@ -1,6 +1,7 @@
 import logging
+import logging.handlers
 
-LOG_FILENAME = 'datalove.log'
+LOG_FILENAME = 'give_datalove.log'
 LOG_LEVEL = logging.DEBUG
 
 ## The log object

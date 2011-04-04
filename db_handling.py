@@ -132,6 +132,7 @@ class DBHandler:
     #        object e. g. with web.py's 
     # <tt>web.database()</tt> function
     def __init__(self,db):
+        log.info('%s Initializing DB handler', get_ctx())
         self.db = db
     
     ## Checks if a string contains any characters in a set of given characters,
@@ -178,6 +179,14 @@ class DBHandler:
                     available_love = DEFAULT_STARTING_LOVE, 
                     pw_as_hash = True):
         nickname = nickname.lower()
+        log.debug(
+                '%s Try to create user %s with available_love = %d ' + \
+                        'where DEFAULT_STARTING_LOVE = %d',
+                get_ctx(),
+                repr(nickname),
+                available_love,
+                DEFAULT_STARTING_LOVE
+            )
         if(not nickname or not password):
             raise AssertionError("Nickname or Password not set.")
         if len(nickname) > MAX_NICK_LEN:
@@ -216,20 +225,24 @@ class DBHandler:
             if('@' not in email):
                 raise AssertionError("Email address must contain an '@' symbol.")
                 
-            q = self.db.insert(
-                    'users', 
-                    nickname=nickname, 
-                    password=password, 
-                    email=email, 
-                    available_love=available_love
-                )
-        else:
-            q = self.db.insert(
-                    'users', 
-                    nickname=nickname, 
-                    password=password, 
-                    available_love=available_love
-                )
+        q = self.db.insert(
+                'users', 
+                nickname=nickname, 
+                password=password, 
+                email=email, 
+                available_love=available_love,
+                _test=True
+            )
+        import re
+        log.debug(
+                '%s Successfully inserted into db: %s',
+                get_ctx(),
+                re.sub(
+                        r"(\([0-9]+),\s*'[0-9a-f]+',(.*\))",
+                        r"\1, '*****', \2",
+                        str(q)
+                    )
+            )
     
     ## Drops a user from the database.
     # @param nickname The nickname of the user.
@@ -278,7 +291,11 @@ class DBHandler:
     #            is set <tt><b>True</b></tt> or if the <i>password</i> is just 
     #            wrong.
     def user_login(self, nickname, password, session_id, pw_as_hash = True):
-        log.debug("%s Try user login.",get_ctx())
+        log.debug(
+                "%s Try user login for session %s.",
+                get_ctx(),
+                repr(session_id)
+            )
         nickname = nickname.lower()
         if self.session_associated_to_any_user(session_id):
             raise AssertionError(
@@ -316,6 +333,11 @@ class DBHandler:
         self.db.insert('user_sessions',
                 nickname=nickname,
                 session_id=session_id
+            )
+        log.debug(
+                "%s User login successful for session %s.",
+                get_ctx(),
+                repr(session_id)
             )
     
     ## Defines the logoff process for a user in the database layer.
@@ -559,6 +581,7 @@ class DBHandler:
     def change_password(self, nickname, old_password, new_password, 
             pw_as_hash = True):
         nickname = nickname.lower()
+        log.debug("%s Try to change password for %s", get_ctx(), nickname)
         if not pw_as_hash:
             old_password = hash_password(nickname,old_password)
             new_password = hash_password(nickname,new_password)
@@ -584,6 +607,7 @@ class DBHandler:
                 vars = locals(),
                 password=new_password
             )
+        log.debug("%s Changed password for %s", get_ctx(), nickname)
     
     ## Gives an amount of datalove points to a selection of users.
     # @param datalove_points The amount of datalove to spread.
@@ -630,13 +654,20 @@ class DBHandler:
     # @returns The actual amount of datalove points spend.
     def send_datalove(self, from_nickname, to_nickname, session_id, 
             datalove_points = 1):
+        log.debug("%s Try to send %d datalovez %s -> %s for session %s", 
+                get_ctx(), 
+                datalove_points,
+                from_nickname,
+                to_nickname,
+                repr(session_id)
+            )
         from_nickname = from_nickname.lower()
         to_nickname = to_nickname.lower()
         if from_nickname == to_nickname:
             raise AssertionError(
                     "Share datalove with other users, not yourself."
                 )
-            
+        self.__update_love__(to_nickname)
         if(datalove_points < 0):
             raise ValueError(
                     "datalove_points must be positive. It is " + 
@@ -669,6 +700,11 @@ class DBHandler:
                 from_user_available_love, 
                 datalove_points
             )
+        log.debug("%s Set actually_spend_love = %d (datalove_points = %d)", 
+                get_ctx(), 
+                actually_spend_love,
+                datalove_points
+            )
         from_user_available_love -= actually_spend_love
         to_user = self.__select_user__(
                 "available_love, received_love",
@@ -680,25 +716,68 @@ class DBHandler:
         to_user.available_love += actually_spend_love
         to_user.received_love += actually_spend_love
         
-        self.db.update(
-                'users',
-                where='nickname = $from_nickname',
-                vars=locals(), 
-                available_love=from_user_available_love
-            )
-        self.db.update(
-                'users',
-                where='nickname = $to_nickname',
-                vars=locals(), 
-                available_love=to_user.available_love,
-                received_love=to_user.received_love
-            )
-        self.db.insert(
-                'history',
-                sender=from_nickname,
-                recipient=to_nickname,
-                amount=actually_spend_love
-            )
+        ta = self.db.transaction()
+        try:
+            q = self.db.update(
+                    'users',
+                    where='nickname = $from_nickname',
+                    vars=locals(), 
+                    available_love=from_user_available_love,
+                    _test=True
+                )
+            log.debug(
+                    '%s Successfully token available love of %s: %s', 
+                    get_ctx(),
+                    from_nickname,
+                    str(q)
+                )
+            q = self.db.update(
+                    'users',
+                    where='nickname = $to_nickname',
+                    vars=locals(), 
+                    available_love=to_user.available_love,
+                    received_love=to_user.received_love,
+                    _test=True
+                )
+            log.debug(
+                    '%s Successfully given love to %s: %s', 
+                    get_ctx(),
+                    to_nickname,
+                    str(q)
+                )
+            q = self.db.insert(
+                    'history',
+                    sender=from_nickname,
+                    recipient=to_nickname,
+                    amount=actually_spend_love,
+                    _test=True
+                )
+            log.debug(
+                    '%s Successfully updated history: %s', 
+                    get_ctx(),
+                    str(q)
+                )
+        except:
+            ta.rollback()
+            log.debug("%s Sending %d datalovez %s -> %s for session %s failed.", 
+                    get_ctx(), 
+                    actually_spend_love,
+                    from_nickname,
+                    to_nickname,
+                    repr(session_id)
+                )
+            raise
+        else:
+            ta.commit()
+            log.debug(
+                    "%s Sending %d datalovez %s -> %s " +
+                            "for session %s successful.", 
+                    get_ctx(), 
+                    actually_spend_love,
+                    from_nickname,
+                    to_nickname,
+                    repr(session_id)
+                )
         return actually_spend_love
     
     ## Returns the user's amount of available datalove points.
@@ -781,6 +860,13 @@ class DBHandler:
     # @returns The user's new amount of available datalove points.
     def __update_love__(self,nickname):
         nickname = nickname.lower()
+        log.debug(
+               '%s Try to update love for user %s, where '+
+                        'DEFAULT_UPDATE_LOVE = %d',
+                get_ctx(),
+                repr(nickname),
+                DEFAULT_UPDATE_LOVE
+            )
         user = self.__select_user__(
                 'available_love, last_changed', 
                 nickname
@@ -795,12 +881,20 @@ class DBHandler:
         
         if (months > 0):
             user.available_love += months * DEFAULT_UPDATE_LOVE
-            self.db.update(
+            q = self.db.update(
                     'users',
                     where='nickname=$nickname',
                     vars=locals(),
-                    available_love=user.available_love
+                    available_love=user.available_love,
+                    _test=True
                 )
+            log.debug(
+                    '%s Successfully updated love (last change was %s: %s)',
+                    get_ctx(), 
+                    str(user.last_changed),
+                    str(q))
+        else:
+            log.debug('%s No need to update.', get_ctx())
         
         return user.available_love
     
@@ -911,9 +1005,11 @@ class DBHandler:
     ## Returns the overall number of users currently registered.
     # @returns The overall number of users currently registered.
     def get_total_loverz(self):
-        log.debug("%s Get total loverz from DB.",get_ctx())
-        amount = self.db.select('users', what='COUNT(nickname) AS amount')
-        return amount[0].amount
+        log.debug("%s Try to get total loverz from DB.",get_ctx())
+        amount = self.db.select('users', what='COUNT(nickname) AS amount')[0] \
+                        .amount
+        log.debug("%s Got %d loverz from DB.",get_ctx(),amount)
+        return amount
     
     ## Gets profile information of a user.
     # @param nickname The user's nickname.

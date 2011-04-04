@@ -225,23 +225,20 @@ class DBHandler:
             if('@' not in email):
                 raise AssertionError("Email address must contain an '@' symbol.")
                 
-        q = self.db.insert(
+        self.db.insert(
                 'users', 
                 nickname=nickname, 
                 password=password, 
                 email=email, 
-                available_love=available_love,
-                _test=True
+                available_love=available_love
             )
         import re
         log.debug(
                 '%s Successfully inserted into db: %s',
                 get_ctx(),
-                re.sub(
-                        r"(\([0-9]+),\s*'[0-9a-f]+',(.*\))",
-                        r"\1, '*****', \2",
-                        str(q)
-                    )
+                str(dict(
+                    self.__select_user__('nickname, available_love',nickname)
+                ))
             )
     
     ## Drops a user from the database.
@@ -722,40 +719,54 @@ class DBHandler:
                     'users',
                     where='nickname = $from_nickname',
                     vars=locals(), 
-                    available_love=from_user_available_love,
-                    _test=True
+                    available_love=from_user_available_love
                 )
             log.debug(
                     '%s Successfully token available love of %s: %s', 
                     get_ctx(),
                     from_nickname,
-                    str(q)
+                    str(dict(self.__select_user__(
+                            'nickname, available_love',
+                            from_nickname
+                        )))
                 )
             q = self.db.update(
                     'users',
                     where='nickname = $to_nickname',
                     vars=locals(), 
                     available_love=to_user.available_love,
-                    received_love=to_user.received_love,
-                    _test=True
+                    received_love=to_user.received_love
                 )
             log.debug(
                     '%s Successfully given love to %s: %s', 
                     get_ctx(),
                     to_nickname,
-                    str(q)
+                    str(dict(self.__select_user__(
+                            'nickname, available_love, received_love',
+                            to_nickname
+                        )))
                 )
             q = self.db.insert(
                     'history',
                     sender=from_nickname,
                     recipient=to_nickname,
-                    amount=actually_spend_love,
-                    _test=True
+                    amount=actually_spend_love
                 )
             log.debug(
                     '%s Successfully updated history: %s', 
                     get_ctx(),
-                    str(q)
+                    to_nickname,
+                    str(dict(self.db.query("""
+                            SELECT sender, recipient, amount
+                            FROM history
+                            WHERE timestamp IN
+                                    (SELECT MAX(timestamp)
+                                    FROM history
+                                    WHERE   sender = $from_nickname AND
+                                            recipient = $to_nickname AND
+                                            amount = $actually_spend_love)
+                            """, vars=locals()
+                        )[0]))
                 )
         except:
             ta.rollback()

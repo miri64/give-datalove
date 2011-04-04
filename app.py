@@ -1143,6 +1143,7 @@ class get_users_received_love:
         except BaseException, e:
             raise internalerror(e)
 
+
 ## Implementation of @ref give_user_datalove for the 
 #  <tt>/api/([^?$/\\#%\s]+)/give_datalove</tt> URL where 
 #  the regular expression stands for the user's name.

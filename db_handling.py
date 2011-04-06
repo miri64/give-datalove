@@ -618,16 +618,26 @@ class DBHandler:
         all_nicknames = [user.nickname for user in users]
         if nicknames == None: nicknames = all_nicknames
         points = dict()
-        for i,nickname in enumerate(all_nicknames):
-            nickname = str(nickname).lower()
-            if nickname in nicknames:
-                user = users[i]
-                self.db.update(
-                        'users',
-                        where="nickname = $nickname",
-                        vars = locals(),
-                        available_love = (user.available_love + datalove_points)
-                    )
+        ta = self.db.transaction()
+        try:
+            for i,nickname in enumerate(all_nicknames):
+                nickname = str(nickname).lower()
+                if nickname in nicknames:
+                    user = users[i]
+                    self.db.update(
+                            'users',
+                            where="nickname = $nickname",
+                            vars = locals(),
+                            available_love = (
+                                    user.available_love + 
+                                    datalove_points
+                                )
+                        )
+        except:
+            ta.rollback()
+            raise
+        else:
+            ta.commit()
     
     ## Sends datalove from a user to another user.
     # @param from_nickname The sending user's nickname.

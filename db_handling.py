@@ -658,8 +658,8 @@ class DBHandler:
                 to_nickname,
                 repr(session_id)
             )
-        from_nickname = from_str(nickname).lower()
-        to_nickname = to_str(nickname).lower()
+	from_nickname = str(from_nickname).lower()
+        to_nickname = str(to_nickname).lower()
         if from_nickname == to_nickname:
             raise AssertionError(
                     "Share datalove with other users, not yourself."

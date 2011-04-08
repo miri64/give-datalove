@@ -41,6 +41,7 @@ urls = (
     '/logoff', 'logoff',
     '/unregister', 'unregister',
     '/reset_password', 'reset_password',
+    '/api/login','api_login',
     r'/api/([^?$/\\#%\s]+)','get_users_love',
     r'/api/([^?$/\\#%\s]+)/','get_users_love',
     r'/api/([^?$/\\#%\s]+)/available_datalove', 'get_users_available_love',
@@ -1069,6 +1070,33 @@ class random_nickname:
             )
         web.header('Content-Type','text/html;charset=utf-8')
         return db_handler.random_nickname()
+
+## Class for the <tt>/api/login</tt> URL.
+class api_login(index):
+    def GET(self):
+        raise web.notfound()
+        
+    def POST(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL'])
+        try:
+            self.login_action()
+        except AssertionError, e:
+            web.ctx.status = '412 Precondition Failed'
+            return e
+        except dbh.IllegalSessionException,e:
+            web.ctx.status = '401 Unauthorized'
+            return e
+        except dbh.LoginException:
+            web.ctx.status = '400 Bad Request'
+            return 'Password not associated to nickname.'
+        except BaseException, e:
+            raise internalerror(e)
+        return get_session_id()
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.

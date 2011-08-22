@@ -42,12 +42,12 @@ urls = (
     '/unregister', 'unregister',
     '/reset_password', 'reset_password',
     '/api/login','api_login',
+    r'/api/users', 'users_api',
     r'/api/([^?$/\\#%\s]+)','get_users_love',
     r'/api/([^?$/\\#%\s]+)/','get_users_love',
     r'/api/([^?$/\\#%\s]+)/available_datalove', 'get_users_available_love',
     r'/api/([^?$/\\#%\s]+)/received_datalove', 'get_users_received_love',
     r'/api/([^?$/\\#%\s]+)/give_datalove', 'give_user_datalove_api',
-    
 )
 
 ## The absolute path of this script.
@@ -1097,6 +1097,36 @@ class api_login(index):
         except BaseException, e:
             raise internalerror(e)
         return get_session_id()
+
+## Class for the <tt>/api/users</tt> URL
+class users:
+    ## Method for a HTTP GET request.
+    def GET(self):
+        log.info(
+                "%s \"%s %s %s\"", 
+                get_ctx(),
+                web.ctx.method, 
+                web.ctx.path, 
+                web.ctx.env['SERVER_PROTOCOL']
+            )
+        web.header('Content-Type','text/html;charset=utf-8')
+        try:
+            session_id = get_session_id()
+            users = db_handler.get_users()
+            templates = web.template.render(os.path.join(abspath,'templates'))
+            total_loverz = db_handler.get_total_loverz()
+            userstring = ""
+            
+            logged_in = db_handler.session_associated_to_any_user(session_id)
+            
+            error = web.input().get('error')
+            
+            for user in users:
+                userstring += user.nickname + "," + user.received_love + "\n"
+            return userstring
+            
+        except BaseException, e:
+            raise internalerror(e)
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.

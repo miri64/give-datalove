@@ -586,7 +586,7 @@ class register:
 
 ## Class for the <tt>/users</tt> URL
 class users:
-    def generate_page(self,users):
+    def show(self,users):
         session_id = get_session_id()
         total_loverz = db_handler.get_total_loverz()
         templates = web.template.render(os.path.join(abspath,'templates'))
@@ -1111,7 +1111,7 @@ class api_login(index):
 
 ## Class for the <tt>/api/users</tt> URL
 class users_api(users):
-    def generate_page(self,users):
+    def show(self,users):
         for user in users:
             userstring += user.nickname + "," + str(user.received_love) + "\n"
         return userstring

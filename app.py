@@ -1143,19 +1143,6 @@ class get_users_love:
         except BaseException, e:
             raise internalerror(e)
 
-class user_api(user):
-    def show(self,nickname):
-        web.header('Content-Type','text/html;charset=utf-8')
-        if not db_handler.user_exists(nickname):
-            raise notfound(
-                    "User '%s' does not exist." % nickname
-                )
-        user = db_handler.get_profile(nickname)
-        userstring = "%s,%d,[" % (user.nickname, user.received_love)
-        for website in user.websites:
-            userstring += website+','
-        userstring += ']\n'
-
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/available_datalove</tt> URL where the 
 #  regular expression stands for the user's name.
 class get_users_available_love:
@@ -1448,6 +1435,19 @@ class give_user_datalove_profile(give_user_datalove):
     # @see give_user_datalove
     def user_not_exists_page(self, nickname):
         return self.error_handling('User %s does not exist')
+
+class user_api(user):
+    def show(self,nickname):
+        web.header('Content-Type','text/html;charset=utf-8')
+        if not db_handler.user_exists(nickname):
+            raise notfound(
+                    "User '%s' does not exist." % nickname
+                )
+        user = db_handler.get_profile(nickname)
+        userstring = "%s,%d,[" % (user.nickname, user.received_love)
+        for website in user.websites:
+            userstring += website+','
+        userstring += ']\n'
 
 if __name__ == '__main__': 
     db = web.database(

@@ -43,6 +43,7 @@ urls = (
     '/reset_password', 'reset_password',
     '/api/login','api_login',
     r'/api/users', 'users_api',
+    r'/api','api',
     r'/api/([^?$/\\#%\s]+)','get_users_love',
     r'/api/([^?$/\\#%\s]+)/','get_users_love',
     r'/api/([^?$/\\#%\s]+)/available_datalove', 'get_users_available_love',
@@ -631,6 +632,14 @@ class users:
             
         except BaseException, e:
             raise internalerror(e)
+
+## Class for the <tt>/api</tt> URL
+class api:
+    def GET(self):
+        templates = web.template.render(os.path.join(abspath,'templates'))
+        total_loverz = db_handler.get_total_loverz()
+        content = templates.api()
+        return templates.index(content,total_loverz)
 
 ## Class for the <tt>/widget</tt> URL.
 class widget:

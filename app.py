@@ -1103,6 +1103,7 @@ class api_login(index):
 ## Class for the <tt>/api/users</tt> URL
 class users_api(users):
     def generate_page(self,users):
+        userstring = ''
         for user in users:
             userstring += user.nickname + "," + str(user.received_love) + "\n"
         return userstring

@@ -1448,6 +1448,7 @@ class user_api(user):
         for website in user.websites:
             userstring += website+','
         userstring += ']\n'
+        return userstring
 
 if __name__ == '__main__': 
     db = web.database(

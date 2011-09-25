@@ -1,5 +1,5 @@
-$def with ()
-$# The standard frame for all pages.
+$$def with ()
+$$# The standard frame for all pages.
 <div id="content">
 <p class="love">give.datalove API</p>
 <p class="abouth">Why an API?</p>
@@ -21,9 +21,9 @@ of the error. If you want to help make our little project better,
 report the error to <a href="https://github.com/authmillenon/give-datalove/issues">https://github.com/authmillenon/give-datalove/issues</a>.
   </li>
 </ul>
-<br /><p class="abouth"><tt>http://give.datalove.me/api/<i>$user</i></tt></p>
+<br /><p class="abouth"><tt>http://give.datalove.me/api/<i>$$user</i></tt></p>
 <p class="about"> Gives back the profile information (username, received datalove, websites) of the
-user named <tt><i>$user</i></tt>.<br />
+user named <tt><i>$$user</i></tt>.<br />
 <br />
 HTTP Status of the Response: </p>
 <ul>
@@ -37,15 +37,15 @@ report the error to <a href="https://github.com/authmillenon/give-datalove/issue
 </ul>
 <br />
 
-<p class="abouth"><tt>http://give.datalove.me/api/<i>$user</i>/available_datalove</tt></p>
+<p class="abouth"><tt>http://give.datalove.me/api/<i>$$user</i>/available_datalove</tt></p>
 <p class="about"> Gives back the available datalove to share of the
-user named <tt><i>$user</i></tt>.<br />
+user named <tt><i>$$user</i></tt>.<br />
 <br />
 HTTP Status of the Response: </p>
 <ul>
   <li><tt>200 OK</tt>: All went right. The message's text is the user's
 available love.</li>
-  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$user</i></tt>
+  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$$user</i></tt>
 in the database. The message's text is an error message.</li>
   <li><tt>500 Internal Server Error</tt>: There is an error at our end
 of the line. The message's text is an error message and the traceback
@@ -54,14 +54,14 @@ report the error to <a href="https://github.com/authmillenon/give-datalove/issue
   </li>
 </ul>
 <br />
-<p class="abouth"><tt>http://give.datalove.me/api/<i>$user</i>/recieved_datalove</tt></p>
-<p class="about"> Gives back the received datalove of the user named <tt><i>$user</i></tt>.<br />
+<p class="abouth"><tt>http://give.datalove.me/api/<i>$$user</i>/recieved_datalove</tt></p>
+<p class="about"> Gives back the received datalove of the user named <tt><i>$$user</i></tt>.<br />
 <br />
 HTTP Status of the Response: </p>
 <ul>
   <li><tt>200 OK</tt>: All went right. The message's text is the user's
 received love.</li>
-  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$user</i></tt>
+  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$$user</i></tt>
 in the database. The message's text is an error message.</li>
   <li><tt>500 Internal Server Error</tt>: There is an error at our end
 of the line. The message's text is an error message and the traceback
@@ -70,16 +70,16 @@ report the error to <a href="https://github.com/authmillenon/give-datalove/issue
   </li>
 </ul>
 <br />
-<p class="abouth"><tt>http://give.datalove.me/api/<i>$user</i>/</tt></p>
+<p class="abouth"><tt>http://give.datalove.me/api/<i>$$user</i>/</tt></p>
 <p class="about"> Gives back the available (<tt>a</tt>) and received
-datalove (<tt>r</tt>) of the user named <tt><i>$user</i></tt> in the
+datalove (<tt>r</tt>) of the user named <tt><i>$$user</i></tt> in the
 following format: <tt>a,r</tt>.<br />
 <br />
 HTTP Status of the Response: </p>
 <ul>
   <li><tt>200 OK</tt>: All went right. The message's text is the user's
 received love.</li>
-  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$user</i></tt>
+  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$$user</i></tt>
 in the database. The message's text is an error message.</li>
   <li><tt>500 Internal Server Error</tt>: There is an error at our end
 of the line. The message's text is an error message and the traceback
@@ -97,7 +97,7 @@ HTTP Status of the Response: </p>
 <ul>
   <li><tt>200 OK</tt>: All went right. The message's text is the user's
 new session ID.</li>
-  <li><tt>400 Bad Request</tt>: The <tt><i>$nickname</i></tt> and <tt><i>$password</i></tt>
+  <li><tt>400 Bad Request</tt>: The <tt><i>$$nickname</i></tt> and <tt><i>$$password</i></tt>
 are not associated. The message's text is an error message.</li>
   <li><tt>401 Unauthorized</tt>: The server got an illegal session ID.
 The message's text is an error message.</li>
@@ -112,11 +112,11 @@ report the error to <a href="https://github.com/authmillenon/give-datalove/issue
   </li>
 </ul>
 <br />
-<p class="abouth"><tt>http://give.datalove.me/api/<i>$user</i>/give_datalove?sid=<i>$session_id</i></tt></p>
-<p class="about">will give datalove to this user $user</p>
-<p class="about"> Giving a user named <tt><i>$user</i></tt> 1
+<p class="abouth"><tt>http://give.datalove.me/api/<i>$$user</i>/give_datalove?sid=<i>$$session_id</i></tt></p>
+<p class="about">will give datalove to this user $$user</p>
+<p class="about"> Giving a user named <tt><i>$$user</i></tt> 1
 datalove. This request needs the giving user to be logged in and his
-session ID <tt><i>$session_id</i></tt> must be in the query as shown.
+session ID <tt><i>$$session_id</i></tt> must be in the query as shown.
 Alternatively you can send the session ID send as a cookie called <tt>'give_datalove_session_id'</tt><br />
 <br />
 HTTP Status of the Response: </p>
@@ -126,7 +126,7 @@ new session ID.</li>
   <li><tt>401 Unauthorized</tt>: The session ID is not associated to a
 user, i. e. the user is not logged in. The message's text is an error
 message.</li>
-  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$user</i></tt>
+  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$$user</i></tt>
 in the database. The message's text is an error message.</li>
   <li><tt>412 Precondition Failed</tt>: Some preondition was not met.
 The message's text is an error message describing what to do.</li>

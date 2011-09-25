@@ -1122,7 +1122,7 @@ class users:
             error = web.input().get('error')
             
             for user in users:
-                userstring += user.nickname + "," + user.received_love + "\n"
+                userstring += user.nickname + "," + str(user.received_love) + "\n"
             return userstring
             
         except BaseException, e:

@@ -585,6 +585,35 @@ class register:
 
 ## Class for the <tt>/users</tt> URL
 class users:
+    def generate_page(self,users):
+        session_id = get_session_id()
+        total_loverz = db_handler.get_total_loverz()
+        templates = web.template.render(os.path.join(abspath,'templates'))
+        logged_in = db_handler.session_associated_to_any_user(session_id)
+        error = web.input().get('error')
+        if session_cookie:
+            content = templates.users(users,error)
+            return templates.index(
+                    content,
+                    total_loverz = total_loverz,
+                    login_block = not logged_in, 
+                    logged_in = logged_in
+                )
+        else:
+            content = templates.users(
+                    users,
+                    errornous_nickname,
+                    error,
+                    session_id
+                )
+            return templates.index(
+                    content,
+                    total_loverz = total_loverz,
+                    session_id = session_id,
+                    login_block = not logged_in, 
+                    logged_in = logged_in
+                )
+    
     ## Method for a HTTP GET request.
     def GET(self):
         log.info(
@@ -596,37 +625,10 @@ class users:
             )
         web.header('Content-Type','text/html;charset=utf-8')
         try:
-            session_id = get_session_id()
             users = db_handler.get_users()
-            templates = web.template.render(os.path.join(abspath,'templates'))
-            total_loverz = db_handler.get_total_loverz()
             
-            logged_in = db_handler.session_associated_to_any_user(session_id)
+            return self.generate_page(users)
             
-            error = web.input().get('error')
-            
-            if session_cookie:
-                content = templates.users(users,error)
-                return templates.index(
-                        content,
-                        total_loverz = total_loverz,
-                        login_block = not logged_in, 
-                        logged_in = logged_in
-                    )
-            else:
-                content = templates.users(
-                        users,
-                        errornous_nickname,
-                        error,
-                        session_id
-                    )
-                return templates.index(
-                        content,
-                        total_loverz = total_loverz,
-                        session_id = session_id,
-                        login_block = not logged_in, 
-                        logged_in = logged_in
-                    )
         except BaseException, e:
             raise internalerror(e)
 
@@ -1099,34 +1101,11 @@ class api_login(index):
         return get_session_id()
 
 ## Class for the <tt>/api/users</tt> URL
-class users_api:
-    ## Method for a HTTP GET request.
-    def GET(self):
-        log.info(
-                "%s \"%s %s %s\"", 
-                get_ctx(),
-                web.ctx.method, 
-                web.ctx.path, 
-                web.ctx.env['SERVER_PROTOCOL']
-            )
-        web.header('Content-Type','text/html;charset=utf-8')
-        try:
-            session_id = get_session_id()
-            users = db_handler.get_users()
-            templates = web.template.render(os.path.join(abspath,'templates'))
-            total_loverz = db_handler.get_total_loverz()
-            userstring = ""
-            
-            logged_in = db_handler.session_associated_to_any_user(session_id)
-            
-            error = web.input().get('error')
-            
-            for user in users:
-                userstring += user.nickname + "," + str(user.received_love) + "\n"
-            return userstring
-            
-        except BaseException, e:
-            raise internalerror(e)
+class users_api(users):
+    def generate_page(self,users):
+        for user in users:
+            userstring += user.nickname + "," + str(user.received_love) + "\n"
+        return userstring
 
 ## Class for the <tt>/api/([^?$/\\#%\s]+)/</tt> URL where the regular 
 #  expression stands for the user's name.

@@ -87,6 +87,20 @@ of the error. If you want to help make our little project better,
 report the error to <a href="https://github.com/authmillenon/give-datalove/issues">https://github.com/authmillenon/give-datalove/issues</a>.
   </li>
 </ul>
+<br /><p class="abouth"><tt>http://give.datalove.me/api/users</tt></p>
+<p class="about"> Gives back all users of give.datalove.me with their received datalove, in random order.<br />
+<br />
+HTTP Status of the Response: </p>
+<ul>
+  <li><tt>200 OK</tt>: All went right. The message's text is <tt><i>$$user</i>,<i>$$receive_datalove</i>,[<i>$$websites</i>]</tt>.</li>
+  <li><tt>404 Not Found</tt>: There is no user called <tt><i>$$user</i></tt>
+in the database. The message's text is an error message.</li>
+  <li><tt>500 Internal Server Error</tt>: There is an error at our end
+of the line. The message's text is an error message and the traceback
+of the error. If you want to help make our little project better,
+report the error to <a href="https://github.com/authmillenon/give-datalove/issues">https://github.com/authmillenon/give-datalove/issues</a>.
+  </li>
+</ul>
 <br />
 <p class="abouth"><tt>http://give.datalove.me/api/login</tt></p>
 <p class="about"> Logging in a user, i. e. associating him with a

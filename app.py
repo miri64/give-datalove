@@ -1099,7 +1099,7 @@ class api_login(index):
         return get_session_id()
 
 ## Class for the <tt>/api/users</tt> URL
-class users:
+class users_api:
     ## Method for a HTTP GET request.
     def GET(self):
         log.info(

@@ -1444,7 +1444,7 @@ class user_api(user):
                     "User '%s' does not exist." % nickname
                 )
         user = db_handler.get_profile(nickname)
-        userstring = "%s,%d,[" % (user.nickname, user.received_love)
+        userstring = "%s,%d,[" % (nickname, user.received_love)
         for website in user.websites:
             userstring += website+','
         userstring += ']\n'

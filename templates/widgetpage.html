@@ -4,17 +4,17 @@ $def with (nickname = None)
 		<p class="about">We provide one widget to integrate into your website or into your blog and enter your username at the end. It looks like this:</p>
 		<p class="about">
 			$if nickname:
-				<iframe src="http://give.datalove.me:8080/widget?user=$nickname" width="70" height="71"></iframe>
+				<iframe src="http://give.datalove.me:8080/widget?user=$nickname" width="70" height="71" style="border: none"></iframe>
 			$else:
-				<iframe src="http://give.datalove.me:8080/widget?random" width="70" height="71"></iframe>
+				<iframe src="http://give.datalove.me:8080/widget?random" width="70" height="71" style="border: none"></iframe>
 		</p>
 		<p class="abouth">How do I integrate this widget?</p>
 		<p class="about">Is is very easy. Just put this one line of code into your website or on your blog:</p>
 		<p class="about">
 			$if nickname:
-				<pre>&lt;iframe src="http://give.datalove.me:8080/widget?user=$nickname" width="70" height="71"&gt;&lt;/iframe&gt;</pre>
+				<pre>&lt;iframe src="http://give.datalove.me:8080/widget?user=$nickname" width="70" height="71" style="border: none"&gt;&lt;/iframe&gt;</pre>
 			$else:
-				<pre>&lt;iframe src="http://give.datalove.me:8080/widget?user=&lt;your_nickname&gt;" width="70" height="71"&gt;&lt;/iframe&gt;</pre>
+				<pre>&lt;iframe src="http://give.datalove.me:8080/widget?user=&lt;your_nickname&gt;" width="70" height="71" style="border: none"&gt;&lt;/iframe&gt;</pre>
 		</p>
 		$if not nickname:
 			<p class="about">Where you have to replace <tt>&lt;your nickname&gt;</tt> with your own nickname, of cause, after you have <a href="/register">registered</a>.</p>

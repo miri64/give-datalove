@@ -629,7 +629,7 @@ class users:
         try:
             users = db_handler.get_users()
             
-            return self.generate_page(users)
+            return self.show(users)
             
         except BaseException, e:
             raise internalerror(e)

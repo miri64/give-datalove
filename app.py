@@ -14,6 +14,8 @@
 #
 #  No Copyright, no license, comes as it is
 
+import sys
+sys.setrecursionlimit(1500)
 import web,os,config,traceback
 from log import log
 from log import get_ctx

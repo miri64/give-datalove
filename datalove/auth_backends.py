@@ -14,7 +14,7 @@ class LegacyUserAuthBackend(object):
             user = User.objects.get(username=username)
 
             if '$' not in user.password:
-                if self._check_legacy_password(password)
+                if self._check_legacy_password(password):
                     user.set_password(password)
                     user.save()
                     return user
@@ -23,5 +23,11 @@ class LegacyUserAuthBackend(object):
             else:
                 if user.check_password(password):
                     return user
+        except User.DoesNotExist:
+            return None
+    
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None

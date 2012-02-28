@@ -1,9 +1,10 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 
 class DataloveProfile(models.Model):
     user = models.OneToOneField(User,related_name='datalove')
-    available_love = models.PositiveIntegerField(blank=False, null=False, default=0)
+    available_love = models.PositiveIntegerField(blank=False, null=False, default=settings.DEFAULT_STARTING_DATALOVE)
     received_love = models.PositiveIntegerField(blank=False, null=False, default=0)
 
 class DataloveHistory(models.Model):

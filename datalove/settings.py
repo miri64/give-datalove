@@ -148,3 +148,5 @@ LOGGING = {
 AUTHENTICATION_BACKENDS = (
     'auth_backends.LegacyUserAuthBackend',
 )
+
+DEFAULT_STARTING_DATALOVE = 5

@@ -75,6 +75,7 @@ class DataloveHistory(models.Model):
                     "DataloveHistory.timestamp must be of " +
                     "type datetime.datetime"
                 )
+        super(DataloveHistory, self).save(*args, **kwargs)
 
 class UserWebsite(models.Model):
     user = models.ForeignKey(
@@ -107,3 +108,4 @@ class LovableObject(models.Model):
             raise IntegrityError(
                     "LovableObject.received_love must be >= 0"
                 )
+        super(LovableObject,self).save(*args, **kwargs)

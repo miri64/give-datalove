@@ -23,6 +23,12 @@ class DataloveProfile(models.Model):
             null=False, 
             default=0
         )
+    last_love_update = models.DateField(
+            blank=False,
+            null=False,
+            auto_now=True,
+            auto_now_add=True
+        )
 
     def save(self, *args, **kwargs):
         if self.available_love < 0:
@@ -34,6 +40,16 @@ class DataloveProfile(models.Model):
                     "DataloveProfile.received_love must be >= 0"
                 )
         super(DataloveProfile, self).save()
+
+    def update_love(self):
+        current_time = datetime.today()
+        years = current_time.year - self.last_love_update.year
+        months = 12*years + (current_time.month - 
+                self.last_love_update.month)
+
+        if (months > 0):
+            self.available_love += months * settings.DEFAULT_UPDATE_DATALOVE
+            self.save()
     
 class DataloveHistory(models.Model):
     sender = models.ForeignKey(
@@ -128,6 +144,7 @@ class LovableObject(models.Model):
 from django.utils import unittest
 
 import random, string, sys
+from datetime import timedelta
 
 def create_user():
     username = 'test'
@@ -196,6 +213,30 @@ class TestUserProfileCreation(unittest.TestCase):
             )
         with self.assertRaises(IntegrityError):
             profile.save()
+
+    def tearDown(self):
+        self.user.delete()
+
+class TestDataloveProfileMethods(unittest.TestCase):
+    def setUp(self):
+        _,self.user = create_user()
+        self.profile = create_profile(self.user)
+
+    def test_update_love(self):
+        year = timedelta(days=365)
+        old_love = self.profile.available_love
+        self.profile.last_love_update -= year
+        self.profile.update_love()
+        try:
+            self.assertEqual(
+                    old_love+11*settings.DEFAULT_UPDATE_DATALOVE, 
+                    self.profile.available_love
+                )
+        except AssertionError:
+            self.assertEqual(
+                    old_love+12*settings.DEFAULT_UPDATE_DATALOVE, 
+                    self.profile.available_love
+                )
 
     def tearDown(self):
         self.user.delete()

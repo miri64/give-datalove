@@ -18,13 +18,13 @@ class LegacyUserAuthBackend(object):
                     user.set_password(password)
                     user.save()
                     return user
-                else:
-                    return None
             else:
                 if user.check_password(password):
+                    user.get_profile().update_love()
                     return user
         except User.DoesNotExist:
-            return None
+            pass
+        return None
     
     def get_user(self, user_id):
         try:

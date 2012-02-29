@@ -34,6 +34,12 @@ class DataloveHistory(models.Model):
         )
     amount = models.PositiveIntegerField(
             blank=False, 
+            null=False,
+            default=1
+        )
+    timestamp = models.DateTimeField(
+            auto_now_add=True,
+            blank=False,
             null=False
         )
 

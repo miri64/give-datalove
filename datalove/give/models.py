@@ -78,17 +78,35 @@ class DataloveHistory(models.Model):
         super(DataloveHistory, self).save(*args, **kwargs)
 
 class UserWebsite(models.Model):
+    URL_LEN = 50
     user = models.ForeignKey(
             DataloveProfile, 
             related_name='websites', 
             blank=False, 
             null=False
         )
-    website = models.URLField(
-            max_length=50, 
+    url = models.URLField(
+            max_length=URL_LEN, 
             blank=False, 
             null=False
         )
+    
+    class Meta:
+        unique_together = ("user","url")
+
+    def save(self, *args, **kwargs):
+        if self.url != None:
+            if len(self.url) == 0:
+                raise IntegrityError(
+                        "UserWebsite.url may not be an empty " +
+                        "string."
+                    )
+            if len(self.url) > UserWebsite.URL_LEN:
+                raise IntegrityError(
+                        "UserWebsite.url may not be longer " +
+                        "then %d charactes" % UserWebsite.URL_LEN
+                    )
+        super(UserWebsite,self).save(*args, **kwargs)
 
 class LovableObject(models.Model):
     creator = models.ForeignKey(

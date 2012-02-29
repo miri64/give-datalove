@@ -70,11 +70,6 @@ class DataloveHistory(models.Model):
             raise IntegrityError(
                     "DataloveHistory.amount must be >= 0"
                 )
-        if not isinstance(self.timestamp,datetime):
-            raise IntegrityError(
-                    "DataloveHistory.timestamp must be of " +
-                    "type datetime.datetime"
-                )
         super(DataloveHistory, self).save(*args, **kwargs)
 
 class UserWebsite(models.Model):
@@ -127,3 +122,218 @@ class LovableObject(models.Model):
                     "LovableObject.received_love must be >= 0"
                 )
         super(LovableObject,self).save(*args, **kwargs)
+
+
+## Tests
+from django.utils import unittest
+
+import random, string, sys
+
+def create_user():
+    username = 'test'
+    if len(User.objects.filter(username=username)) > 0:
+        running_number = 0
+        username = "test%03d" % running_number
+        while len(User.objects.filter(username=username)) > 0:
+            running_number += 1
+            username = "test%03d" % running_number
+    user = User(username=username,password=username)
+    user.save()
+    return username,user
+
+def create_profile(user):
+    return DataloveProfile.objects.create(user=user) 
+
+def randstr(
+        length, 
+        rand_len=True,
+        char_set = string.ascii_uppercase + \
+                   string.ascii_lowercase + \
+                   string.digits + ':./%?#&\\'
+    ):
+    if rand_len:
+        length = random.randint(1,length)
+    return ''.join(random.choice(char_set) for x in range(length))
+
+class TestUserProfileCreation(unittest.TestCase):
+    def setUp(self):
+        _, self.user = create_user()
+    
+    def test_NoneUserProfileCreation(self):
+        with self.assertRaises(ValueError):
+            profile = DataloveProfile(user=None)
+    
+    def test_NoneAvailableLoveCreation(self):
+        profile = DataloveProfile(
+                user=self.user,
+                available_love=None
+            )
+        with self.assertRaises(IntegrityError):
+            profile.save()
+
+    def test_NoneReceivedLoveCreation(self):
+        profile = DataloveProfile(
+                user=self.user, 
+                received_love=None
+            )
+        with self.assertRaises(IntegrityError):
+            profile.save()
+    
+    def test_NegativeAvailableLoveCreation(self):
+        love = random.randint(-(sys.maxint)-1,-1)
+        profile = DataloveProfile(
+                user=self.user, 
+                available_love=love
+            )
+        with self.assertRaises(IntegrityError):
+            profile.save()
+
+    def test_NegativeReceivedLoveCreation(self):
+        love = random.randint(-(sys.maxint)-1,-1)
+        profile = DataloveProfile(
+                user=self.user, 
+                available_love=love
+            )
+        with self.assertRaises(IntegrityError):
+            profile.save()
+
+    def tearDown(self):
+        self.user.delete()
+
+class TestDataloveHistoryCreation(unittest.TestCase):
+    def setUp(self):
+        _, self.user1 = create_user()
+        self.profile1 = create_profile(self.user1)
+        _, self.user2 = create_user()
+        self.profile2 = create_profile(self.user2)
+    
+    def test_NoneSenderCreation(self):
+        with self.assertRaises(ValueError):
+            transaction = DataloveHistory(
+                    sender=None,
+                    recipient=self.profile2
+                )
+
+    def test_NoneRecipientCreation(self):
+        with self.assertRaises(ValueError):
+            transaction = DataloveHistory(
+                    sender=self.profile1,
+                    recipient=None
+                )
+    
+    def test_SenderAndRecipientEqualCreation(self):
+        transaction = DataloveHistory(
+                sender=self.profile1,
+                recipient=self.profile1
+            )
+        with self.assertRaises(IntegrityError):
+            transaction.save()
+            
+
+    def test_NoneAmountCreation(self):
+        transaction = DataloveHistory(
+                    sender=self.profile1,
+                    recipient=self.profile2,
+                    amount=None
+                )
+        with self.assertRaises(IntegrityError):
+            transaction.save()
+
+    def test_NegativeAmountCreation(self):
+        love = random.randint(-(sys.maxint)-1,-1)
+        transaction = DataloveHistory(
+                sender=self.profile1,
+                recipient=self.profile2,
+                amount=love
+            )
+        with self.assertRaises(IntegrityError):
+            transaction.save()
+    
+    def tearDown(self):
+        self.user1.delete()
+        self.user2.delete()
+
+class TestUserWebsiteCreation(unittest.TestCase):
+    def setUp(self):
+        _, self.user = create_user()
+        self.profile = create_profile(self.user)
+    
+    def test_NoneUserCreation(self):
+        url = randstr(UserWebsite.URL_LEN)
+        with self.assertRaises(ValueError):
+            website = UserWebsite(
+                    user=None,
+                    url=url
+                )
+
+    def test_NoneUrlCreation(self):
+        website = UserWebsite(
+                user=self.profile,
+                url=None
+            )
+        with self.assertRaises(IntegrityError):
+            website.save()
+    
+    def test_EmptyUrlCreation(self):
+        website = UserWebsite(
+                user=self.profile,
+                url=''
+            )
+        with self.assertRaises(IntegrityError):
+            website.save()
+
+    def test_TooLongUrlCreation(self):
+        url = randstr(UserWebsite.URL_LEN + 10,False)
+        website = UserWebsite(
+                user=self.profile,
+                url=url
+            )
+        with self.assertRaises(IntegrityError):
+            website.save()
+    
+    def test_UniquenessConstraint(self):
+        url = randstr(UserWebsite.URL_LEN)
+        website1 = UserWebsite(
+                user=self.profile,
+                url=url
+            )
+        website1.save()
+        website2 = UserWebsite(
+                user=self.profile,
+                url=url
+            )
+        with self.assertRaises(IntegrityError):
+            website2.save()
+
+    def tearDown(self):
+        self.user.delete()
+
+class TestLovableObjectCreation(unittest.TestCase):
+    def setUp(self):
+        _, self.user = create_user()
+        self.profile = create_profile(self.user)
+    
+    def test_NoneCreatorCreation(self):
+        with self.assertRaises(ValueError):
+            obj = LovableObject(creator=None)
+
+    def test_NoneReceivedLoveCreation(self):
+        obj = LovableObject(
+                creator=self.profile,
+                received_love=None
+            )
+        with self.assertRaises(IntegrityError):
+            obj.save()
+
+    def test_NoneReceivedLoveCreation(self):
+        love = random.randint(-(sys.maxint)-1,-1)
+        obj = LovableObject(
+                creator=self.profile,
+                received_love=love
+            )
+        with self.assertRaises(IntegrityError):
+            obj.save()
+
+    def tearDown(self):
+        self.user.delete()
+

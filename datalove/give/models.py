@@ -41,6 +41,11 @@ class DataloveProfile(models.Model):
                 )
         super(DataloveProfile, self).save()
 
+    def add_free_datalove(self, datalove):
+        if datalove < 0:
+            raise ValueError("Free datalove must be >= 0.")
+        self.available_love += datalove
+
     def update_love(self):
         current_time = datetime.today()
         years = current_time.year - self.last_love_update.year
@@ -222,7 +227,7 @@ class TestDataloveProfileMethods(unittest.TestCase):
         _,self.user = create_user()
         self.profile = create_profile(self.user)
 
-    def test_update_love(self):
+    def test_update_love_Correct(self):
         year = timedelta(days=365)
         old_love = self.profile.available_love
         self.profile.last_love_update -= year
@@ -237,6 +242,24 @@ class TestDataloveProfileMethods(unittest.TestCase):
                     old_love+12*settings.DEFAULT_UPDATE_DATALOVE, 
                     self.profile.available_love
                 )
+    
+    def test_add_free_datalove_Correct(self):
+        free_datalove = random.randint(1,sys.maxint)
+        old_love = self.profile.available_love
+        self.profile.add_free_datalove(free_datalove)
+        self.assertEqual(
+                old_love + free_datalove,
+                self.profile.available_love
+            )
+    
+    def test_add_free_datalove_NoneArg(self):
+        with self.assertRaises(ValueError):
+            self.profile.add_free_datalove(None)
+
+    def test_add_free_datalove_NegativeArg(self):
+        free_datalove = random.randint(-(sys.maxint-1),-1)
+        with self.assertRaises(ValueError):
+            self.profile.add_free_datalove(free_datalove)
 
     def tearDown(self):
         self.user.delete()

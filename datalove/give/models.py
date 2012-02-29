@@ -15,3 +15,7 @@ class DataloveHistory(models.Model):
 class UserWebsite(models.Model):
     user = models.ForeignKey(DataloveProfile,related_name='websites')
     website = models.URLField(max_length=50, blank=False, null=False)
+
+class LovableObject(models.Model):
+    creator = models.ForeignKey(DataloveProfile,related_name='lovable_objects')
+    received_love = models.PositiveIntegerField(blank=False, null=False, default=0)

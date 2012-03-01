@@ -51,6 +51,10 @@ class DataloveProfile(LovableObject):
             raise ValueError("Free datalove must be >= 0.")
         self.available_love += datalove
 
+    @staticmethod
+    def get_total_loverz():
+        return len(DataloveProfile.objects.all())
+
     def update_love(self):
         current_time = datetime.today()
         years = current_time.year - self.last_love_update.year
@@ -157,7 +161,9 @@ def create_user():
     return username,user
 
 def create_profile(user):
-    return DataloveProfile.objects.create(user=user) 
+    profile = DataloveProfile(user=user)  
+    profile.save()
+    return profile 
 
 def randstr(
         length, 
@@ -253,6 +259,13 @@ class TestDataloveProfileMethods(unittest.TestCase):
         free_datalove = random.randint(-(sys.maxint-1),-1)
         with self.assertRaises(ValueError):
             self.profile.add_free_datalove(free_datalove)
+    
+    def test_get_total_loverz_Correct(self):
+        total_loverz = len(DataloveProfile.objects.all())
+        self.assertEqual(
+                total_loverz,
+                DataloveProfile.get_total_loverz()
+            )
 
     def tearDown(self):
         self.user.delete()

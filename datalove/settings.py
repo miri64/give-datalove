@@ -149,4 +149,7 @@ AUTHENTICATION_BACKENDS = (
     'auth_backends.LegacyUserAuthBackend',
 )
 
+AUTH_PROFILE_MODULE = 'give.DataloveProfile'
+
 DEFAULT_STARTING_DATALOVE = 5
+DEFAULT_UPDATE_DATALOVE = 5

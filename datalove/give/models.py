@@ -4,6 +4,12 @@ from django.contrib.auth.models import User
 
 from datetime import datetime
 
+class UserException(Exception):
+    pass
+
+class NotEnoughDataloveException(Exception):
+    pass
+
 class LovableObject(models.Model):
     received_love = models.PositiveIntegerField(
             blank=False, 
@@ -54,6 +60,51 @@ class DataloveProfile(LovableObject):
     @staticmethod
     def get_total_loverz():
         return len(DataloveProfile.objects.all())
+
+    def send_datalove(self, recipient, datalove=1):
+        if datalove < 0:
+            raise ValueError("datalove must be >= 0.")
+        if isinstance(recipient, User):
+            try:
+                recipient = recipient.get_profile()
+            except DataloveProfile.DoesNotExist:
+                raise UserException(
+                        "User '%s' has no datalove profile." % 
+                        recipient.username
+                    )
+        elif isinstance(recipient, LovableObject):
+            pass
+        else:
+            try:
+                recipient = User.objects.get(
+                        username=str(recipient)
+                    ).get_profile()
+            except User.DoesNotExist:
+                raise UserException(
+                        "User '%s' does not exist." % 
+                        str(recipient)
+                    )
+        self.update_love()
+        if self.available_love == 0:
+            raise NotEnoughDataloveException(
+                    "%s does not have enough datalove." % 
+                    self.user.username
+                )
+        actually_spend_love = min(
+                self.available_love,
+                datalove
+            )
+        self.available_love -= actually_spend_love
+        recipient.received_love += actually_spend_love
+        if not isinstance(recipient, LovableItem):
+            recipient.available_love += actually_spend_love
+        transaction = DataloveHistory(
+                sender=self,
+                recipient=recipient,
+                amount=actually_spend_love
+            )
+        transaction.save()
+        return actually_spend_love
 
     def update_love(self):
         current_time = datetime.today()
@@ -266,6 +317,91 @@ class TestDataloveProfileMethods(unittest.TestCase):
                 total_loverz,
                 DataloveProfile.get_total_loverz()
             )
+    
+    def test_send_datalove_Correct_RecipientUser(self):
+        _,recipient = create_user()
+        create_profile(recipient)
+        to_send = random.randint(1,self.profile.available_love)
+        sent = self.profile.send_datalove(recipient,to_send)
+        self.assertEqual(to_send,sent)
+        transaction = DataloveHistory.objects.get(
+                sender=self.profile,
+                recipient=recipient
+            )
+        self.assertEqual(transaction.amount,sent)
+        recipient.delete()
+    
+    def test_send_datalove_Correct_RecipientProfile(self):
+        _,user = create_user()
+        recipient = create_profile(user)
+        to_send = random.randint(1,self.profile.available_love)
+        sent = self.profile.send_datalove(recipient,to_send)
+        self.assertEqual(to_send,sent)
+        transaction = DataloveHistory.objects.get(
+                sender=self.profile,
+                recipient=recipient
+            )
+        self.assertEqual(transaction.amount,sent)
+        user.delete()
+
+    def test_send_datalove_Correct_RecipientItem(self):
+        recipient = LovableItem(creator=self.profile)
+        recipient.save()
+        to_send = random.randint(1,self.profile.available_love)
+        sent = self.profile.send_datalove(recipient,to_send)
+        self.assertEqual(to_send,sent)
+        transaction = DataloveHistory.objects.get(
+                sender=self.profile,
+                recipient=recipient
+            )
+        self.assertEqual(transaction.amount,sent)
+        recipient.delete()
+
+    def test_send_datalove_NegativeDatalove(self):
+        _,recipient = create_user()
+        create_profile(recipient)
+        old_love = self.profile.available_love
+        to_send = random.randint(-(sys.maxint)-1,-1)
+        with self.assertRaises(ValueError):
+            sent = self.profile.send_datalove(recipient,to_send)
+        self.assertEqual(old_love,self.profile.available_love)
+        recipient.delete()
+    
+    def test_send_datalove_NotExistentUser(self):
+        recipient = randstr(20) 
+        old_love = self.profile.available_love
+        to_send = random.randint(1,self.profile.available_love)
+        with self.assertRaises(UserException):
+            sent = self.profile.send_datalove(recipient,to_send)
+        self.assertEqual(old_love,self.profile.available_love)
+
+    def test_send_datalove_ToMuchLove(self):
+        _,recipient = create_user()
+        create_profile(recipient)
+        old_love = self.profile.available_love
+        to_send = random.randint(
+                self.profile.available_love+1,
+                sys.maxint
+            )
+        sent = self.profile.send_datalove(recipient,to_send)
+        self.assertNotEqual(to_send,sent)
+        self.assertEqual(old_love,sent)
+        self.assertEqual(self.profile.available_love,0)
+        transaction = DataloveHistory.objects.get(
+                sender=self.profile,
+                recipient=recipient
+            )
+        self.assertEqual(transaction.amount,sent)
+        recipient.delete()
+    
+    def test_send_datalove_NoAvailableLove(self):
+        _,recipient = create_user()
+        create_profile(recipient)
+        self.profile.available_love = 0
+        self.profile.save()
+        to_send = random.randint(1,sys.maxint)
+        with self.assertRaises(NotEnoughDataloveException):
+            sent = self.profile.send_datalove(recipient,to_send)
 
     def tearDown(self):
         self.user.delete()

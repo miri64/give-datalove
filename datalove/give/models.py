@@ -4,7 +4,21 @@ from django.contrib.auth.models import User
 
 from datetime import datetime
 
-class DataloveProfile(models.Model):
+class LovableObject(models.Model):
+    received_love = models.PositiveIntegerField(
+            blank=False, 
+            null=False, 
+            default=0
+        )
+    
+    def save(self, *args, **kwargs):
+        if self.received_love < 0:
+            raise IntegrityError(
+                    "LovableObject.received_love must be >= 0"
+                )
+        super(LovableObject,self).save(*args, **kwargs)
+
+class DataloveProfile(LovableObject):
     user = models.OneToOneField(
             User, 
             related_name='datalove', 
@@ -18,11 +32,6 @@ class DataloveProfile(models.Model):
             null=False, 
             default=settings.DEFAULT_STARTING_DATALOVE
         )
-    received_love = models.PositiveIntegerField(
-            blank=False, 
-            null=False, 
-            default=0
-        )
     last_love_update = models.DateField(
             blank=False,
             null=False,
@@ -35,11 +44,7 @@ class DataloveProfile(models.Model):
             raise IntegrityError(
                     "DataloveProfile.available_love must be >= 0"
                 ) 
-        if self.received_love < 0:
-            raise IntegrityError(
-                    "DataloveProfile.received_love must be >= 0"
-                )
-        super(DataloveProfile, self).save()
+        super(DataloveProfile, self).save(*args, **kwargs)
 
     def add_free_datalove(self, datalove):
         if datalove < 0:
@@ -64,7 +69,7 @@ class DataloveHistory(models.Model):
             null=False
         )
     recipient = models.ForeignKey(
-            DataloveProfile, 
+            LovableObject, 
             related_name='receive_history', 
             blank=False, 
             null=False
@@ -124,25 +129,13 @@ class UserWebsite(models.Model):
                     )
         super(UserWebsite,self).save(*args, **kwargs)
 
-class LovableObject(models.Model):
+class LovableItem(LovableObject):
     creator = models.ForeignKey(
             DataloveProfile,
             related_name='lovable_objects',
             blank=False,
             null=False
         )
-    received_love = models.PositiveIntegerField(
-            blank=False, 
-            null=False, 
-            default=0
-        )
-    
-    def save(self, *args, **kwargs):
-        if self.received_love < 0:
-            raise IntegrityError(
-                    "LovableObject.received_love must be >= 0"
-                )
-        super(LovableObject,self).save(*args, **kwargs)
 
 
 ## Tests
@@ -372,17 +365,17 @@ class TestUserWebsiteCreation(unittest.TestCase):
     def tearDown(self):
         self.user.delete()
 
-class TestLovableObjectCreation(unittest.TestCase):
+class TestLovableItemCreation(unittest.TestCase):
     def setUp(self):
         _, self.user = create_user()
         self.profile = create_profile(self.user)
     
     def test_NoneCreatorCreation(self):
         with self.assertRaises(ValueError):
-            obj = LovableObject(creator=None)
+            obj = LovableItem(creator=None)
 
     def test_NoneReceivedLoveCreation(self):
-        obj = LovableObject(
+        obj = LovableItem(
                 creator=self.profile,
                 received_love=None
             )
@@ -391,7 +384,7 @@ class TestLovableObjectCreation(unittest.TestCase):
 
     def test_NoneReceivedLoveCreation(self):
         love = random.randint(-(sys.maxint)-1,-1)
-        obj = LovableObject(
+        obj = LovableItem(
                 creator=self.profile,
                 received_love=love
             )

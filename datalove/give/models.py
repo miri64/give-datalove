@@ -128,6 +128,8 @@ class DataloveProfile(LovableObject):
                 amount=actually_spend_love
             )
         transaction.save()
+        recipient.save()
+        self.save()
         return actually_spend_love
 
     def update_love(self):

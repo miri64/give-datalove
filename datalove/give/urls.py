@@ -7,8 +7,7 @@ urlpatterns = patterns('datalove.give.views.html',
             '^login$',
             login,
             {   
-                'template_name': 'give/welcome.html',
-                'redirect_field_name': '/'
+                'template_name': 'give/welcome.html'
             },
             name='login'
         ),

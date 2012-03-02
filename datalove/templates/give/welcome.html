@@ -47,6 +47,7 @@
                 <a href="register" style="font-size: 75%;">Register</a> |
                 <a href="reset_password" style="font-size: 75%;">Forgot password?</a>
                 <input class="button" type="submit" value="Login" /><br />
+                {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
             </div>
             {{ form.non_field_errors }}
         </form>

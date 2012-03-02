@@ -34,8 +34,11 @@ def index(request):
                 ) 
         else:
             form = AuthenticationForm()
+            next = None
+            if 'next' in request.GET:
+                next = request.GET['next']
             return render_to_response2(
                     request,
                     'give/welcome.html',
-                    {'form': form}
+                    {'form': form,'next': next}
                 )

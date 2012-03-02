@@ -1,3 +1,4 @@
+{# Is loaded on '/' when a user is logged in. #}
 {% extends 'give/index.html' %}
 {% block content %}
 <p class="love">Ohai <a href="/user/{{ profile.user.username }}">{{ profile.user.username }}</a>,</p>

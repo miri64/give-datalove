@@ -1,10 +1,14 @@
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.conf import settings
-from django.core import serializers
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, get_list_or_404
 from give.models import *
 
 import simplejson as json
+
+import _common as common
+
+API_LOGIN_URL=settings.LOGIN_URL
 
 _resp_encode = json.dumps
 _resp_mimetype = 'application/json'
@@ -25,6 +29,17 @@ def respond(
             content=content,
             mimetype=mimetype,
             content_type=content_type
+        )
+
+@login_required(login_url=API_LOGIN_URL)
+def get_history(request, format='json'):
+    _set_format(format)
+    history = {}
+    profile = get_object_or_404(DataloveProfile, pk=request.user.id)
+    history['send'] = common.get_history(sender=profile)
+    history['received'] = common.get_history(recipient=profile)
+    return respond(
+            content=_resp_encode(history)
         )
 
 def profile(request, user_id, format='json'):

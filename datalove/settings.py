@@ -145,6 +145,8 @@ LOGGING = {
     }
 }
 
+LOGIN_URL = '/login'
+
 AUTHENTICATION_BACKENDS = (
     'auth_backends.LegacyUserAuthBackend',
 )

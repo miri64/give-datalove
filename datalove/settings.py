@@ -103,9 +103,15 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'datalove.urls'
 
 TEMPLATE_DIRS = (
+    './templates',
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.csrf',
+    'give.context_processors.total_loverz',
 )
 
 INSTALLED_APPS = (
@@ -145,7 +151,8 @@ LOGGING = {
     }
 }
 
-LOGIN_URL = '/login'
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = LOGIN_URL
 
 AUTHENTICATION_BACKENDS = (
     'auth_backends.LegacyUserAuthBackend',

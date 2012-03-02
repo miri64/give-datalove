@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" media="screen" href="http://datalove.me/datalove.css" />
+<link rel="shortcut icon" type="image/x-icon" href="http://datalove.me/datalove-favicon.png" />
+<title>~~~~=:) - give.datalove.me - (:=~~~~</title>
+</head>
+<body>
+<div class="menu">
+<a href="http://datalove.me/index.html">Principles</a> | <a href="http://datalove.me/images.html">Images</a> | <a href="http://datalove.me/about.html">About</a> | <a href="http://give.datalove.me/">give.datalove</a>
+
+</div>
+<div>
+    <div id="sidebar">
+        <ul>
+{% block logged_in_menu %}
+            <li><a href="/logout">Logout</a></li>
+            <li><a href="/manage_account">Manage account</a></li>
+            <li><a href="/history">History</a></li>
+{% endblock %}
+            <li><a href="/widget">Widget for website</a></li>
+            <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
+            <li><a href="/users">Loverz</a></li>
+            <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
+            <li><a href="/api">API Documentation</a></li>
+        </ul>
+{% block login_box %}{% endblock %}
+    </div>
+    <div id="content">
+{% block content %}{% endblock %}
+    </div>
+    <div class="footer">
+    <span style="font-weight:bold">There are {{ total_loverz }} dataloverz registered!</span><br />
+    No Copyright, no license. Sorry, no kittehs.<br />
+    Version 1.0 - beating heart <br />
+    Part of the Telecomix Network.<br />
+    <div class="footerrow">
+    <a href="http://www.telecomix.org"><img src="http://datalove.me/telecomix.gif" border="0"  align="bottom" align="left" /></a>
+    <a href="http://www.kopimi.com"><img src="http://www.kopimi.com/kopimi/k/mkopimi_gay.gif" border="0"  align="bottom" align="left" /></a>
+<div class="mails"><span>info [at] datalove [dot] me<br />
+info [at] werebuild [dot] eu<br />
+info [at] telecomix [dot] org</span></div>
+</div>
+    </div>
+
+</div>
+</body>
+</html>
+
+

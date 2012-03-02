@@ -1,0 +1,11 @@
+{% extends 'give/index.html' %}
+{% block content %}
+<p class="love">Ohai <a href="/user/{{ profile.user.username }}">{{ profile.user.username }}</a>,</p>
+        <p class="about">
+            U haz <span id="received_love">{{ profile.received_love }}</span> 
+            datalovez received and <span id="available_love">{{ profile.available_love }}</span>
+            waiting to be spread.
+        </p>
+        <!--Place holder-->
+        <div style="height: 400px">&nbsp;</div>
+{% endblock %}

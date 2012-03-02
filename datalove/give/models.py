@@ -10,6 +10,11 @@ class UserException(Exception):
 class NotEnoughDataloveException(Exception):
     pass
 
+class AttributedDict(dict):
+    def __init__(self, **entries):
+        self.update(**entries)
+        self.__dict__.update(entries)
+
 class LovableObject(models.Model):
     received_love = models.PositiveIntegerField(
             blank=False, 
@@ -56,7 +61,26 @@ class DataloveProfile(LovableObject):
         if datalove < 0:
             raise ValueError("Free datalove must be >= 0.")
         self.available_love += datalove
-
+    
+    def get_profile_dict(self, selection = None):
+        profile_dict = dict()
+        if selection == None:
+            selection = [f.name for f in self._meta.fields]
+            selection.remove('user')
+            selection.remove('lovableobject_ptr')
+            selection.remove('id')
+            selection += [f.name for f in self.user._meta.fields]
+            selection.append('websites')
+        for key in set(selection) & set(self.__dict__.keys()):
+            profile_dict[key] = self.__dict__[key]
+        for key in set(selection) & set(self.user.__dict__.keys()):
+            profile_dict[key] = self.user.__dict__[key]
+        if 'websites' in selection:
+            profile_dict['website'] = [
+                    AttributedDict(url=w) for w in self.websites.all()
+                ]
+        return AttributedDict(**profile_dict)
+    
     @staticmethod
     def get_total_loverz():
         return len(DataloveProfile.objects.all())
@@ -115,6 +139,10 @@ class DataloveProfile(LovableObject):
         if (months > 0):
             self.available_love += months * settings.DEFAULT_UPDATE_DATALOVE
             self.save()
+    
+    @models.permalink
+    def get_api_url(self):
+        return ('api__profile', [str(self.user.id)])
     
 class DataloveHistory(models.Model):
     sender = models.ForeignKey(

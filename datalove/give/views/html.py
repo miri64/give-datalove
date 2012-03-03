@@ -120,22 +120,23 @@ def profile(request, username):
     vars = get_more_information(request, {'profile': profile})
     return render_to_response2(request,'give/profile.html',vars)
 
+def query_redirect(to, query = {}, *args, **kwargs):
+    response = redirect(to, *args, **kwargs)
+    if len(query) > 0:
+        response['Location'] += "?%s" % urlencode(query)
+    return response
+
 @login_required
 def give_datalove(request, username, from_users=False):
     recipient = get_object_or_404(DataloveProfile, user__username=username)
     query = {}
     try:
         request.user.get_profile().send_datalove(recipient) 
-        if from_users:
-            return redirect('users')
-        else:
-            return redirect(recipient)
     except IntegrityError, e:
         query['error'] = str(e)
     except NotEnoughDataloveException:
         query['error'] = "You do not have enough datalove :(."
-    query = urlencode(query)  
     if from_users:
-        return redirect(reverse('users')+query, permanent=True)
+        return query_redirect('users', query)
     else:
-        return redirect(recipient.get_absolute_url()+query, permanent=True)
+        return query_redirect(recipient, query)

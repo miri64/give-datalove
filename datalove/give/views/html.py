@@ -1,11 +1,13 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
+from urllib import urlencode
 from give.forms import *
 from give.models import *
 
@@ -98,6 +100,11 @@ def get_more_information(request, vars={}):
         vars.update({'error': request.GET['error']})
     return vars
 
+def users(request):
+    profiles = DataloveProfile.objects.order_by('?')
+    vars = get_more_information(request, {'profiles': profiles})
+    return render_to_response2(request,'give/users.html',vars)
+
 @csrf_exempt
 def register(request):
     form = DataloveUserCreationForm()
@@ -114,13 +121,21 @@ def profile(request, username):
     return render_to_response2(request,'give/profile.html',vars)
 
 @login_required
-def give_datalove(request, username):
-    recipient = DataloveProfile.objects.get(user__username=username) 
+def give_datalove(request, username, from_users=False):
+    recipient = get_object_or_404(DataloveProfile, user__username=username)
+    query = {}
     try:
         request.user.get_profile().send_datalove(recipient) 
-        return redirect(recipient)
+        if from_users:
+            return redirect('users')
+        else:
+            return redirect(recipient)
     except IntegrityError, e:
-        return redirect(recipient.get_absolute_url()+'?error='+str(e))
+        query['error'] = str(e)
     except NotEnoughDataloveException:
-        e = "You do not have enough datalove :(."
-        return redirect(recipient.get_absolute_url()+'?error='+e)
+        query['error'] = "You do not have enough datalove :(."
+    query = urlencode(query)  
+    if from_users:
+        return redirect(reverse('users')+query, permanent=True)
+    else:
+        return redirect(recipient.get_absolute_url()+query, permanent=True)

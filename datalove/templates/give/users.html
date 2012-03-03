@@ -1,0 +1,21 @@
+{# A list of registered users #}
+{% extends "give/index.html" %}
+{% block content %}
+        <div id="content">
+            <p>Currently we have <span style="color:#f00">{{ total_loverz }}</span> loverz!</p>
+            {% if error %}
+                <div style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">
+                    {{ error }}
+                </div>
+            {% endif %}
+            <ul>
+                {% for profile in profiles %}
+                    <li>
+                        <a href="/user/{{ profile.user.username }}">{{ profile.user.username }}</a>
+                        (haz {{ profile.received_love }} datalovez)
+                        {% if logged_in and user != profile.user %}<a href="/users/give_{{ profile.user.username }}_datalove">Give some love</a>{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+{% endblock %}

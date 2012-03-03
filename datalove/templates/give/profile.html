@@ -12,5 +12,5 @@
             </p><br />
         {% endif %}
         {% if error %}<p style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">{{ error }}</p>{% endif %}
-        {% if logged_in and user != profile.user %}<a href="/user/{{ profile.user.username }}/give_datalove">Give love!</a>{% endif %}
+        {% if logged_in and user != profile.user %}<a href="/users/{{ profile.user.username }}/give_datalove">Give love!</a>{% endif %}
 {% endblock %}

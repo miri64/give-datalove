@@ -28,6 +28,12 @@ class LovableObject(models.Model):
                     "LovableObject.received_love must be >= 0"
                 )
         super(LovableObject,self).save(*args, **kwargs)
+    
+    def __str__(self):
+        result = "("
+        for f in self._meta.fields:
+            result += f.name + "=" + f.value_to_string(self) + ","
+        return result[:-1]+")"
 
 class DataloveProfile(LovableObject):
     user = models.OneToOneField(
@@ -146,6 +152,12 @@ class DataloveProfile(LovableObject):
     def get_api_url(self):
         return ('api__profile', [str(self.user.id)])
     
+    def __str__(self):
+        result = "("
+        for f in self._meta.fields:
+            result += f.name + "=" + f.value_to_string(self) + ","
+        return result[:-1]+")"
+
 class DataloveHistory(models.Model):
     sender = models.ForeignKey(
             DataloveProfile, 
@@ -185,6 +197,12 @@ class DataloveHistory(models.Model):
                     "DataloveHistory.amount must be >= 0"
                 )
         super(DataloveHistory, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        result = "("
+        for f in self._meta.fields:
+            result += f.name + "=" + f.value_to_string(self) + ","
+        return result[:-1]+")"
 
 class UserWebsite(models.Model):
     URL_LEN = 50
@@ -216,6 +234,12 @@ class UserWebsite(models.Model):
                         "then %d charactes" % UserWebsite.URL_LEN
                     )
         super(UserWebsite,self).save(*args, **kwargs)
+    
+    def __str__(self):
+        result = "("
+        for f in self._meta.fields:
+            result += f.name + "=" + f.value_to_string(self) + ","
+        return result[:-1]+")"
 
 class LovableItem(LovableObject):
     creator = models.ForeignKey(
@@ -224,6 +248,12 @@ class LovableItem(LovableObject):
             blank=False,
             null=False
         )
+    
+    def __str__(self):
+        result = "("
+        for f in self._meta.fields:
+            result += f.name + "=" + f.value_to_string(self) + ","
+        return result[:-1]+")"
 
 
 ## Tests

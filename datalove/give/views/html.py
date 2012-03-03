@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
@@ -105,4 +106,18 @@ def profile(request, username):
     vars = {'profile': profile}
     if request.user.is_authenticated():
         vars.update({'user': request.user})
+    if 'error' in request.GET:
+        vars.update({'error': request.GET['error']})
     return render_to_response2(request,'give/profile.html',vars)
+
+@login_required
+def give_datalove(request, username):
+    recipient = DataloveProfile.objects.get(user__username=username) 
+    try:
+        request.user.get_profile().send_datalove(recipient) 
+        return redirect(recipient)
+    except IntegrityError, e:
+        return redirect(recipient.get_absolute_url()+'?error='+str(e))
+    except NotEnoughDataloveException:
+        e = "You do not have enough datalove :(."
+        return redirect(recipient.get_absolute_url()+'?error='+e)

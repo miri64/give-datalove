@@ -152,6 +152,10 @@ class DataloveProfile(LovableObject):
     def get_api_url(self):
         return ('api__profile', [str(self.user.id)])
     
+    @models.permalink
+    def get_absolute_url(self):
+        return ('profile', [str(self.user.username)])
+    
     def __str__(self):
         result = "("
         for f in self._meta.fields:

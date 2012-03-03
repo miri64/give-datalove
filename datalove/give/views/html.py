@@ -1,8 +1,8 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
-from django.http import HttpResponse
-from django.shortcuts import render_to_response, redirect
+from django.http import HttpResponse, Http404
+from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from give.forms import *
@@ -99,3 +99,16 @@ def register(request):
             form.save()
             return redirect('/')
     return render_to_response2(request,'give/register.html',{'form':form})    
+
+def profile(request, username=None, user_id=None):
+    if not username and not user_id:
+        raise Http404()
+    print username
+    if username:
+        profile = get_object_or_404(DataloveProfile, user__username=username)
+    if user_id: 
+        profile = get_object_or_404(DataloveProfile, user__id=user_id)
+    vars = {'profile': profile}
+    if request.user.is_authenticated():
+        vars.update({'user': request.user})
+    return render_to_response2(request,'give/profile.html',vars)

@@ -91,6 +91,13 @@ def manage_account(request):
             }
         )
 
+def get_more_information(request, vars={}):
+    if request.user.is_authenticated():
+        vars.update({'user': request.user})
+    if 'error' in request.GET:
+        vars.update({'error': request.GET['error']})
+    return vars
+
 @csrf_exempt
 def register(request):
     form = DataloveUserCreationForm()
@@ -103,11 +110,7 @@ def register(request):
 
 def profile(request, username):
     profile = get_object_or_404(DataloveProfile, user__username=username)
-    vars = {'profile': profile}
-    if request.user.is_authenticated():
-        vars.update({'user': request.user})
-    if 'error' in request.GET:
-        vars.update({'error': request.GET['error']})
+    vars = get_more_information(request, {'profile': profile})
     return render_to_response2(request,'give/profile.html',vars)
 
 @login_required

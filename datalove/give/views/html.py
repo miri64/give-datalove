@@ -21,12 +21,7 @@ def render_to_response2(request, *args, **kwargs):
 def index(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            try:
-                profile = request.user.get_profile()
-            except DataloveProfile.DoesNotExist:
-                # if there is no datalove profile make it
-                profile = DataloveProfile(user=request.user)
-                profile.save()
+            profile = request.user.get_profile()
             return render_to_response2(
                     request,
                     'give/userpage.html',

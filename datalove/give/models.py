@@ -158,6 +158,12 @@ class DataloveProfile(LovableObject):
             result += f.name + "=" + f.value_to_string(self) + ","
         return result[:-1]+")"
 
+def _create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        DataloveProfile.objects.create(user=instance)
+
+models.signals.post_save.connect(_create_user_profile, sender=User)
+
 class DataloveHistory(models.Model):
     sender = models.ForeignKey(
             DataloveProfile, 
@@ -274,11 +280,6 @@ def create_user():
     user.save()
     return username,user
 
-def create_profile(user):
-    profile = DataloveProfile(user=user)  
-    profile.save()
-    return profile 
-
 def randstr(
         length, 
         rand_len=True,
@@ -290,89 +291,43 @@ def randstr(
         length = random.randint(1,length)
     return ''.join(random.choice(char_set) for x in range(length))
 
-class TestUserProfileCreation(unittest.TestCase):
-    def setUp(self):
-        _, self.user = create_user()
-    
-    def test_NoneUserProfileCreation(self):
-        with self.assertRaises(ValueError):
-            profile = DataloveProfile(user=None)
-    
-    def test_NoneAvailableLoveCreation(self):
-        profile = DataloveProfile(
-                user=self.user,
-                available_love=None
-            )
-        with self.assertRaises(IntegrityError):
-            profile.save()
-
-    def test_NoneReceivedLoveCreation(self):
-        profile = DataloveProfile(
-                user=self.user, 
-                received_love=None
-            )
-        with self.assertRaises(IntegrityError):
-            profile.save()
-    
-    def test_NegativeAvailableLoveCreation(self):
-        love = random.randint(-(sys.maxint)-1,-1)
-        profile = DataloveProfile(
-                user=self.user, 
-                available_love=love
-            )
-        with self.assertRaises(IntegrityError):
-            profile.save()
-
-    def test_NegativeReceivedLoveCreation(self):
-        love = random.randint(-(sys.maxint)-1,-1)
-        profile = DataloveProfile(
-                user=self.user, 
-                available_love=love
-            )
-        with self.assertRaises(IntegrityError):
-            profile.save()
-
-    def tearDown(self):
-        self.user.delete()
-
 class TestDataloveProfileMethods(unittest.TestCase):
     def setUp(self):
         _,self.user = create_user()
-        self.profile = create_profile(self.user)
 
     def test_update_love_Correct(self):
         year = timedelta(days=365)
-        old_love = self.profile.available_love
-        self.profile.last_love_update -= year
-        self.profile.update_love()
+        old_love = self.user.get_profile().available_love
+        self.user.get_profile().last_love_update -= year
+        self.user.get_profile().update_love()
         try:
             self.assertEqual(
                     old_love+11*settings.DEFAULT_UPDATE_DATALOVE, 
-                    self.profile.available_love
+                    self.user.get_profile().available_love
                 )
         except AssertionError:
             self.assertEqual(
                     old_love+12*settings.DEFAULT_UPDATE_DATALOVE, 
-                    self.profile.available_love
+                    self.user.get_profile().available_love
                 )
     
     def test_add_free_datalove_Correct(self):
         free_datalove = random.randint(1,sys.maxint)
-        old_love = self.profile.available_love
-        self.profile.add_free_datalove(free_datalove)
+        old_love = self.user.get_profile().available_love
+        self.user.get_profile().add_free_datalove(free_datalove)
         self.assertEqual(
                 old_love + free_datalove,
-                self.profile.available_love
+                self.user.get_profile().available_love
             )
     
     def test_add_free_datalove_NoneArg(self):
         with self.assertRaises(ValueError):
-            self.profile.add_free_datalove(None)
+            self.user.get_profile().add_free_datalove(None)
 
     def test_add_free_datalove_NegativeArg(self):
         free_datalove = random.randint(-(sys.maxint-1),-1)
         with self.assertRaises(ValueError):
-            self.profile.add_free_datalove(free_datalove)
+            self.user.get_profile().add_free_datalove(free_datalove)
     
     def test_get_total_loverz_Correct(self):
         total_loverz = len(DataloveProfile.objects.all())
@@ -383,15 +338,14 @@ class TestDataloveProfileMethods(unittest.TestCase):
     
     def test_send_datalove_Correct_RecipientUser(self):
         _,recipient = create_user()
-        create_profile(recipient)
-        to_send = random.randint(1,self.profile.available_love)
+        to_send = random.randint(1,self.user.get_profile().available_love)
         before = datetime.now()
-        sent = self.profile.send_datalove(recipient,to_send)
+        sent = self.user.get_profile().send_datalove(recipient,to_send)
         after = datetime.now()
         self.assertEqual(to_send,sent)
         transaction = DataloveHistory.objects.get(
-                sender=self.profile,
-                recipient=recipient
+                sender=self.user.get_profile(),
+                recipient=recipient.get_profile()
             )
         self.assertEqual(transaction.amount,sent)
         self.assertTrue(
@@ -401,34 +355,36 @@ class TestDataloveProfileMethods(unittest.TestCase):
         recipient.delete()
     
     def test_send_datalove_Correct_RecipientProfile(self):
-        _,user = create_user()
-        recipient = create_profile(user)
-        to_send = random.randint(1,self.profile.available_love)
+        _,recipient = create_user()
+        to_send = random.randint(1,self.user.get_profile().available_love)
         before = datetime.now()
-        sent = self.profile.send_datalove(recipient,to_send)
+        sent = self.user.get_profile().send_datalove(
+                recipient.get_profile(),
+                to_send
+            )
         after = datetime.now()
         self.assertEqual(to_send,sent)
         transaction = DataloveHistory.objects.get(
-                sender=self.profile,
-                recipient=recipient
+                sender=self.user.get_profile(),
+                recipient=recipient.get_profile()
             )
         self.assertEqual(transaction.amount,sent)
         self.assertTrue(
                 transaction.timestamp > before and 
                 transaction.timestamp < after
             )
-        user.delete()
+        recipient.delete()
 
     def test_send_datalove_Correct_RecipientItem(self):
-        recipient = LovableItem(creator=self.profile)
+        recipient = LovableItem(creator=self.user.get_profile())
         recipient.save()
-        to_send = random.randint(1,self.profile.available_love)
         before = datetime.now()
-        sent = self.profile.send_datalove(recipient,to_send)
+        to_send = random.randint(1,self.user.get_profile().available_love)
         after = datetime.now()
+        sent = self.user.get_profile().send_datalove(recipient,to_send)
         self.assertEqual(to_send,sent)
         transaction = DataloveHistory.objects.get(
-                sender=self.profile,
+                sender=self.user.get_profile(),
                 recipient=recipient
             )
         self.assertEqual(transaction.amount,sent)
@@ -440,39 +396,37 @@ class TestDataloveProfileMethods(unittest.TestCase):
 
     def test_send_datalove_NegativeDatalove(self):
         _,recipient = create_user()
-        create_profile(recipient)
-        old_love = self.profile.available_love
+        old_love = self.user.get_profile().available_love
         to_send = random.randint(-(sys.maxint)-1,-1)
         with self.assertRaises(ValueError):
-            sent = self.profile.send_datalove(recipient,to_send)
-        self.assertEqual(old_love,self.profile.available_love)
+            sent = self.user.get_profile().send_datalove(recipient,to_send)
+        self.assertEqual(old_love,self.user.get_profile().available_love)
         recipient.delete()
     
     def test_send_datalove_NotExistentUser(self):
         recipient = randstr(20) 
-        old_love = self.profile.available_love
-        to_send = random.randint(1,self.profile.available_love)
+        old_love = self.user.get_profile().available_love
+        to_send = random.randint(1,self.user.get_profile().available_love)
         with self.assertRaises(UserException):
-            sent = self.profile.send_datalove(recipient,to_send)
-        self.assertEqual(old_love,self.profile.available_love)
+            sent = self.user.get_profile().send_datalove(recipient,to_send)
+        self.assertEqual(old_love,self.user.get_profile().available_love)
 
     def test_send_datalove_ToMuchLove(self):
         _,recipient = create_user()
-        create_profile(recipient)
-        old_love = self.profile.available_love
+        old_love = self.user.get_profile().available_love
         to_send = random.randint(
-                self.profile.available_love+1,
+                self.user.get_profile().available_love+1,
                 sys.maxint
             )
         before = datetime.now()
-        sent = self.profile.send_datalove(recipient,to_send)
+        sent = self.user.get_profile().send_datalove(recipient,to_send)
         after = datetime.now()
         self.assertNotEqual(to_send,sent)
         self.assertEqual(old_love,sent)
-        self.assertEqual(self.profile.available_love,0)
+        self.assertEqual(self.user.get_profile().available_love,0)
         transaction = DataloveHistory.objects.get(
-                sender=self.profile,
-                recipient=recipient
+                sender=self.user.get_profile(),
+                recipient=recipient.get_profile()
             )
         self.assertEqual(transaction.amount,sent)
         self.assertTrue(
@@ -483,12 +437,11 @@ class TestDataloveProfileMethods(unittest.TestCase):
     
     def test_send_datalove_NoAvailableLove(self):
         _,recipient = create_user()
-        create_profile(recipient)
-        self.profile.available_love = 0
-        self.profile.save()
+        self.user.get_profile().available_love = 0
+        self.user.get_profile().save()
         to_send = random.randint(1,sys.maxint)
         with self.assertRaises(NotEnoughDataloveException):
-            sent = self.profile.send_datalove(recipient,to_send)
+            sent = self.user.get_profile().send_datalove(recipient,to_send)
 
     def tearDown(self):
         self.user.delete()
@@ -496,28 +449,26 @@ class TestDataloveProfileMethods(unittest.TestCase):
 class TestDataloveHistoryCreation(unittest.TestCase):
     def setUp(self):
         _, self.user1 = create_user()
-        self.profile1 = create_profile(self.user1)
         _, self.user2 = create_user()
-        self.profile2 = create_profile(self.user2)
     
     def test_NoneSenderCreation(self):
         with self.assertRaises(ValueError):
             transaction = DataloveHistory(
                     sender=None,
-                    recipient=self.profile2
+                    recipient=self.user2.get_profile()
                 )
 
     def test_NoneRecipientCreation(self):
         with self.assertRaises(ValueError):
             transaction = DataloveHistory(
-                    sender=self.profile1,
+                    sender=self.user1.get_profile(),
                     recipient=None
                 )
     
     def test_SenderAndRecipientEqualCreation(self):
         transaction = DataloveHistory(
-                sender=self.profile1,
-                recipient=self.profile1
+                sender=self.user1.get_profile(),
+                recipient=self.user1.get_profile()
             )
         with self.assertRaises(IntegrityError):
             transaction.save()
@@ -525,8 +476,8 @@ class TestDataloveHistoryCreation(unittest.TestCase):
 
     def test_NoneAmountCreation(self):
         transaction = DataloveHistory(
-                    sender=self.profile1,
-                    recipient=self.profile2,
+                    sender=self.user1.get_profile(),
+                    recipient=self.user2.get_profile(),
                     amount=None
                 )
         with self.assertRaises(IntegrityError):
@@ -535,8 +486,8 @@ class TestDataloveHistoryCreation(unittest.TestCase):
     def test_NegativeAmountCreation(self):
         love = random.randint(-(sys.maxint)-1,-1)
         transaction = DataloveHistory(
-                sender=self.profile1,
-                recipient=self.profile2,
+                sender=self.user1.get_profile(),
+                recipient=self.user2.get_profile(),
                 amount=love
             )
         with self.assertRaises(IntegrityError):
@@ -549,7 +500,6 @@ class TestDataloveHistoryCreation(unittest.TestCase):
 class TestUserWebsiteCreation(unittest.TestCase):
     def setUp(self):
         _, self.user = create_user()
-        self.profile = create_profile(self.user)
     
     def test_NoneUserCreation(self):
         url = randstr(UserWebsite.URL_LEN)
@@ -561,7 +511,7 @@ class TestUserWebsiteCreation(unittest.TestCase):
 
     def test_NoneUrlCreation(self):
         website = UserWebsite(
-                user=self.profile,
+                user=self.user.get_profile(),
                 url=None
             )
         with self.assertRaises(IntegrityError):
@@ -569,7 +519,7 @@ class TestUserWebsiteCreation(unittest.TestCase):
     
     def test_EmptyUrlCreation(self):
         website = UserWebsite(
-                user=self.profile,
+                user=self.user.get_profile(),
                 url=''
             )
         with self.assertRaises(IntegrityError):
@@ -578,7 +528,7 @@ class TestUserWebsiteCreation(unittest.TestCase):
     def test_TooLongUrlCreation(self):
         url = randstr(UserWebsite.URL_LEN + 10,False)
         website = UserWebsite(
-                user=self.profile,
+                user=self.user.get_profile(),
                 url=url
             )
         with self.assertRaises(IntegrityError):
@@ -587,12 +537,12 @@ class TestUserWebsiteCreation(unittest.TestCase):
     def test_UniquenessConstraint(self):
         url = randstr(UserWebsite.URL_LEN)
         website1 = UserWebsite(
-                user=self.profile,
+                user=self.user.get_profile(),
                 url=url
             )
         website1.save()
         website2 = UserWebsite(
-                user=self.profile,
+                user=self.user.get_profile(),
                 url=url
             )
         with self.assertRaises(IntegrityError):
@@ -604,7 +554,6 @@ class TestUserWebsiteCreation(unittest.TestCase):
 class TestLovableItemCreation(unittest.TestCase):
     def setUp(self):
         _, self.user = create_user()
-        self.profile = create_profile(self.user)
     
     def test_NoneCreatorCreation(self):
         with self.assertRaises(ValueError):
@@ -612,7 +561,7 @@ class TestLovableItemCreation(unittest.TestCase):
 
     def test_NoneReceivedLoveCreation(self):
         obj = LovableItem(
-                creator=self.profile,
+                creator=self.user.get_profile(),
                 received_love=None
             )
         with self.assertRaises(IntegrityError):
@@ -621,7 +570,7 @@ class TestLovableItemCreation(unittest.TestCase):
     def test_NoneReceivedLoveCreation(self):
         love = random.randint(-(sys.maxint)-1,-1)
         obj = LovableItem(
-                creator=self.profile,
+                creator=self.user.get_profile(),
                 received_love=love
             )
         with self.assertRaises(IntegrityError):

@@ -91,6 +91,14 @@ class DataloveProfile(LovableObject):
     def get_total_loverz():
         return len(DataloveProfile.objects.all())
 
+    @staticmethod
+    def get_random_profile():
+        profiles = DataloveProfile.objects.order_by('?')
+        if len(profiles) > 0:
+            return profiles[0]
+        else:
+            return None
+
     def send_datalove(self, recipient, datalove=1):
         if datalove < 0:
             raise ValueError("datalove must be >= 0.")

@@ -140,3 +140,31 @@ def give_datalove(request, username, from_users=False):
         return query_redirect('users', query)
     else:
         return query_redirect(recipient, query)
+
+def widget(request):
+    vars = {'error': request.GET['error']} if 'error' in request.GET else {}
+    if 'random' in request.GET:
+        vars['profile'] = DataloveProfile.get_random_profile()
+    elif 'user' in request.GET:
+        try:
+            vars['profile'] = DataloveProfile.objects.get(
+                    user__username=request.GET['user']
+                )
+        except DataloveProfile.DoesNotExist:
+            vars['error'] = "User '%s' does not exist" % request.GET['user']
+    else:
+        if request.user.is_authenticated():
+            vars['profile'] = request.user.get_profile()
+        return render_to_response2(request, 'give/widgetpage.html', vars)
+    return render_to_response2(request, 'give/widget.html', vars)
+
+def widget_give_datalove(request, username):
+    recipient = get_object_or_404(DataloveProfile, user__username=username)
+    query = {'user': username}
+    try:
+        request.user.get_profile().send_datalove(recipient) 
+    except IntegrityError, e:
+        query['error'] = "You are narcistic! :("
+    except NotEnoughDataloveException:
+        query['error'] = "Not enough datalove :(."
+    return query_redirect('widget', query)

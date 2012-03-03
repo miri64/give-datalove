@@ -22,5 +22,10 @@ urlpatterns = patterns('datalove.give.views.html',
         ),
     url('^users/(?P<username>[^?$/\\#%\s]+)$','profile',name='profile'),
     url('^users/(?P<username>[^?$/\\#%\s]+)/give_datalove$','give_datalove'),
+    url('^widget$','widget',name='widget'),
+    url(
+            '^widget/give_(?P<username>[^?$/\\#%\s]+)_datalove$',
+            'widget_give_datalove',
+        ),
     url('^api/',include('datalove.give.apiurls')),
 )

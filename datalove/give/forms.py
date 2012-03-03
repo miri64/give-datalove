@@ -11,6 +11,18 @@ class DataloveUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
         fields = ('username','email',)
 
+class DataloveUserCreationForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super(DataloveUserCreationForm, self).__init__(*args,**kwargs)
+        self.fields['username'].help_text = ''
+        self.fields['username'].label += '*'
+        self.fields['password1'].label += '*'
+        self.fields['password2'].help_text = ''
+        self.fields['password2'].label += '*'
+
+    class Meta(UserCreationForm.Meta):
+        fields = ('username','email',)
+
 class BaseUserWebsiteFormSet(forms.models.BaseModelFormSet):
     def __init__(self, user, *args, **kwargs):
         super(BaseUserWebsiteFormSet, self).__init__(*args, **kwargs)

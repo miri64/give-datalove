@@ -1,0 +1,38 @@
+{# Is loaded on '/register'. #}
+{% extends 'give/index.html' %}
+{% block logged_in_menu %}{% endblock %}
+{% block content %}
+        <style type="text/css">
+            input {
+                border: #ffffff 1pt solid;
+                background-color: #000000;
+                font-family: monospace;
+                color: #ffffff;
+                margin: 2px;
+            }
+            
+            input.button {
+                border-left: #ffffff 2pt solid;
+                border-top: #ffffff 2pt solid;
+                border-right: #aaaaaa 2pt solid;
+                border-bottom: #aaaaaa 2pt solid;
+                background-color: #000000;
+                font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
+                font-weight: bold;
+                color: #ffffff;
+                margin: 2px;
+            }
+        </style>
+        <p class="love">Register to give.datalove.me</p>
+        <form method="post" action="#">{% csrf_token %}
+            <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
+                {{ form.as_p }}
+                <input class="button" type="submit" value="Register account" /> <br />
+                <div style="font-size: 75%;text-align: left;">
+                    * This field is mandatory. Note that password recovery is not possible without an e-mail address
+                </div>
+            </div> 
+        </form>
+        <!--Place holder-->
+        <div style="height: 200px">&nbsp;</div>
+{% endblock %}

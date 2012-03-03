@@ -90,3 +90,13 @@ def manage_account(request):
                 'profile_form': profile_form
             }
         )
+
+@csrf_exempt
+def register(request):
+    form = DataloveUserCreationForm()
+    if request.method == 'POST':
+        form = DataloveUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    return render_to_response2(request,'give/register.html',{'form':form})    

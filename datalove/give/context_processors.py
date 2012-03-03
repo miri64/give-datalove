@@ -10,3 +10,6 @@ def login_information(request):
     if not logged_in:
         result.update({'login_form': AuthenticationForm()})
     return result
+
+def path(request):
+    return {'path': request.path}

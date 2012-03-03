@@ -16,7 +16,7 @@
     <div id="sidebar">
         <ul>
 {% if logged_in %}
-            <li><a href="/logout">Logout</a></li>
+            <li><a href="/logout?next={{ path }}">Logout</a></li>
             <li><a href="/manage_account">Manage account</a></li>
             <li><a href="/history">History</a></li>
 {% endif %}

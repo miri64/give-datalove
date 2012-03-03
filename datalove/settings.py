@@ -113,6 +113,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.csrf',
     'give.context_processors.total_loverz',
     'give.context_processors.login_information',
+    'give.context_processors.path',
 )
 
 INSTALLED_APPS = (

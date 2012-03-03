@@ -106,14 +106,16 @@ class DataloveProfile(LovableObject):
             pass
         else:
             try:
-                recipient = User.objects.get(
-                        username=str(recipient)
-                    ).get_profile()
+                recipient = DataloveProfile.objects.get(
+                        user__username=str(recipient)
+                    )
             except User.DoesNotExist:
                 raise UserException(
                         "User '%s' does not exist." % 
                         str(recipient)
                     )
+        if self == recipient:
+            raise IntegrityError("You can not send datalove to yourself.")
         self.update_love()
         if self.available_love == 0:
             raise NotEnoughDataloveException(

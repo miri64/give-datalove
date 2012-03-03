@@ -100,14 +100,8 @@ def register(request):
             return redirect('/')
     return render_to_response2(request,'give/register.html',{'form':form})    
 
-def profile(request, username=None, user_id=None):
-    if not username and not user_id:
-        raise Http404()
-    print username
-    if username:
-        profile = get_object_or_404(DataloveProfile, user__username=username)
-    if user_id: 
-        profile = get_object_or_404(DataloveProfile, user__id=user_id)
+def profile(request, username):
+    profile = get_object_or_404(DataloveProfile, user__username=username)
     vars = {'profile': profile}
     if request.user.is_authenticated():
         vars.update({'user': request.user})

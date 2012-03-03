@@ -12,5 +12,6 @@ urlpatterns = patterns('datalove.give.views.html',
             name='login'
         ),
     url('^logout$',logout,{'next_page': '/'}),
+    url('^manage_account$','manage_account',name='manage_account'),
     url('^api/',include('datalove.give.apiurls')),
 )

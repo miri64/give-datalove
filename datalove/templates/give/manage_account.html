@@ -1,0 +1,60 @@
+{# Is loaded on '/manage_account' when a user is logged in. #}
+{% extends 'give/index.html' %}
+{% block content %}
+        <style type="text/css">
+            input, textarea {
+                border: #ffffff 1pt solid;
+                background-color: #000000;
+                font-family: monospace;
+                color: #ffffff;
+                margin: 2px;
+                width: auto;
+            }
+
+            input.url_input {
+                width: 430px;
+                margin-right: 20px;
+            }
+            
+            input.button {
+                border-left: #ffffff 2pt solid;
+                border-top: #ffffff 2pt solid;
+                border-right: #aaaaaa 2pt solid;
+                border-bottom: #aaaaaa 2pt solid;
+                background-color: #000000;
+                font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
+                font-weight: bold;
+                color: #ffffff;
+                margin: 2px;
+                width: auto;
+            }
+        </style>
+        <p class="love">Manage Account [<a href='/'>{{ profile.user.username }}</a>]</p>
+        <p class="abouth">Change user data:</p>
+        <form method="post" action="#" id="user_form">
+            <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
+            {{ user_form.as_p }}
+            <input class="button" type="submit" name="user" value="Change user data." />
+            </div>
+        </form>
+        <p class="abouth">Change Password:</p>
+        <form method="post" action="#" id="password_form">
+            <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
+            {{ password_form.as_p }}
+            <input class="button" type="submit" name="password" value="Change password." />
+            </div>
+        </form>
+        <p class="abouth">Profile:</p>
+        <form method="post" action="#" id="profile_form">
+            Websites:
+            <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
+            {{ profile_form.management_form }}
+            <ul style="list-style-type: none">
+            {% for form in profile_form %}
+            <li>{{ form.id }}{{ form.url }}{% for error in form.url.errors %}{{ error|escape }},{% endfor %}{{ form.non_field_errors }}</li>
+            {% endfor %}
+            </ul>
+            <input class="button" type="submit" name="profile" value="Update Profile" />
+            </div>
+        </form>
+{% endblock %}

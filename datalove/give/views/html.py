@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
@@ -30,14 +30,13 @@ def index(request):
                     {'profile': profile}
                 ) 
         else:
-            form = AuthenticationForm()
             next = None
             if 'next' in request.GET:
                 next = request.GET['next']
             return render_to_response2(
                     request,
                     'give/welcome.html',
-                    {'form': form,'next': next}
+                    {'next': next}
                 )
 
 @csrf_exempt

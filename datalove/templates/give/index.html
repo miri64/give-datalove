@@ -15,18 +15,18 @@
 <div>
     <div id="sidebar">
         <ul>
-{% block logged_in_menu %}
+{% if logged_in %}
             <li><a href="/logout">Logout</a></li>
             <li><a href="/manage_account">Manage account</a></li>
             <li><a href="/history">History</a></li>
-{% endblock %}
+{% endif %}
             <li><a href="/widget">Widget for website</a></li>
             <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
             <li><a href="/users">Loverz</a></li>
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
             <li><a href="/api">API Documentation</a></li>
         </ul>
-{% block login_box %}{% endblock %}
+{% if not logged_in %}{% include "give/login_box.html" %}{% endif %}
     </div>
     <div id="content">
 {% block content %}{% endblock %}

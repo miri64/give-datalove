@@ -1,57 +1,5 @@
 {# Is loaded on '/' when no user is logged in. #}
 {% extends 'give/index.html' %}
-{% block logged_in_menu %}{% endblock %}
-{% block login_box %}
-        <style type="text/css">
-            input {
-                border: #ffffff 1pt solid;
-                background-color: #000000;
-                font-family: monospace;
-                color: #ffffff;
-                margin: 2px;
-                width: 100%;
-            }
-
-            input.button {
-                border-left: #ffffff 2pt solid;
-                border-top: #ffffff 2pt solid;
-                border-right: #aaaaaa 2pt solid;
-                border-bottom: #aaaaaa 2pt solid;
-                background-color: #000000;
-                font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
-                font-weight: bold;
-                color: #ffffff;
-                margin: 2px;
-                width: auto;
-            }
-            .historydiv {
-                width:45%;
-                float:left;
-            }
-            .errorlist {
-                color: #ff0000;
-                font-size: 75%;
-                text-align: left;
-            }
-        </style>
-        <form method="post" 
-            action="{% url login %}">
-            {% csrf_token %}
-            <div class="about" style="text-align: right;">
-                <label class="input_label" style="font-size: 75%; text-align: right;">{{ form.username.label }}</label><br />
-                {{ form.username }}<br />
-                {{ form.username.errors }}
-                <label class="input_label" style="font-size: 75%; text-align: right;">{{ form.password.label }}</label><br />
-                {{ form.password }}<br />
-                {{ form.password.errors }}
-                <a href="register" style="font-size: 75%;">Register</a> |
-                <a href="reset_password" style="font-size: 75%;">Forgot password?</a>
-                <input class="button" type="submit" value="Login" /><br />
-                {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
-            </div>
-            {{ form.non_field_errors }}
-        </form>
-{% endblock %}
 {% block content %}
         <p class="love">give.datalove &mdash; the new way to show your datalove</p>
         <p class="abouth">Welcome to give.datalove.</p>

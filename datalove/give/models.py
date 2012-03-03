@@ -260,7 +260,7 @@ class LovableItem(LovableObject):
 from django.utils import unittest
 
 import random, string, sys
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 def create_user():
     username = 'test'
@@ -385,39 +385,57 @@ class TestDataloveProfileMethods(unittest.TestCase):
         _,recipient = create_user()
         create_profile(recipient)
         to_send = random.randint(1,self.profile.available_love)
+        before = datetime.now()
         sent = self.profile.send_datalove(recipient,to_send)
+        after = datetime.now()
         self.assertEqual(to_send,sent)
         transaction = DataloveHistory.objects.get(
                 sender=self.profile,
                 recipient=recipient
             )
         self.assertEqual(transaction.amount,sent)
+        self.assertTrue(
+                transaction.timestamp > before and 
+                transaction.timestamp < after
+            )
         recipient.delete()
     
     def test_send_datalove_Correct_RecipientProfile(self):
         _,user = create_user()
         recipient = create_profile(user)
         to_send = random.randint(1,self.profile.available_love)
+        before = datetime.now()
         sent = self.profile.send_datalove(recipient,to_send)
+        after = datetime.now()
         self.assertEqual(to_send,sent)
         transaction = DataloveHistory.objects.get(
                 sender=self.profile,
                 recipient=recipient
             )
         self.assertEqual(transaction.amount,sent)
+        self.assertTrue(
+                transaction.timestamp > before and 
+                transaction.timestamp < after
+            )
         user.delete()
 
     def test_send_datalove_Correct_RecipientItem(self):
         recipient = LovableItem(creator=self.profile)
         recipient.save()
         to_send = random.randint(1,self.profile.available_love)
+        before = datetime.now()
         sent = self.profile.send_datalove(recipient,to_send)
+        after = datetime.now()
         self.assertEqual(to_send,sent)
         transaction = DataloveHistory.objects.get(
                 sender=self.profile,
                 recipient=recipient
             )
         self.assertEqual(transaction.amount,sent)
+        self.assertTrue(
+                transaction.timestamp > before and 
+                transaction.timestamp < after
+            )
         recipient.delete()
 
     def test_send_datalove_NegativeDatalove(self):
@@ -446,7 +464,9 @@ class TestDataloveProfileMethods(unittest.TestCase):
                 self.profile.available_love+1,
                 sys.maxint
             )
+        before = datetime.now()
         sent = self.profile.send_datalove(recipient,to_send)
+        after = datetime.now()
         self.assertNotEqual(to_send,sent)
         self.assertEqual(old_love,sent)
         self.assertEqual(self.profile.available_love,0)
@@ -455,6 +475,10 @@ class TestDataloveProfileMethods(unittest.TestCase):
                 recipient=recipient
             )
         self.assertEqual(transaction.amount,sent)
+        self.assertTrue(
+                transaction.timestamp > before and 
+                transaction.timestamp < after
+            )
         recipient.delete()
     
     def test_send_datalove_NoAvailableLove(self):

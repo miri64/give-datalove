@@ -34,16 +34,16 @@
             action="{% url login %}">
             {% csrf_token %}
             <div class="about" style="text-align: right;">
-                <label class="input_label" style="font-size: 75%; text-align: right;">{{ login_form.username.label }}</label><br />
-                {{ login_form.username }}<br />
-                {{ login_form.username.errors }}
-                <label class="input_label" style="font-size: 75%; text-align: right;">{{ login_form.password.label }}</label><br />
-                {{ login_form.password }}<br />
-                {{ login_form.password.errors }}
+                <label class="input_label" style="font-size: 75%; text-align: right;">{{ form.username.label }}</label><br />
+                {{ form.username }}<br />
+                {{ form.username.errors }}
+                <label class="input_label" style="font-size: 75%; text-align: right;">{{ form.password.label }}</label><br />
+                {{ form.password }}<br />
+                {{ form.password.errors }}
                 <a href="register" style="font-size: 75%;">Register</a> |
                 <a href="reset_password" style="font-size: 75%;">Forgot password?</a>
                 <input class="button" type="submit" value="Login" /><br />
                 <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{{ path }}{% endif %}" />
             </div>
-            {{ login_form.non_field_errors }}
+            {{ form.non_field_errors }}
         </form>

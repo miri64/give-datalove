@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib.auth.views import login, logout, password_reset, \
         password_reset_done, password_reset_confirm, password_reset_complete
+from give.forms import DataloveAuthenticationForm
 
 urlpatterns = patterns('datalove.give.views.html',
     url(r'^$','index'),
@@ -8,7 +9,10 @@ urlpatterns = patterns('datalove.give.views.html',
     url(    
             r'^login$',
             login,
-            {'template_name': 'give/welcome.html'},
+            {
+                'template_name': 'give/welcome.html',
+                'authentication_form': DataloveAuthenticationForm
+            },
             name='login'
         ),
     url(r'^logout$',logout,{'next_page': '/'}),
@@ -38,7 +42,7 @@ urlpatterns = patterns('datalove.give.views.html',
             password_reset_complete,
             {'template_name': 'give/reset_password_complete.html'}
         ),
-    url(r'^register$','register'),
+    url(r'^register$','register',name='register'),
     url(r'^unregister$','unregister'),
     url(r'^users$', 'users', name='users'),
     url(

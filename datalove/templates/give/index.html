@@ -26,7 +26,7 @@
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
             <li><a href="/api">API Documentation</a></li>
         </ul>
-{% if not logged_in %}{% include "give/login_box.html" %}{% endif %}
+{% if not logged_in and login_form_needed %}{% include "give/login_box.html" %}{% endif %}
     </div>
     <div id="content">
 {% block content %}{% endblock %}

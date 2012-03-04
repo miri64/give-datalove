@@ -1,8 +1,16 @@
 from django import forms
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserChangeForm, \
+        UserCreationForm
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from give.models import *
+
+class DataloveAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        kwargs['prefix'] = kwargs.get('prefix','login')
+        super(DataloveAuthenticationForm, self).__init__(*args, **kwargs)
+        for _, field in self.fields.items():
+            field.widget.attrs['class'] = 'login_input'
 
 class DataloveUserChangeForm(UserChangeForm):
     def __init__(self, *args, **kwargs):

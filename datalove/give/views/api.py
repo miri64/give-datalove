@@ -6,7 +6,7 @@ from give.models import *
 
 import simplejson as json
 
-import _common as common
+from _common import render_to_response2
 
 API_LOGIN_URL=settings.LOGIN_URL
 
@@ -30,6 +30,9 @@ def respond(
             mimetype=mimetype,
             content_type=content_type
         )
+
+def api_doc(request):
+    return render_to_response2(request, 'give/api.html')
 
 @login_required(login_url=API_LOGIN_URL)
 def get_history(request, format='json'):

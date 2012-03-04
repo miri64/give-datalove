@@ -1,5 +1,6 @@
-$def with ()
-$# The standard frame for all pages.
+{# The API documentation. #}
+{% extends "give/index.html" %}
+{% block content %}
 <div id="content">
 <p class="love">give.datalove API</p>
 <p class="abouth">Why an API?</p>
@@ -127,7 +128,7 @@ report the error to <a href="https://github.com/authmillenon/give-datalove/issue
 </ul>
 <br />
 <p class="abouth"><tt>http://give.datalove.me/api/<i>$$user</i>/give_datalove?sid=<i>$$session_id</i></tt></p>
-<p class="about">will give datalove to this user $$user</p>
+<p class="about">will give datalove to this user <tt><i>$$user</i></tt></p>
 <p class="about"> Giving a user named <tt><i>$$user</i></tt> 1
 datalove. This request needs the giving user to be logged in and his
 session ID <tt><i>$$session_id</i></tt> must be in the query as shown.
@@ -151,3 +152,4 @@ report the error to <a href="https://github.com/authmillenon/give-datalove/issue
   </li>
 </ul>
 <br />
+{% endblock %}

@@ -4,6 +4,7 @@ from django.contrib.auth.views import login, logout, password_reset, \
 
 urlpatterns = patterns('datalove.give.views.html',
     url(r'^$','index'),
+    url(r'^history$','history'),
     url(    
             r'^login$',
             login,

@@ -1,0 +1,55 @@
+{% extends "give/index.html" %}
+{% block content %}
+<style type="text/css">
+    .historydiv {
+        width:45%;
+        float:left;
+        margin-right:5%;
+        
+    }
+    .historytable {
+        border:2px solid white;
+        border-collapse:collapse;
+        width:100%;
+    }
+    .historytable tr td {
+        margin:0;
+        border:1px solid white;
+        padding:2px 7px;
+        font-size:14px;
+    }
+    .historytable tr th {
+       border-bottom:2px solid white;
+    }
+</style>
+<div style="overflow: hidden; min-height:400px;">
+<p class="love">History</p>
+<p class="about">The last 30 transactions</p>
+<div class="historydiv">
+    <p class="abouth">Received</p>
+    <table class="historytable">
+    <tr><th>From</th><th>Amount</th><th>Time</th></tr>
+    {% for i in received %}
+        <tr>
+            <td><a href="{{ i.sender.user.username }}">{{ i.sender.user.username }}</a></td>
+            <td style="text-align: center;">{{ i.amount }}</td>
+            <td>{{ i.timestamp|date:"Y M. j, H:m (O)" }}</td>
+        </tr>
+    {%endfor%}
+    </table>
+</div>
+<div class="historydiv">
+    <p class="abouth">Sent</p>
+    <table class="historytable">
+    <tr><th>To</th><th>Amount</th><th>Time</th></tr>
+    {% for i in sent %}
+        <tr>
+            <td><a href="{{ i.sender.user.username }}">{{ i.sender.user.username }}</a></td>
+            <td style="text-align: center;">{{ i.amount }}</td>
+            <td>{{ i.timestamp|date:"Y M. j, H:m (O)" }}</td>
+        </tr>
+    {%endfor%}
+    </table>
+</div>
+</div>
+{% endblock %}

@@ -57,6 +57,15 @@ def index(request):
                     {'next': next}
                 )
 
+@login_required
+def history(request):
+    profile = request.user.get_profile()
+    vars = {}
+    vars['received'] = profile.receive_history.all()[:30]
+    vars['sent'] = profile.send_history.all()[:30]
+    return render_to_response2(request,'give/history.html',vars)
+
+
 @csrf_exempt
 @login_required
 def manage_account(request):

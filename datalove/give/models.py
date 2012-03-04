@@ -203,7 +203,7 @@ class DataloveHistory(models.Model):
         )
     
     class Meta:
-        ordering = ['timestamp']
+        ordering = ['-timestamp']
 
     def save(self, *args, **kwargs):
         if self.sender == self.recipient:

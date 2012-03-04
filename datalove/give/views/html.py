@@ -123,6 +123,11 @@ def register(request):
             return redirect('/')
     return render_to_response2(request,'give/register.html',{'form':form})    
 
+@login_required
+def unregister(request):
+    request.user.delete()
+    return redirect('/')
+
 def profile(request, username):
     profile = get_object_or_404(DataloveProfile, user__username=username)
     vars = get_more_information(request, {'profile': profile})

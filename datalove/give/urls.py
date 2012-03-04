@@ -12,6 +12,7 @@ urlpatterns = patterns('datalove.give.views.html',
     url(r'^logout$',logout,{'next_page': '/'}),
     url(r'^manage_account$','manage_account',name='manage_account'),
     url(r'^register$','register'),
+    url(r'^unregister$','unregister'),
     url(r'^users$', 'users', name='users'),
     url(
             r'^users/give_(?P<username>[^?$/\\#%\s]+)_datalove$',

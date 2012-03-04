@@ -1,10 +1,11 @@
 from django.conf.urls.defaults import patterns, include, url
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = staticfiles_urlpatterns() + patterns('',
     # Examples:
     # url(r'^$', 'datalove.views.home', name='home'),
     url(r'^', include('datalove.give.urls')),

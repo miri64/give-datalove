@@ -1,34 +1,6 @@
 {# Is loaded on '/manage_account' when a user is logged in. #}
 {% extends 'give/index.html' %}
 {% block content %}
-        <style type="text/css">
-            input, textarea {
-                border: #ffffff 1pt solid;
-                background-color: #000000;
-                font-family: monospace;
-                color: #ffffff;
-                margin: 2px;
-                width: auto;
-            }
-
-            input.url_input {
-                width: 430px;
-                margin-right: 20px;
-            }
-            
-            input.button {
-                border-left: #ffffff 2pt solid;
-                border-top: #ffffff 2pt solid;
-                border-right: #aaaaaa 2pt solid;
-                border-bottom: #aaaaaa 2pt solid;
-                background-color: #000000;
-                font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
-                font-weight: bold;
-                color: #ffffff;
-                margin: 2px;
-                width: auto;
-            }
-        </style>
         <p class="love">Manage Account [<a href='/'>{{ profile.user.username }}</a>]</p>
         <p class="abouth">Change user data:</p>
         <form method="post" action="#" id="user_form">

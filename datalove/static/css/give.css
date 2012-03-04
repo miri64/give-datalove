@@ -1,0 +1,66 @@
+pre {
+    border: 1pt #ffffff solid;
+}
+
+input {
+    border: #ffffff 1pt solid;
+    background-color: #000000;
+    font-family: monospace;
+    color: #ffffff;
+    margin: 2px;
+}
+
+input.login_input {
+    border: #ffffff 1pt solid;
+    background-color: #000000;
+    font-family: monospace;
+    color: #ffffff;
+    margin: 2px;
+    width: 100%;
+}
+
+input.url_input {
+    width: 430px;
+    margin-right: 20px;
+}
+            
+input.button {
+    border-left: #ffffff 2pt solid;
+    border-top: #ffffff 2pt solid;
+    border-right: #aaaaaa 2pt solid;
+    border-bottom: #aaaaaa 2pt solid;
+    background-color: #000000;
+    font-family: "Lucida Sans","DejaVu Sans","Bitstream Vera Sans","Liberation Sans",Verdana,"Verdana Ref",sans-serif;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 2px;
+}
+
+.errorlist {
+    color: #ff0000;
+    font-size: 75%;
+    text-align: left;
+}
+
+div.history {
+    width:45%;
+    float:left;
+    margin-right:5%;
+}
+
+div.history table {
+    border:2px solid white;
+    border-collapse:collapse;
+    width:100%;
+}
+
+div.history table tr td {
+    margin:0;
+    border:1px solid white;
+    padding:2px 7px;
+    font-size:14px;
+}
+
+div.history table tr th {
+    border-bottom:2px solid white;
+}

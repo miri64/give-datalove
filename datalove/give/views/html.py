@@ -4,12 +4,12 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
-from django.shortcuts import get_object_or_404, render_to_response, redirect
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from urllib import urlencode
 from give.forms import *
 from give.models import *
+from give.views._common import render_to_response2
 
 ## Helper functions
 def get_more_information(request, vars={}):
@@ -24,17 +24,6 @@ def query_redirect(to, query = {}, *args, **kwargs):
     if len(query) > 0:
         response['Location'] += "?%s" % urlencode(query)
     return response
-
-def render_to_response2(request, *args, **kwargs):
-    if 'context_instance' in kwargs:
-        raise AttributeError(
-                "'context_instance' not allowed for render_to_response2"
-            )
-    return render_to_response(
-            *args, 
-            context_instance=RequestContext(request),
-            **kwargs
-        )
 
 ## Views
 @csrf_exempt

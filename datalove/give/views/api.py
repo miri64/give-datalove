@@ -36,8 +36,8 @@ def get_history(request, format='json'):
     _set_format(format)
     history = {}
     profile = get_object_or_404(DataloveProfile, pk=request.user.id)
-    history['send'] = common.get_history(sender=profile)
-    history['received'] = common.get_history(recipient=profile)
+    #history['send'] = common.get_history(sender=profile)
+    #history['received'] = common.get_history(recipient=profile)
     return respond(
             content=_resp_encode(history)
         )

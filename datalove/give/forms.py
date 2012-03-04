@@ -1,12 +1,22 @@
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 from give.models import *
 
 class DataloveUserChangeForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
         super(DataloveUserChangeForm, self).__init__(*args,**kwargs)
         self.fields['username'].help_text = ''
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if self.instance.username.lower() != username.lower() and \
+                len(User.objects.filter(username__iexact=username)) > 0:
+            raise forms.ValidationError(
+                    "A user with that username already exists."
+                )
+        return username
 
     class Meta(UserChangeForm.Meta):
         fields = ('username','email',)
@@ -19,6 +29,14 @@ class DataloveUserCreationForm(UserCreationForm):
         self.fields['password1'].label += '*'
         self.fields['password2'].help_text = ''
         self.fields['password2'].label += '*'
+    
+    def clean_username(self):
+        username = super(DataloveUserChangeForm, self).clean_username()
+        if len(User.objects.filter(username__iexact=username)) > 0:
+            raise forms.ValidationError(
+                    self.error_messages['duplicate_username']
+                )
+        return username
 
     class Meta(UserCreationForm.Meta):
         fields = ('username','email',)

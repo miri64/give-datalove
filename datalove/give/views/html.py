@@ -11,6 +11,20 @@ from urllib import urlencode
 from give.forms import *
 from give.models import *
 
+## Helper functions
+def get_more_information(request, vars={}):
+    if request.user.is_authenticated():
+        vars.update({'user': request.user})
+    if 'error' in request.GET:
+        vars.update({'error': request.GET['error']})
+    return vars
+
+def query_redirect(to, query = {}, *args, **kwargs):
+    response = redirect(to, *args, **kwargs)
+    if len(query) > 0:
+        response['Location'] += "?%s" % urlencode(query)
+    return response
+
 def render_to_response2(request, *args, **kwargs):
     if 'context_instance' in kwargs:
         raise AttributeError(
@@ -22,6 +36,7 @@ def render_to_response2(request, *args, **kwargs):
             **kwargs
         )
 
+## Views
 @csrf_exempt
 def index(request):
     if request.method == 'GET':
@@ -93,13 +108,6 @@ def manage_account(request):
             }
         )
 
-def get_more_information(request, vars={}):
-    if request.user.is_authenticated():
-        vars.update({'user': request.user})
-    if 'error' in request.GET:
-        vars.update({'error': request.GET['error']})
-    return vars
-
 def users(request):
     profiles = DataloveProfile.objects.order_by('?')
     vars = get_more_information(request, {'profiles': profiles})
@@ -119,12 +127,6 @@ def profile(request, username):
     profile = get_object_or_404(DataloveProfile, user__username=username)
     vars = get_more_information(request, {'profile': profile})
     return render_to_response2(request,'give/profile.html',vars)
-
-def query_redirect(to, query = {}, *args, **kwargs):
-    response = redirect(to, *args, **kwargs)
-    if len(query) > 0:
-        response['Location'] += "?%s" % urlencode(query)
-    return response
 
 @login_required
 def give_datalove(request, username, from_users=False):

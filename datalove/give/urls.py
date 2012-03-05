@@ -24,7 +24,8 @@ urlpatterns = patterns('datalove.give.views.html',
                 'template_name': 'give/reset_password.html',
                 'email_template_name': 'give/reset_password_email.html',
                 'from_email': 'password-reset@give.datalove.me'
-            }
+            },
+            name='password_reset'
         ),
     url(
             '^reset_password/done$',
@@ -32,7 +33,7 @@ urlpatterns = patterns('datalove.give.views.html',
             {'template_name': 'give/reset_password_done.html'}
         ),
     url(
-            r'^reset_password/(?P<uidb36>.*)/(?P<token>.*)$',
+            r'^reset_password/confirm/(?P<uidb36>[0-9]+)/(?P<token>[-0-9a-f]+)$',
             password_reset_confirm,
             {'template_name': 'give/reset_password_confirm.html'},
             name='password_reset_confirm',

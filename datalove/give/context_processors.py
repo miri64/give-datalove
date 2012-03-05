@@ -1,6 +1,16 @@
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from give.forms import DataloveAuthenticationForm
 from give.models import DataloveProfile
+
+def path_is_in(request_path, view_list):
+    for view in view_list:
+        try:
+            if reverse(view) == request_path:
+                return True
+        except NoReverseMatch:
+            if view in request_path:
+                return True
+    return False
 
 def total_loverz(request):
     return {'total_loverz': DataloveProfile.get_total_loverz()}
@@ -8,8 +18,10 @@ def total_loverz(request):
 def login_information(request):
     logged_in = request.user.is_authenticated()
     result = {'logged_in': logged_in}
-    login_form_needed = reverse('login') != request.path and \
-           reverse('register') != request.path
+    login_form_needed = not path_is_in(
+            request.path, 
+            ['login','register','password_reset_confirm','reset_password']
+        )
     print reverse('register'), request.path
     result['login_form_needed'] = login_form_needed
     if not logged_in and login_form_needed:

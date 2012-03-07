@@ -69,7 +69,7 @@ def get_history_dicts(selection=None, *args, **kwargs):
         ][:30]
 
 @_apicall()
-def get_history(format, request):
+def history(format, request):
     if not request.user.is_authenticated():
         return _not_logged_in_response()
     history = {}

@@ -91,3 +91,19 @@ def profile(format, request, username):
             content=format.resp_encode(profile.get_profile_dict(selection)),
             mimetype=format.resp_mimetype
         )
+
+@_apicall()
+def give_datalove(format, request, username):
+    if not request.user.is_authenticated():
+        return _not_logged_in_response()
+    query = common.give_datalove(request, username)
+    if 'error' in query:
+        return _respond(
+                HttpResponseBadRequest,
+                content=format.resp_encode(query),
+                mimetype=format.resp_mimetype
+            ) 
+    return _respond(
+            content=format.resp_encode({}),
+            mimetype=format.resp_mimetype
+        )

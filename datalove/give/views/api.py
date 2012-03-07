@@ -2,11 +2,10 @@ from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, get_list_or_404
+import django.utils.simplejson as json
 from give.models import *
 
 from collections import namedtuple
-
-import simplejson as json
 
 import _common as common
 

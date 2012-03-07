@@ -26,7 +26,7 @@ class _apicall(object):
         Format = namedtuple('Format', 'resp_encode resp_mimetype req_decode')
         if 'format' != self.apiview.func_code.co_varnames[0]:
             raise ValueError("'%s' is no apicall. Needs argument 'format' as first argument." % \
-                    self.abiview.__name__)
+                    self.apiview.__name__)
         if 'format' in kwargs:
             format = kwargs.pop('format')
         else:

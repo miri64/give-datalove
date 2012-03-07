@@ -82,6 +82,18 @@ def history(format, request):
         )
 
 @_apicall()
+def users(format, request):
+    selection = ['username','received_love','websites']
+    profiles = [
+            p.get_profile_dict(selection) for \
+                    p in DataloveProfile.objects.order_by('?')
+        ]
+    return _respond(
+            content=format.resp_encode(profiles),
+            mimetype=format.resp_mimetype
+        )
+
+@_apicall()
 def profile(format, request, username):
     profile = get_object_or_404(DataloveProfile,user__username=username)
     selection = ['username','received_love','websites']

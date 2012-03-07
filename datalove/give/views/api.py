@@ -60,13 +60,13 @@ def _not_logged_in_response():
             mimetype=format.resp_mimetype
         )
 
-def doc(request):
-    return common.render_to_response2(request, 'give/api.html')
-
 def get_history_dicts(selection=None, *args, **kwargs):
     return [m.get_history_dict(selection) for m in \
             DataloveHistory.objects.filter(*args,**kwargs)
         ][:30]
+
+def doc(request):
+    return common.render_to_response2(request, 'give/api.html')
 
 @_apicall()
 def history(format, request):

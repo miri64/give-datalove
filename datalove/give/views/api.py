@@ -40,14 +40,13 @@ class _apicall(object):
 
 def _respond(
         ResponseObjectType=HttpResponse, 
-        content=None, 
-        mimetype=None,
-        content_type=settings.DEFAULT_CONTENT_TYPE
+        content='', 
+        mimetype=settings.DEFAULT_CONTENT_TYPE,
     ):
     return ResponseObjectType(
             content=content,
             mimetype=mimetype,
-            content_type=content_type
+            content_type=mimetype
         )
 
 def api_doc(request):
@@ -61,7 +60,8 @@ def get_history(format, request):
     #history['send'] = common.get_history(sender=profile)
     #history['received'] = common.get_history(recipient=profile)
     return _respond(
-            content=format.resp_encode(history)
+            content=format.resp_encode(history),
+            mimetype=format.resp_mimetype
         )
 
 @_apicall()
@@ -71,5 +71,6 @@ def profile(format, request, username):
     if request.user.is_authenticated() and request.user == profile.user:
         selection += ['available_love']
     return _respond(
-            content=format.resp_encode(profile.get_profile_dict(selection))
+            content=format.resp_encode(profile.get_profile_dict(selection)),
+            mimetype=format.resp_mimetype
         )

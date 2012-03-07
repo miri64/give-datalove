@@ -2,7 +2,7 @@ from django.conf.urls.defaults import patterns, include, url
 import views
 
 urlpatterns = patterns('datalove.give.views.api',
-    url(r'^$', 'api_doc'),
+    url(r'^$', 'doc', name='api__doc'),
     url(r'^history$', 'get_history', name='api__get_history'),
     url(r'^(?P<format>(json|xml))/history$', 'get_history'),
     url(r'^users/(?P<username>[^?$/\\#%\s]+)$', 'profile', name='api__profile'),

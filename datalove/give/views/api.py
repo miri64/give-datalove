@@ -60,7 +60,7 @@ def _not_logged_in_response():
             mimetype=format.resp_mimetype
         )
 
-def api_doc(request):
+def doc(request):
     return common.render_to_response2(request, 'give/api.html')
 
 def get_history_dicts(selection=None, *args, **kwargs):

@@ -47,7 +47,7 @@ def index(request):
                 )
 
 @login_required
-def get_history(request):
+def history(request):
     profile = request.user.get_profile()
     vars = {}
     vars['received'] = profile.receive_history.all()[:30]

@@ -11,6 +11,7 @@ urlpatterns = patterns('datalove.give.views.api',
         'give_datalove', 
         name='api__give_datalove'
     ),
+    url(r'^(?P<format>[a-z]+)/users$', 'users'), 
     url(r'^(?P<format>[a-z]+)/history$', 'history'),
     url(r'^(?P<format>[a-z]+)/users/(?P<username>[^?$/\\#%\s]+)$', 'profile'),
     url(

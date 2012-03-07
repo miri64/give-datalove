@@ -8,7 +8,7 @@ from collections import namedtuple
 
 import simplejson as json
 
-from _common import render_to_response2
+import _common as common
 
 API_LOGIN_URL=settings.LOGIN_URL
 
@@ -50,7 +50,7 @@ def _respond(
         )
 
 def api_doc(request):
-    return render_to_response2(request, 'give/api.html')
+    return common.render_to_response2(request, 'give/api.html')
 
 @login_required(login_url=API_LOGIN_URL)
 @_apicall()

@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from urllib import urlencode
 from give.forms import *
 from give.models import *
-from give.views._common import render_to_response2
+import _common as common
 
 ## Helper functions
 def get_more_information(request, vars={}):
@@ -31,7 +31,7 @@ def index(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
             profile = request.user.get_profile()
-            return render_to_response2(
+            return common.render_to_response2(
                     request,
                     'give/userpage.html',
                     {'profile': profile}
@@ -40,7 +40,7 @@ def index(request):
             next = None
             if 'next' in request.GET:
                 next = request.GET['next']
-            return render_to_response2(
+            return common.render_to_response2(
                     request,
                     'give/welcome.html',
                     {'next': next}
@@ -52,7 +52,7 @@ def history(request):
     vars = {}
     vars['received'] = profile.receive_history.all()[:30]
     vars['sent'] = profile.send_history.all()[:30]
-    return render_to_response2(request,'give/history.html',vars)
+    return common.render_to_response2(request,'give/history.html',vars)
 
 
 @csrf_exempt
@@ -95,7 +95,7 @@ def manage_account(request):
             if profile_form.is_valid():
                 profile_form.save()
                 return redirect('manage_account')
-    return render_to_response2(
+    return common.render_to_response2(
             request,
             'give/manage_account.html',
             {
@@ -109,7 +109,7 @@ def manage_account(request):
 def users(request):
     profiles = DataloveProfile.objects.order_by('?')
     vars = get_more_information(request, {'profiles': profiles})
-    return render_to_response2(request,'give/users.html',vars)
+    return common.render_to_response2(request,'give/users.html',vars)
 
 @csrf_exempt
 def register(request):
@@ -119,7 +119,7 @@ def register(request):
         if form.is_valid():
             form.save()
             return redirect('/')
-    return render_to_response2(request,'give/register.html',{'form':form})    
+    return common.render_to_response2(request,'give/register.html',{'form':form})    
 
 @login_required
 def unregister(request):
@@ -129,18 +129,11 @@ def unregister(request):
 def profile(request, username):
     profile = get_object_or_404(DataloveProfile, user__username=username)
     vars = get_more_information(request, {'profile': profile})
-    return render_to_response2(request,'give/profile.html',vars)
+    return common.render_to_response2(request,'give/profile.html',vars)
 
 @login_required
 def give_datalove(request, username, from_users=False):
-    recipient = get_object_or_404(DataloveProfile, user__username=username)
-    query = {}
-    try:
-        request.user.get_profile().send_datalove(recipient) 
-    except IntegrityError, e:
-        query['error'] = str(e)
-    except NotEnoughDataloveException:
-        query['error'] = "You do not have enough datalove :(."
+    query = common.give_datalove(request,username) 
     if from_users:
         return query_redirect('users', query)
     else:
@@ -160,16 +153,9 @@ def widget(request):
     else:
         if request.user.is_authenticated():
             vars['profile'] = request.user.get_profile()
-        return render_to_response2(request, 'give/widgetpage.html', vars)
-    return render_to_response2(request, 'give/widget.html', vars)
+        return common.render_to_response2(request, 'give/widgetpage.html', vars)
+    return common.render_to_response2(request, 'give/widget.html', vars)
 
 def widget_give_datalove(request, username):
-    recipient = get_object_or_404(DataloveProfile, user__username=username)
-    query = {'user': username}
-    try:
-        request.user.get_profile().send_datalove(recipient) 
-    except IntegrityError, e:
-        query['error'] = "You are narcistic! :("
-    except NotEnoughDataloveException:
-        query['error'] = "Not enough datalove :(."
+    query = common.give_datalove(request, username, query={'user': username})
     return query_redirect('widget', query)

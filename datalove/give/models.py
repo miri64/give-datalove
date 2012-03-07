@@ -204,6 +204,15 @@ class DataloveHistory(models.Model):
     
     class Meta:
         ordering = ['-timestamp']
+    
+    def get_history_dict(self, selection=None):
+        profile_dict = dict()
+        if selection == None:
+            selection = [f.name for f in self._meta.fields]
+            selection.remove('id')
+        for key in set(selection) & set(self.__dict__.keys()):
+            profile_dict[key] = str(self.__dict__[key])
+        return AttributedDict(**profile_dict)
 
     def save(self, *args, **kwargs):
         if self.sender == self.recipient:

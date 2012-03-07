@@ -1,6 +1,6 @@
-from django.shortcuts import get_object_or_404, get_list_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from give.models import DataloveHistory, DataloveProfile
+from give.models import DataloveProfile
 
 def render_to_response2(request, *args, **kwargs):
     if 'context_instance' in kwargs:
@@ -12,17 +12,6 @@ def render_to_response2(request, *args, **kwargs):
             context_instance=RequestContext(request),
             **kwargs
         )
-
-def get_history(**args):
-    send_history = [m.__dict__ for m in get_list_or_404(
-            DataloveHistory, 
-            **args
-        )]
-    for h in send_history:
-        del h['_state']
-        del h['id']
-        h['timestamp'] = str(h['timestamp'])
-    return send_history 
 
 def give_datalove(request, username, love=1, query={}):
     recipient = get_object_or_404(DataloveProfile, user__username=username)
@@ -36,3 +25,4 @@ def give_datalove(request, username, love=1, query={}):
     except NotEnoughDataloveException:
         query['error'] = "You've got not enough datalove. :("
     return query
+

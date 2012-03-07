@@ -14,6 +14,11 @@ API_LOGIN_URL=settings.LOGIN_URL
 
 _FORMAT_LIST = ['json']
 
+class HttpResponseUnauthorized(HttpResponse):
+    def __init__(self, *args, **kwargs):
+        super(HttpResponseUnauthorized,self).__init__(*args,**kwargs)
+        self.status_code = 401
+
 class _apicall(object):
     def __init__(self):
         self.apiview = None
@@ -49,16 +54,29 @@ def _respond(
             content_type=mimetype
         )
 
+def _not_logged_in_response():
+    return _respond(
+            HttpResponseUnauthorized,
+            content=format.resp_encode({'error': 'You are not logged in.'}),
+            mimetype=format.resp_mimetype
+        )
+
 def api_doc(request):
     return common.render_to_response2(request, 'give/api.html')
 
-@login_required(login_url=API_LOGIN_URL)
+def get_history_dicts(selection=None, *args, **kwargs):
+    return [m.get_history_dict(selection) for m in \
+            DataloveHistory.objects.filter(*args,**kwargs)
+        ][:30]
+
 @_apicall()
 def get_history(format, request):
+    if not request.user.is_authenticated():
+        return _not_logged_in_response()
     history = {}
     profile = get_object_or_404(DataloveProfile, pk=request.user.id)
-    #history['send'] = common.get_history(sender=profile)
-    #history['received'] = common.get_history(recipient=profile)
+    history['send'] = get_history_dicts(sender=profile)
+    history['received'] = get_history_dicts(recipient=profile)
     return _respond(
             content=format.resp_encode(history),
             mimetype=format.resp_mimetype

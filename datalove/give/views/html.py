@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.views import login
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
@@ -43,6 +44,13 @@ def index(request):
                     'give/welcome.html',
                     {'next': next}
                 )
+    else:
+        return login(
+                request, 
+                template_name='give/welcome.html',
+                authentication_form=DataloveAuthenticationForm
+            )
+
 
 @login_required
 def history(request,username):

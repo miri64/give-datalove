@@ -9,7 +9,7 @@
     <tr><th>From</th><th>Amount</th><th>Time</th></tr>
     {% for i in received %}
         <tr>
-            <td><a href="{{ i.sender.user.username }}">{{ i.sender.user.username }}</a></td>
+            <td><a href="{{ i.sender.username }}">{{ i.sender.username }}</a></td>
             <td style="text-align: center;">{{ i.amount }}</td>
             <td>{{ i.timestamp|date:"Y M. j, H:m (O)" }}</td>
         </tr>
@@ -22,7 +22,7 @@
     <tr><th>To</th><th>Amount</th><th>Time</th></tr>
     {% for i in sent %}
         <tr>
-            <td><a href="{{ i.sender.user.username }}">{{ i.sender.user.username }}</a></td>
+            <td><a href="{{ i.sender.username }}">{{ i.sender.username }}</a></td>
             <td style="text-align: center;">{{ i.amount }}</td>
             <td>{{ i.timestamp|date:"Y M. j, H:m (O)" }}</td>
         </tr>

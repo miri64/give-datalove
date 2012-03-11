@@ -30,11 +30,9 @@ def query_redirect(to, query = {}, *args, **kwargs):
 def index(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            profile = request.user.get_profile()
             return common.render_to_response2(
                     request,
                     'give/userpage.html',
-                    {'profile': profile}
                 ) 
         else:
             next = None
@@ -47,7 +45,9 @@ def index(request):
                 )
 
 @login_required
-def history(request):
+def history(request,username):
+    if request.user.username != username:
+        return redirect('profile', username)
     profile = request.user.get_profile()
     vars = {}
     vars['received'] = profile.receive_history.all()[:30]
@@ -76,7 +76,7 @@ def manage_account(request):
                 )
             if user_form.is_valid():
                 user_form.save()
-                return redirect('manage_account')
+                return redirect(manage_account)
         if "password" in request.POST:
             password_form = PasswordChangeForm(
                     request.user,
@@ -85,7 +85,7 @@ def manage_account(request):
                 )
             if password_form.is_valid():
                 password_form.save()
-                return redirect('manage_account')
+                return redirect(manage_account)
         if "profile" in request.POST:
             profile_form = UserWebsiteFormSet(
                     request.user,
@@ -94,12 +94,11 @@ def manage_account(request):
                 )
             if profile_form.is_valid():
                 profile_form.save()
-                return redirect('manage_account')
+                return redirect(manage_account)
     return common.render_to_response2(
             request,
             'give/manage_account.html',
             {
-                'profile': request.user.get_profile(),
                 'user_form': user_form,
                 'password_form': password_form,
                 'profile_form': profile_form
@@ -118,13 +117,13 @@ def register(request):
         form = DataloveUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/')
+            return redirect(index)
     return common.render_to_response2(request,'give/register.html',{'form':form})    
 
 @login_required
 def unregister(request):
     request.user.delete()
-    return redirect('/')
+    return redirect(index)
 
 def profile(request, username):
     profile = get_object_or_404(DataloveProfile, user__username=username)
@@ -135,9 +134,9 @@ def profile(request, username):
 def give_datalove(request, username, from_users=False):
     query = common.give_datalove(request,username) 
     if from_users:
-        return query_redirect('users', query)
+        return query_redirect(users, query)
     else:
-        return query_redirect(recipient, query)
+        return query_redirect(profile, query, username)
 
 def widget(request):
     vars = {'error': request.GET['error']} if 'error' in request.GET else {}
@@ -158,4 +157,4 @@ def widget(request):
 
 def widget_give_datalove(request, username):
     query = common.give_datalove(request, username, query={'user': username})
-    return query_redirect('widget', query)
+    return query_redirect(widget, query)

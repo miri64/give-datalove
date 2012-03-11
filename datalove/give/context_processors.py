@@ -29,6 +29,8 @@ def login_information(request):
             result.update({'form': DataloveAuthenticationForm(request.POST)})
         else:
             result.update({'form': DataloveAuthenticationForm()})
+    if logged_in:
+        result.update({'userprofile': request.user.get_profile()})
     return result
 
 def path(request):

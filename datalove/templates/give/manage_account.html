@@ -1,23 +1,23 @@
 {# Is loaded on '/manage_account' when a user is logged in. #}
 {% extends 'give/index.html' %}
 {% block content %}
-        <p class="love">Manage Account [<a href='/'>{{ profile.user.username }}</a>]</p>
+        <p class="love">Manage Account [<a href='{% url profile userprofile.username %}'>{{ userprofile.username }}</a>]</p>
         <p class="abouth">Change user data:</p>
-        <form method="post" action="#" id="user_form">
+        <form method="post" action="{% url manage_account %}" id="user_form">
             <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
             {{ user_form.as_p }}
             <input class="button" type="submit" name="user" value="Change user data." />
             </div>
         </form>
         <p class="abouth">Change Password:</p>
-        <form method="post" action="#" id="password_form">
+        <form method="post" action="{% url manage_account %}" id="password_form">
             <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
             {{ password_form.as_p }}
             <input class="button" type="submit" name="password" value="Change password." />
             </div>
         </form>
         <p class="abouth">Profile:</p>
-        <form method="post" action="#" id="profile_form">
+        <form method="post" action="{% url manage_account %}" id="profile_form">
             Websites:
             <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
             {{ profile_form.management_form }}

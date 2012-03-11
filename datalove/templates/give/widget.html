@@ -45,7 +45,7 @@
 <title>~~~~=:) - give.datalove.me - (:=~~~~</title>
 </head>
 <body>
-<a href="widget/give_{{ profile.user.username }}_datalove">
+    <a href="{% url widget_give_datalove profile.username %}">
     <div class="widget">
         <div class="received_love">
             {{ profile.received_love|stringformat:"012d" }}

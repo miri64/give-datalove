@@ -11,9 +11,9 @@
             <ul>
                 {% for profile in profiles %}
                     <li>
-                        <a href="/user/{{ profile.user.username }}">{{ profile.user.username }}</a>
+                        <a href="{% url profile profile.username %}">{{ profile.username }}</a>
                         (haz {{ profile.received_love }} datalovez)
-                        {% if logged_in and user != profile.user %}<a href="/users/give_{{ profile.user.username }}_datalove">Give some love</a>{% endif %}
+                        {% if logged_in and user != profile.user %}<a href="{% url give_user_datalove profile.username %}">Give some love</a>{% endif %}
                     </li>
                 {% endfor %}
             </ul>

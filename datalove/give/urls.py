@@ -4,8 +4,7 @@ from django.contrib.auth.views import login, logout, password_reset, \
 from give.forms import DataloveAuthenticationForm
 
 urlpatterns = patterns('datalove.give.views.html',
-    url(r'^/?$','index'),
-    url(r'^history/?$','history'),
+    url(r'^/?$','index',name='index'),
     url(    
             r'^login/?$',
             login,
@@ -15,7 +14,7 @@ urlpatterns = patterns('datalove.give.views.html',
             },
             name='login'
         ),
-    url(r'^logout/?$',logout,{'next_page': '/'}),
+    url(r'^logout/?$',logout,{'next_page': '/'},name='logout'),
     url(r'^manage_account/?$','manage_account',name='manage_account'),
     url(
             r'^reset_password/?$',
@@ -44,19 +43,30 @@ urlpatterns = patterns('datalove.give.views.html',
             {'template_name': 'give/reset_password_complete.html'}
         ),
     url(r'^register/?$','register',name='register'),
-    url(r'^unregister/?$','unregister'),
+    url(r'^unregister/?$','unregister',name='unregister'),
     url(r'^users/?$', 'users', name='users'),
     url(
             r'^users/give_(?P<username>[^?$/\\#%\s]+)_datalove/?$',
             'give_datalove',
             {'from_users': True},
+            name='give_user_datalove'
         ),
     url(r'^users/(?P<username>[^?$/\\#%\s]+)/?$','profile',name='profile'),
-    url(r'^users/(?P<username>[^?$/\\#%\s]+)/give_datalove/?$','give_datalove'),
+    url(
+            r'^users/(?P<username>[^?$/\\#%\s]+)/give_datalove/?$',
+            'give_datalove',
+            name='give_datalove'
+        ),
+    url(
+            r'^users/(?P<username>[^?$/\\#%\s]+)/history/?$',
+            'history',
+            name='history'
+        ),
     url(r'^widget/?$','widget',name='widget'),
     url(
             r'^widget/give_(?P<username>[^?$/\\#%\s]+)_datalove/?$',
             'widget_give_datalove',
+            name='widget_give_datalove'
         ),
     url(r'^api/',include('datalove.give.apiurls')),
 )

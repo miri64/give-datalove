@@ -17,15 +17,15 @@
     <div id="sidebar">
         <ul>
 {% if logged_in %}
-            <li><a href="/logout?next={{ path }}">Logout</a></li>
-            <li><a href="/manage_account">Manage account</a></li>
-            <li><a href="/history">History</a></li>
+            <li><a href="{% url logout %}?next={{ path }}">Logout</a></li>
+            <li><a href="{% url manage_account %}">Manage account</a></li>
+            <li><a href="{% url history userprofile.username %}">History</a></li>
 {% endif %}
-            <li><a href="/widget">Widget for website</a></li>
+            <li><a href="{% url widget %}">Widget for website</a></li>
             <li><a href="http://datalove.me/give/about.html">About give.datalove.me</a>
-            <li><a href="/users">Loverz</a></li>
+            <li><a href="{% url users %}">Loverz</a></li>
             <li><a href="http://datalove.me/give/faq.html">FAQ</a></li>
-            <li><a href="/api">API Documentation</a></li>
+            <li><a href="{% url api__doc %}">API Documentation</a></li>
         </ul>
 {% if not logged_in and login_form_needed %}{% include "give/login_box.html" %}{% endif %}
     </div>

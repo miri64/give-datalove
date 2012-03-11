@@ -1,6 +1,6 @@
 {% extends "give/index.html" %}
 {% block content %}
-        <p class="love">Username: {{ profile.user.username }}</p>
+        <p class="love">Username: {{ profile.username }}</p>
         <p class="about">Received love: {{ profile.received_love }}</p>
         {% if profile.websites.all|length > 0 %}
             <p class="about">
@@ -12,5 +12,5 @@
             </p><br />
         {% endif %}
         {% if error %}<p style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">{{ error }}</p>{% endif %}
-        {% if logged_in and user != profile.user %}<a href="/users/{{ profile.user.username }}/give_datalove">Give love!</a>{% endif %}
+        {% if logged_in and user != profile.user %}<a href="{% url give_datalove profile.username %}">Give love!</a>{% endif %}
 {% endblock %}

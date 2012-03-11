@@ -11,7 +11,7 @@
         <tr>
             <td><a href="{{ i.sender.username }}">{{ i.sender.username }}</a></td>
             <td style="text-align: center;">{{ i.amount }}</td>
-            <td>{{ i.timestamp|date:"Y M. j, H:m (O)" }}</td>
+            <td>{{ i.timestamp|date:"Y-m-d H:i" }}</td>
         </tr>
     {%endfor%}
     </table>
@@ -28,7 +28,7 @@
             <td>{{ i.recipient.id }}</td>
             {% endif %}
             <td style="text-align: center;">{{ i.amount }}</td>
-            <td>{{ i.timestamp|date:"Y M. j, H:m (O)" }}</td>
+            <td>{{ i.timestamp|date:"Y-m-d H:i" }}</td>
         </tr>
     {%endfor%}
     </table>

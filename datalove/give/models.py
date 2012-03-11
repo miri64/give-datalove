@@ -98,6 +98,10 @@ class DataloveProfile(LovableObject):
             return profiles[0]
         else:
             return None
+    
+    @property
+    def username(self):
+        return self.user.username
 
     def send_datalove(self, recipient, datalove=1):
         if datalove < 0:
@@ -164,7 +168,7 @@ class DataloveProfile(LovableObject):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('profile', [str(self.user.username)])
+        return ('profile', [str(self.username)])
     
     def __str__(self):
         result = "("

@@ -20,7 +20,7 @@ def login_information(request):
     result = {'logged_in': logged_in}
     login_form_needed = not path_is_in(
             request.path, 
-            ['login','register','password_reset_confirm','reset_password']
+            ['register','password_reset_confirm','reset_password']
         )
     print reverse('register'), request.path
     result['login_form_needed'] = login_form_needed

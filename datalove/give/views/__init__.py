@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_protect
 from urllib import urlencode
 from give.forms import *
 from give.models import *
@@ -27,7 +27,7 @@ def query_redirect(to, query = {}, *args, **kwargs):
     return response
 
 ## Views
-@csrf_exempt
+@csrf_protect
 def index(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
@@ -63,8 +63,8 @@ def history(request,username):
     return common.render_to_response2(request,'give/history.html',vars)
 
 
-@csrf_exempt
 @login_required
+@csrf_protect
 def manage_account(request):
     user_form = DataloveUserChangeForm(instance=request.user,prefix="user")
     password_form = PasswordChangeForm(
@@ -118,7 +118,7 @@ def users(request):
     vars = get_more_information(request, {'profiles': profiles})
     return common.render_to_response2(request,'give/users.html',vars)
 
-@csrf_exempt
+@csrf_protect
 def register(request):
     form = DataloveUserCreationForm()
     if request.method == 'POST':

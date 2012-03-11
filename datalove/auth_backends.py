@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 import hashlib
 
 class LegacyUserAuthBackend(object):
-    def _check_legacy_password(self,password):
-        nickname = self.nickname.lower()
-        salt = sum([ord(char) for char in nickname]) % len(nickname)
+    def _check_legacy_password(self,user,password):
+        username = user.username.lower()
+        salt = sum([ord(char) for char in username]) % len(username)
         return user.password == hashlib.sha256(str(salt) + password).hexdigest()
     
     def authenticate(self, username=None, password=None):
@@ -14,7 +14,7 @@ class LegacyUserAuthBackend(object):
             user = User.objects.get(username=username)
 
             if '$' not in user.password:
-                if self._check_legacy_password(password):
+                if self._check_legacy_password(user, password):
                     user.set_password(password)
                     user.save()
                     return user

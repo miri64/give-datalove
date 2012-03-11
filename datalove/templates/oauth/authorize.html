@@ -1,0 +1,11 @@
+{% extends "give/index.html" %}
+
+{% block content %}
+    	<p class="love">Authorize</p>
+        <form method="POST" action="">{% csrf_token %}
+            {{ form.non_field_errors }}
+            <p class="about">Grant "{{ token.consumer.name }}" access to {% if access_ranges %}the following parts of{% endif %} your account? {{ form.authorize_access }}{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}</p>
+            {{ form.authorize_access.errors }}
+            <input class="button" type="submit" value="Grant access" /><br />
+        </form>
+{% endblock %}

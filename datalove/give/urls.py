@@ -68,5 +68,5 @@ urlpatterns = patterns('datalove.give.views.html',
             'widget_give_datalove',
             name='widget_give_datalove'
         ),
-    url(r'^api/',include('datalove.give.apiurls')),
+    url(r'^api/?$','api_doc',name='api__doc'),
 )

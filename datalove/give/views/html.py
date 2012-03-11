@@ -166,3 +166,6 @@ def widget(request):
 def widget_give_datalove(request, username):
     query = common.give_datalove(request, username, query={'user': username})
     return query_redirect(widget, query)
+
+def api_doc(request):
+    pass

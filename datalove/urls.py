@@ -8,6 +8,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = staticfiles_urlpatterns() + patterns('',
     # Examples:
     # url(r'^$', 'datalove.views.home', name='home'),
+    url(r'^api/', include('datalove.api.urls')),
     url(r'^', include('datalove.give.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

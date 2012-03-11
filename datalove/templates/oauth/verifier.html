@@ -1,0 +1,7 @@
+{% extends "give/index.html" %}
+
+{% block content %}
+    	<p class="love">Verify authorization</p>
+        <p class="about">Put the following PIN into the "{{ token.consumer.name }}" App</p>
+        <p class="about">PIN: {{ token.verifier }}</p>
+{% endblock %}

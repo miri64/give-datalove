@@ -7,6 +7,9 @@ from datetime import datetime
 class UserException(Exception):
     pass
 
+class DataNarcismException(ValueError):
+    pass
+
 class NotEnoughDataloveException(Exception):
     pass
 
@@ -83,8 +86,10 @@ class DataloveProfile(LovableObject):
             profile_dict[key] = self.user.__dict__[key]
         if 'websites' in selection:
             profile_dict['website'] = [
-                    AttributedDict(url=w) for w in self.websites.all()
+                    AttributedDict(url=w.url) for w in self.websites.all()
                 ]
+        profile_dict['resource_uri'] = self.get_api_url()
+        profile_dict['give_datalove_uri'] = self.get_give_datalove_url()
         return AttributedDict(**profile_dict)
     
     @staticmethod
@@ -104,16 +109,14 @@ class DataloveProfile(LovableObject):
         return self.user.username
 
     def send_datalove(self, recipient, datalove=1):
+        
         if datalove < 0:
             raise ValueError("datalove must be >= 0.")
         if isinstance(recipient, User):
             try:
                 recipient = recipient.get_profile()
             except DataloveProfile.DoesNotExist:
-                raise UserException(
-                        "User '%s' has no datalove profile." % 
-                        recipient.username
-                    )
+                DataloveProfile.objects.create(user=recipient)
         elif isinstance(recipient, LovableObject):
             pass
         else:
@@ -126,8 +129,15 @@ class DataloveProfile(LovableObject):
                         "User '%s' does not exist." % 
                         str(recipient)
                     )
-        if self == recipient:
-            raise IntegrityError("You can not send datalove to yourself.")
+        try:
+            if (isinstance(recipient, DataloveProfile) and \
+                    self == recipient) or \
+                    (isinstance(recipient, LovableObject) and \
+                    self == recipient.dataloveprofile
+                ):
+                raise DataNarcismException("You can not send datalove to yourself.")
+        except DataloveProfile.DoesNotExist:
+            pass
         self.update_love()
         if self.available_love == 0:
             raise NotEnoughDataloveException(
@@ -140,8 +150,14 @@ class DataloveProfile(LovableObject):
             )
         self.available_love -= actually_spend_love
         recipient.received_love += actually_spend_love
-        if not isinstance(recipient, LovableItem):
+        if not isinstance(recipient, LovableItem) and \
+                not isinstance(recipient, LovableObject):
             recipient.available_love += actually_spend_love
+        elif isinstance(recipient, LovableObject):
+            try:
+                recipient.dataloveprofile.available_love += actually_spend_love
+            except DataloveProfile.DoesNotExist:
+                pass
         transaction = DataloveHistory(
                 sender=self,
                 recipient=recipient,
@@ -163,8 +179,12 @@ class DataloveProfile(LovableObject):
             self.save()
     
     @models.permalink
+    def get_give_datalove_url(self):
+        return ('api__give_datalove', [str(self.lovableobject_ptr.id)])
+
+    @models.permalink
     def get_api_url(self):
-        return ('api__profile', [str(self.user.id)])
+        return ('api__profile', [str(self.username)])
     
     @models.permalink
     def get_absolute_url(self):
@@ -216,6 +236,11 @@ class DataloveHistory(models.Model):
             selection.remove('id')
         for key in set(selection) & set(self.__dict__.keys()):
             profile_dict[key] = str(self.__dict__[key])
+        profile_dict['sender'] = self.sender.username
+        try:
+            profile_dict['recipient'] = self.recipient.dataloveprofile.username
+        except DataloveProfile.DoesNotExist:
+            profile_dict['recipient'] = self.recipient.lovableobject.id
         return AttributedDict(**profile_dict)
 
     def save(self, *args, **kwargs):

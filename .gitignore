@@ -1,1 +1,4 @@
-config.py
+*.dump
+*.pyc
+*.swp
+*~

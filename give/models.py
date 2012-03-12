@@ -328,7 +328,8 @@ def create_user():
         while len(User.objects.filter(username=username)) > 0:
             running_number += 1
             username = "test%03d" % running_number
-    user = User(username=username,password=username)
+    user = User(username=username)
+    user.set_password(username)
     user.save()
     return username,user
 

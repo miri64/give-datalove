@@ -22,7 +22,6 @@ def login_information(request):
             request.path, 
             ['register','password_reset_confirm','reset_password']
         )
-    print reverse('register'), request.path
     result['login_form_needed'] = login_form_needed
     if not logged_in and login_form_needed:
         if request.method == 'POST' and 'login' in request.POST:

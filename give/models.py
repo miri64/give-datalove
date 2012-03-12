@@ -124,7 +124,7 @@ class DataloveProfile(LovableObject):
                 recipient = DataloveProfile.objects.get(
                         user__username=str(recipient)
                     )
-            except User.DoesNotExist:
+            except DataloveProfile.DoesNotExist:
                 raise UserException(
                         "User '%s' does not exist." % 
                         str(recipient)

@@ -1,6 +1,3 @@
-[submodule "datalove/piston"]
-	path = datalove/piston
-	url = git@github.com:authmillenon/django-piston-Fork.git
 [submodule "piston"]
 	path = piston
 	url = git@github.com:authmillenon/django-piston-Fork.git

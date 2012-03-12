@@ -1,5 +1,6 @@
         <form method="post" 
-            action="{% url login %}">
+            action="{{ login_scheme }}{{ host }}{% url index %}"
+            id="id_login">
             {% csrf_token %}
             <div class="about" style="text-align: right;">
                 <label class="input_label" style="font-size: 75%; text-align: right;">{{ form.username.label }}</label><br />

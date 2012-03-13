@@ -5,15 +5,6 @@ from give.forms import DataloveAuthenticationForm
 
 urlpatterns = patterns('give.views',
     url(r'^/?$','index',name='index'),
-    url(    
-            r'^login/?$',
-            login,
-            {
-                'template_name': 'give/welcome.html',
-                'authentication_form': DataloveAuthenticationForm
-            },
-            name='login'
-        ),
     url(r'^logout/?$',logout,{'next_page': '/'},name='logout'),
     url(r'^manage_account/?$','manage_account',name='manage_account'),
     url(

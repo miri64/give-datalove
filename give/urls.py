@@ -60,4 +60,5 @@ urlpatterns = patterns('give.views',
             name='widget_give_datalove'
         ),
     url(r'^api/?$','api_doc',name='api__doc'),
+    url(r'^ajax/', include('give.ajaxurls'))
 )

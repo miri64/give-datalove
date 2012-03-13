@@ -13,6 +13,7 @@
                 <a href="reset_password" style="font-size: 75%;">Forgot password?</a>
                 <input class="button" type="submit" value="Login" /><br />
                 <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{{ path }}{% endif %}" />
+                <input type="hidden" name="ajax_action" value="{{ login_scheme }}{{ host }}{% url ajax__login %}" />
             </div>
             {{ form.non_field_errors }}
         </form>

@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from piston import authentication
+from djangopiston.piston import authentication
 
 class OAuthAuthentication(authentication.OAuthAuthentication):
     def __init__(self, *args, **kwargs):

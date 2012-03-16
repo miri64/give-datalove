@@ -1,4 +1,4 @@
-from piston.handler import AnonymousBaseHandler,BaseHandler
+from djangopiston.piston.handler import AnonymousBaseHandler,BaseHandler
 from give.models import *
 from give.views._common import give_datalove
 from django.contrib.auth.models import User

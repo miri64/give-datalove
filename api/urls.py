@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
-from piston.resource import Resource
-from piston.authentication import oauth_request_token, oauth_user_auth, \
+from djangopiston.piston.resource import Resource
+from djangopiston.piston.authentication import oauth_request_token, oauth_user_auth, \
         oauth_access_token
 from authentication import OAuthAuthentication
 from handlers import *

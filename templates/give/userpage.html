@@ -1,12 +1,3 @@
 {# Is loaded on '/' when a user is logged in. #}
 {% extends 'give/index.html' %}
-{% block content %}
-<p class="love">Ohai <a href="{% url profile userprofile.username %}">{{ userprofile.username }}</a>,</p>
-        <p class="about">
-            U haz <span id="received_love">{{ userprofile.received_love }}</span> 
-            datalovez received and <span id="available_love">{{ userprofile.available_love }}</span>
-            waiting to be spread.
-        </p>
-        <!--Place holder-->
-        <div style="height: 400px">&nbsp;</div>
-{% endblock %}
+{% block content %}{% include 'give/userpage_raw.html' %}{% endblock %}

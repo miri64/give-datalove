@@ -1,0 +1,13 @@
+{# Is loaded on '/register'. #}
+        <p class="love">Register to give.datalove.me</p>
+        <form method="post" action="{% url register %}">{% csrf_token %}
+            <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
+                {{ form.as_p }}
+                <input class="button" type="submit" value="Register account" /> <br />
+                <div style="font-size: 75%;text-align: left;">
+                    * This field is mandatory. Note that password recovery is not possible without an e-mail address
+                </div>
+            </div> 
+        </form>
+        <!--Place holder-->
+        <div style="height: 200px">&nbsp;</div>

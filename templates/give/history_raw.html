@@ -1,0 +1,34 @@
+<div style="overflow: hidden; min-height:400px;">
+<p class="love">History</p>
+<p class="about">The last 30 transactions</p>
+<div class="history">
+    <p class="abouth">Received</p>
+    <table>
+    <tr><th>From</th><th>Amount</th><th>Time</th></tr>
+    {% for i in received %}
+        <tr>
+            <td><a href="{{ i.sender.username }}">{{ i.sender.username }}</a></td>
+            <td style="text-align: center;">{{ i.amount }}</td>
+            <td>{{ i.timestamp|date:"Y-m-d H:i" }}</td>
+        </tr>
+    {%endfor%}
+    </table>
+</div>
+<div class="history">
+    <p class="abouth">Sent</p>
+    <table>
+    <tr><th>To</th><th>Amount</th><th>Time</th></tr>
+    {% for i in sent %}
+        <tr>
+            {% if i.recipient.dataloveprofile %}
+            <td><a href="{% url profile i.recipient.dataloveprofile.username %}">{{ i.recipient.dataloveprofile.username }}</a></td>
+            {% else %}
+            <td>{{ i.recipient.id }}</td>
+            {% endif %}
+            <td style="text-align: center;">{{ i.amount }}</td>
+            <td>{{ i.timestamp|date:"Y-m-d H:i" }}</td>
+        </tr>
+    {%endfor%}
+    </table>
+</div>
+</div>

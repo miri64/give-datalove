@@ -1,0 +1,26 @@
+		<p class="love">give.datalove widget</p>
+		<p class="abouth">What to do with this widget?</p>
+		<p class="about">We provide one widget to integrate into your website or into your blog and enter your username at the end. It looks like this:</p>
+		<p class="about">
+            {% if profile %}
+            <iframe src="/widget?user={{ profile.username }}" width="70" height="71" style="border: none"></iframe>
+            {% else %}
+            <iframe src="/widget?random" width="70" height="71" style="border: none"></iframe>
+            {% endif %}
+		</p>
+		<p class="abouth">How do I integrate this widget?</p>
+		<p class="about">Is is very easy. Just put these lines of code into your website or on your blog:</p>
+		<p class="about">
+            {% if profile %}
+                <pre>&lt;iframe src="http://give.datalove.me/widget?user={{ profile.username }}"{% else %}
+                <pre>&lt;iframe src="http://give.datalove.me/widget?user=&lt;your_username&gt;"{% endif %} 
+        width="70" 
+        height="71" 
+        style="border: none"&gt;
+&lt;/iframe&gt;</pre>
+		</p>
+        {% if not profile %}<p class="about">Where you have to replace <tt>&lt;your username&gt;</tt> with your own username, of cause, after you have <a href="{% url register %}">registered</a>.</p>{% endif %}
+		<p class="abouth">Are there more widgets?</p>
+		<p class="about">Not yet, but we hope that people create some so that we can upload them here and provide them to the users.</p>
+		<p class="abouth">I created one! How do I get it here?</p>
+		<p class="about">This is rather simple. Just mail it to info [at] datalove [dot] me</p>

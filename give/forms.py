@@ -39,7 +39,7 @@ class DataloveUserCreationForm(UserCreationForm):
         self.fields['password2'].label += '*'
     
     def clean_username(self):
-        username = super(DataloveUserChangeForm, self).clean_username()
+        username = super(DataloveUserCreationForm, self).clean_username()
         if len(User.objects.filter(username__iexact=username)) > 0:
             raise forms.ValidationError(
                     self.error_messages['duplicate_username']

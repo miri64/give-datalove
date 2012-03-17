@@ -163,6 +163,8 @@ def widget_doc(request):
 
 
 def widget_give_datalove(request, username):
+    if not request.user.is_authenticated():
+        return redirect(index)
     query = common.give_datalove(request, username, query={'user': username})
     return query_redirect(widget, query)
 

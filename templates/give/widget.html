@@ -45,7 +45,11 @@
 <title>~~~~=:) - give.datalove.me - (:=~~~~</title>
 </head>
 <body>
+    {% if logged_in %}
     <a href="{% url widget_give_datalove profile.username %}">
+    {% else %}
+    <a href="{% url index %}" target="_blank">
+    {% endif %}
     <div class="widget">
         <div class="received_love">
             {{ profile.received_love|stringformat:"012d" }}

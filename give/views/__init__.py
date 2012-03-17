@@ -4,7 +4,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import login
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_protect
 from urllib import urlencode
@@ -139,9 +139,9 @@ def give_datalove(request, username, from_users=False):
 
 def widget(request):
     vars = {'error': request.GET['error']} if 'error' in request.GET else {}
-    if 'random' in request.GET:
+    if 'random' in request.GET and 'user' not in request.GET:
         vars['profile'] = DataloveProfile.get_random_profile()
-    elif 'user' in request.GET:
+    elif 'user' in request.GET and 'random' not in request.GET:
         try:
             vars['profile'] = DataloveProfile.objects.get(
                     user__username=request.GET['user']
@@ -149,10 +149,18 @@ def widget(request):
         except DataloveProfile.DoesNotExist:
             vars['error'] = "User '%s' does not exist" % request.GET['user']
     else:
-        if request.user.is_authenticated():
-            vars['profile'] = request.user.get_profile()
-        return common.render_to_response2(request, 'give/widgetpage.html', vars)
-    return common.render_to_response2(request, 'give/widget.html', vars)
+        return HttpResponseBadRequest(
+                "GET request must have eather query parameter 'user' or "
+                "'random'."
+            )
+    return common.render_to_response2(request, 'give/widget.html', context)
+
+def widget_doc(request):
+    context = {}
+    if request.user.is_authenticated():
+        context['profile'] = request.user.get_profile()
+    return common.render_to_response2(request, 'give/widget_doc.html', context)
+
 
 def widget_give_datalove(request, username):
     query = common.give_datalove(request, username, query={'user': username})

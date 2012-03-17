@@ -54,6 +54,7 @@ urlpatterns = patterns('give.views',
             name='history'
         ),
     url(r'^widget/?$','widget',name='widget'),
+    url(r'^widget/doc/?$','widget_doc',name='widget_doc'),
     url(
             r'^widget/give_(?P<username>[^?$/\\#%\s]+)_datalove/?$',
             'widget_give_datalove',

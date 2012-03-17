@@ -25,7 +25,7 @@ def login_information(request, result = {}):
     result['login_form_needed'] = login_form_needed
     if not logged_in and login_form_needed:
         if 'HTTP_HOST' in request.META:
-            result['login_scheme'] = 'https://',
+            result['login_scheme'] = 'https://'
             result['host'] = request.META['HTTP_HOST']
         if request.method == 'POST' and 'login' in request.POST:
             result['form'] = DataloveAuthenticationForm(request.POST)

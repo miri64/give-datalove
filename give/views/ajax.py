@@ -27,5 +27,5 @@ def login(request):
     else:
         errors = dict()
         for field,error in form.errors.items():
-            errors[field.strip('_')] = error
+            errors[field.strip('_')] = error.as_ul()
         return HttpResponse(json.dumps(errors))

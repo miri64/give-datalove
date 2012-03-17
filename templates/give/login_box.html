@@ -1,6 +1,6 @@
         <form method="post" 
             action="{% url index %}"
-            id="id_login">
+            id="login_box">
             {% csrf_token %}
             <div class="about" style="text-align: right;">
                 <label class="input_label" style="font-size: 75%; text-align: right;">{{ form.username.label }}</label><br />

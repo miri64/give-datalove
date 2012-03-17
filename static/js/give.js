@@ -1,6 +1,6 @@
 $(document).ready(function() {
     // AJAX Login
-    $("#id_login").submit(function(event) {
+    $("#login_box").submit(function(event) {
         var form = $(this);
         var data = form.serialize();
         var action = form.find("input[name=ajax_action]").val();

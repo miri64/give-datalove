@@ -1,27 +1,27 @@
 {# Is loaded on '/manage_account' when a user is logged in. #}
         <p class="love">Manage Account [<a href='{% url profile userprofile.username %}'>{{ userprofile.username }}</a>]</p>
         <p class="abouth">Change user data:</p>
-        <form method="post" action="{% url manage_account %}" id="user_form">
+        <form method="post" action="{% url manage_account %}" id="user_form">{% csrf_token %}
             <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
             {{ user_form.as_p }}
             <input class="button" type="submit" name="user" value="Change user data." />
             </div>
         </form>
         <p class="abouth">Change Password:</p>
-        <form method="post" action="{% url manage_account %}" id="password_form">
+        <form method="post" action="{% url manage_account %}" id="password_form">{% csrf_token %}
             <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
             {{ password_form.as_p }}
             <input class="button" type="submit" name="password" value="Change password." />
             </div>
         </form>
         <p class="abouth">Profile:</p>
-        <form method="post" action="{% url manage_account %}" id="profile_form">
+        <form method="post" action="{% url manage_account %}" id="profile_form">{% csrf_token %}
             Websites:
             <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
             {{ profile_form.management_form }}
             <ul style="list-style-type: none">
             {% for form in profile_form %}
-            <li>{{ form.id }}{{ form.url }}{% for error in form.url.errors %}{{ error|escape }},{% endfor %}{{ form.non_field_errors }}</li>
+            <li>{{ form.id }}{{ form.url }}{% for error in form.url.errors %}<span class="errorlist">{{ error|escape }} | </span>{% endfor %}{{ form.non_field_errors }}</li>
             {% endfor %}
             </ul>
             <input class="button" type="submit" name="profile" value="Update Profile" />

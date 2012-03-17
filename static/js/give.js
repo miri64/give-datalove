@@ -1,5 +1,3 @@
-var host = window.location.host
-
 $(document).ready(function() {
     // AJAX Login
     $("#id_login").submit(function(event) {

@@ -29,13 +29,11 @@ def index(request):
                     'give/userpage.html',
                 ) 
         else:
-            next = None
-            if 'next' in request.GET:
-                next = request.GET['next']
+            context = {'next': request.GET.get('next', None)}
             return common.render_to_response2(
                     request,
                     'give/welcome.html',
-                    {'next': next}
+                    context
                 )
     else:
         return login(

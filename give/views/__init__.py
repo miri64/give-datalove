@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
 from urllib import urlencode
 from give.models import DataloveProfile
-import _common as common
+import _common
 
 ## Helper functions
 def query_redirect(to, query = {}, *args, **kwargs):
@@ -19,13 +19,13 @@ def query_redirect(to, query = {}, *args, **kwargs):
 def index(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            return common.render_to_response2(
+            return _common.render_to_response2(
                     request,
                     'give/userpage.html',
                 ) 
         else:
             context = {'next': request.GET.get('next', None)}
-            return common.render_to_response2(
+            return _common.render_to_response2(
                     request,
                     'give/welcome.html',
                     context
@@ -41,41 +41,41 @@ def index(request):
 def history(request,username):
     if request.user.username != username:
         return redirect('profile', username)
-    context = common.get_history_context(request)
-    return common.render_to_response2(request,'give/history.html',context)
+    context = _common.get_history_context(request)
+    return _common.render_to_response2(request,'give/history.html',context)
 
 @login_required
 @csrf_protect
 def manage_account(request):
-    context = common.get_manage_account_context(request)
+    context = _common.get_manage_account_context(request)
     if request.method == 'POST':
         form_valid = False
         if "user" in request.POST:
-            context, form_valid = common.check_user_form(request, context) 
+            context, form_valid = _common.check_user_form(request, context) 
         elif "password" in request.POST:
-            context, form_valid = common.check_password_form(request, context) 
+            context, form_valid = _common.check_password_form(request, context) 
         elif "profile" in request.POST:
-            context, form_valid = common.check_profile_form(request, context) 
+            context, form_valid = _common.check_profile_form(request, context) 
         if form_valid:
             return redirect(manage_account)
-    return common.render_to_response2(
+    return _common.render_to_response2(
             request,
             'give/manage_account.html',
             context
         )
 
 def users(request):
-    context = common.get_users_context(request)
-    return common.render_to_response2(request,'give/users.html',context)
+    context = _common.get_users_context(request)
+    return _common.render_to_response2(request,'give/users.html',context)
 
 @csrf_protect
 def register(request):
-    context = common.get_register_context(request)
+    context = _common.get_register_context(request)
     if request.method == 'POST':
-        context, form_valid = common.check_register_form(request,context)
+        context, form_valid = _common.check_register_form(request,context)
         if form_valid:
             return redirect(index)
-    return common.render_to_response2(request,'give/register.html',context)    
+    return _common.render_to_response2(request,'give/register.html',context)    
 
 @login_required
 def unregister(request):
@@ -83,12 +83,12 @@ def unregister(request):
     return redirect(index)
 
 def profile(request, username):
-    context = common.get_profile_context(request,username)
-    return common.render_to_response2(request,'give/profile.html',context)
+    context = _common.get_profile_context(request,username)
+    return _common.render_to_response2(request,'give/profile.html',context)
 
 @login_required
 def give_datalove(request, username, from_users=False):
-    query = common.give_datalove(request,username) 
+    query = _common.give_datalove(request,username) 
     if from_users:
         return query_redirect(users, query)
     else:
@@ -110,16 +110,16 @@ def widget(request):
                 "GET request must have eather query parameter 'user' or "
                 "'random'."
             )
-    return common.render_to_response2(request, 'give/widget.html', context)
+    return _common.render_to_response2(request, 'give/widget.html', context)
 
 def widget_doc(request):
-    context = common.get_widget_doc_context(request)
-    return common.render_to_response2(request, 'give/widget_doc.html', context)
+    context = _common.get_widget_doc_context(request)
+    return _common.render_to_response2(request, 'give/widget_doc.html', context)
 
 def widget_give_datalove(request, username):
     if not request.user.is_authenticated():
         return redirect(index)
-    query = common.give_datalove(request, username, query={'user': username})
+    query = _common.give_datalove(request, username, query={'user': username})
     return query_redirect(widget, query)
 
 def api_doc(request):

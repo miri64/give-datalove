@@ -33,3 +33,10 @@ def give_datalove(request, id, love=1, query={}):
         query['error'] = "You've got not enough datalove. :("
     return query
 
+def get_more_information(request, vars={}):
+    if request.user.is_authenticated():
+        vars.update({'user': request.user})
+    if 'error' in request.GET:
+        vars.update({'error': request.GET['error']})
+    return vars
+

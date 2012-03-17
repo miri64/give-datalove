@@ -13,13 +13,6 @@ from give.models import *
 import _common as common
 
 ## Helper functions
-def get_more_information(request, vars={}):
-    if request.user.is_authenticated():
-        vars.update({'user': request.user})
-    if 'error' in request.GET:
-        vars.update({'error': request.GET['error']})
-    return vars
-
 def query_redirect(to, query = {}, *args, **kwargs):
     response = redirect(to, *args, **kwargs)
     if len(query) > 0:
@@ -115,7 +108,7 @@ def manage_account(request):
 
 def users(request):
     profiles = DataloveProfile.objects.order_by('?')
-    vars = get_more_information(request, {'profiles': profiles})
+    vars = common.get_more_information(request, {'profiles': profiles})
     return common.render_to_response2(request,'give/users.html',vars)
 
 @csrf_protect
@@ -135,7 +128,7 @@ def unregister(request):
 
 def profile(request, username):
     profile = get_object_or_404(DataloveProfile, user__username=username)
-    vars = get_more_information(request, {'profile': profile})
+    vars = common.get_more_information(request, {'profile': profile})
     return common.render_to_response2(request,'give/profile.html',vars)
 
 @login_required

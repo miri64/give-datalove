@@ -23,7 +23,7 @@ urlpatterns = patterns('give.views',
             {'template_name': 'give/reset_password_done.html'}
         ),
     url(
-            r'^reset_password/confirm/(?P<uidb36>[0-9]+)/(?P<token>[-0-9a-f]+)/?$',
+            r'^reset_password/confirm/(?P<uidb36>[0-9]+)/(?P<token>[0-9a-z]+-[0-9a-f]+)/?$',
             password_reset_confirm,
             {'template_name': 'give/reset_password_confirm.html'},
             name='password_reset_confirm',

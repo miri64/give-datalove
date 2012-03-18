@@ -8,6 +8,11 @@ urlpatterns = patterns('give.views',
     url(r'^logout/?$',logout,{'next_page': '/'},name='logout'),
     url(r'^manage_account/?$','manage_account',name='manage_account'),
     url(
+            r'^manage_account/delete_website/(?P<id>[0-9]+)/?$',
+            'manage_account_delete_website',
+            name='manage_account_delete_website'
+        ),
+    url(
             r'^reset_password/?$',
             password_reset,
             {

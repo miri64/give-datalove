@@ -21,7 +21,13 @@
             {{ profile_form.management_form }}
             <ul style="list-style-type: none">
             {% for form in profile_form %}
-            <li>{{ form.id }}{{ form.url }}{% for error in form.url.errors %}<span class="errorlist">{{ error|escape }} | </span>{% endfor %}{{ form.non_field_errors }}</li>
+            {% with website_id=form.fields.id.initial %}
+            <li>
+                {{ form.id }}{{ form.url }}{% if website_id %}<a href="{% url manage_account_delete_website id=website_id %}">&ndash;</a>{% else %}<span style="color: #000000; opacity: 0;">&ndash;</span>{% endif %}
+                {% for error in form.url.errors %}<span class="errorlist">{{ error|escape }} | </span>{% endfor %}
+                {{ form.non_field_errors }}
+            </li>
+            {% endwith %}
             {% endfor %}
             </ul>
             <input class="button" type="submit" name="profile" value="Update Profile" />

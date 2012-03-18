@@ -64,6 +64,12 @@ def manage_account(request):
             context
         )
 
+@login_required
+@csrf_protect
+def manage_account_delete_website(request,id):
+    _common.manage_account_delete_website(request,id)
+    return redirect(manage_account)
+
 def users(request):
     context = _common.get_users_context(request)
     return _common.render_to_response2(request,'give/users.html',context)

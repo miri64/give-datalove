@@ -98,6 +98,13 @@ def check_profile_form(request, context):
         )
     return context, check_form(context['profile_form'])
 
+def manage_account_delete_website(request,id):
+    website = get_object_or_404(UserWebsite, pk=id)
+    if website.user == request.user.get_profile():
+        website.delete()
+        return website
+    return None
+
 def get_register_context(request):
     context = {}
     context['form'] = DataloveUserCreationForm()

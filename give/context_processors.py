@@ -2,6 +2,8 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from give.forms import DataloveAuthenticationForm
 from give.models import DataloveProfile
 
+from urllib import urlencode
+
 def path_is_in(request_path, view_list):
     for view in view_list:
         try:
@@ -14,6 +16,31 @@ def path_is_in(request_path, view_list):
 
 def total_loverz(request):
     return {'total_loverz': DataloveProfile.get_total_loverz()}
+
+def menu(request, result = {}):
+    menu = []
+    if request.user.is_authenticated():
+        menu += [
+                {'url': reverse('logout')+'?'+urlencode(
+                        {'next': request.path.replace('/ajax','')}
+                    ), 'name': 'Logout'},
+                {'url': reverse('manage_account'), 'name': 'Manage account'},
+                {'url': reverse(
+                        'history', 
+                        kwargs={'username': request.user.username}
+                    ), 'name': 'History'},
+            ]
+    menu += [
+            {'url': reverse('widget_doc'), 'name': 'Widget for website'},
+            {
+                    'url': 'http://datalove.me/give/about.html', 
+                    'name': 'About give.datalove.me'
+                },
+            {'url': reverse('users'), 'name': 'Loverz'},
+            {'url': 'http://datalove.me/give/faq.html', 'name': 'FAQ'},
+            {'url': reverse('api__doc'), 'name': 'API Documentation'},
+        ]
+    return {'menu': menu}
 
 def login_information(request, result = {}):
     logged_in = request.user.is_authenticated()

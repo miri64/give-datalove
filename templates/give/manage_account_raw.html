@@ -4,6 +4,7 @@
         <form method="post" action="{% url manage_account %}" id="user_form">{% csrf_token %}
             <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
             {{ user_form.as_p }}
+            <input type="hidden" name="ajax_action" value="{% url ajax__manage_account_post form_name='user' %}" />
             <input class="button" type="submit" name="user" value="Change user data." />
             </div>
         </form>
@@ -11,6 +12,7 @@
         <form method="post" action="{% url manage_account %}" id="password_form">{% csrf_token %}
             <div class="about" style="padding-left: 2em; text-align: right; width: 450px;">
             {{ password_form.as_p }}
+            <input type="hidden" name="ajax_action" value="{% url ajax__manage_account_post form_name='password' %}" />
             <input class="button" type="submit" name="password" value="Change password." />
             </div>
         </form>
@@ -30,6 +32,7 @@
             {% endwith %}
             {% endfor %}
             </ul>
+            <input type="hidden" name="ajax_action" value="{% url ajax__manage_account_post form_name='profile' %}" />
             <input class="button" type="submit" name="profile" value="Update Profile" />
             </div>
         </form>

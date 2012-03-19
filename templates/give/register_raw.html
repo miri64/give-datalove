@@ -3,6 +3,7 @@
         <form method="post" action="{% url register %}">{% csrf_token %}
             <div class="about" style="padding-left: 2em; text-align: right; width: 400px;">
                 {{ form.as_p }}
+                <input type="hidden" name="ajax_action" value="{% url ajax__register_post %}"
                 <input class="button" type="submit" value="Register account" /> <br />
                 <div style="font-size: 75%;text-align: left;">
                     * This field is mandatory. Note that password recovery is not possible without an e-mail address

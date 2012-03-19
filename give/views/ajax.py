@@ -6,20 +6,30 @@ from django.views.decorators.csrf import csrf_protect
 
 from give.forms import DataloveAuthenticationForm
 
+def _find_content_and_convert(args,kwargs):
+    if (len(args) > 0):
+        content = args[0]
+        args = args[1:]
+    else:
+        content = kwargs.pop('content',{})
+    return json.dumps(content)
+
 class HttpResponse(DjangoResponse):
     def __init__(self, *args, **kwargs):
-        super(HttpResponse, self).__init__(*args, **kwargs)
+        content = _find_content_and_convert(args,kwargs)
+        super(HttpResponse, self).__init__(content, *args, **kwargs)
         self['Content-Type'] = 'application/json'
 
 class HttpResponseBadRequest(DjangoResponseBadRequest):
     def __init__(self, *args, **kwargs):
-        super(HttpResponseBadRequest, self).__init__(*args, **kwargs)
+        content = _find_content_and_convert(args,kwargs)
+        super(HttpResponseBadRequest, self).__init__(content, *args, **kwargs)
         self['Content-Type'] = 'application/json'
 
 from django.shortcuts import get_object_or_404, render_to_response
 def login(request):
     if request.method != 'POST':
-        return HttpResponseBadRequest('{}') 
+        return HttpResponseBadRequest({}) 
     form = DataloveAuthenticationForm(data=request.POST)
     if form.is_valid():
         auth_login(request,form.get_user())
@@ -28,4 +38,4 @@ def login(request):
         errors = dict()
         for field,error in form.errors.items():
             errors[field.strip('_')] = error.as_ul()
-        return HttpResponse(json.dumps(errors))
+        return HttpResponse(errors)

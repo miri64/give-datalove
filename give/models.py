@@ -119,7 +119,6 @@ class DataloveProfile(LovableObject):
         return self.user.username
 
     def send_datalove(self, recipient, datalove=1):
-        
         if datalove < 0:
             raise ValueError("datalove must be >= 0.")
         if isinstance(recipient, User):

@@ -6,16 +6,16 @@ $(document).ready(function() {
         var action = form.find("input[name=ajax_action]").val();
         var next = form.find("input[name=next]").val();
 
-        $.post(action, data, function(errors) {
-            if (errors) {
+        $.post(action, data, function(data) {
+            if (data.errors) {
                 form.find("ul").remove();
                 form.find("ul#login-all-errors").remove();
-                for (var field in errors) {
+                for (var field in data.errors) {
                     if (field == 'all') {
-                        form.append(errors[field]);
+                        form.append(data.errors[field]);
                     } else {
                         form.find("input#id_login-"+field+"+br")
-                                .after(errors[field]);
+                                .after(data.errors[field]);
                     }
                 }
             } else {

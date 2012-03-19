@@ -34,7 +34,8 @@ def login(request):
         auth_login(request,form.get_user())
         return HttpResponse()
     else:
-        errors = dict()
+        data = dict()
+        data['errors'] = dict()
         for field,error in form.errors.items():
-            errors[field.strip('_')] = error.as_ul()
+            data['errors'][field.strip('_')] = error.as_ul()
         return HttpResponse(errors)

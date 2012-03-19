@@ -7,7 +7,8 @@ from urllib import urlencode
 def _path_is_in(request_path, view_list):
     for view in view_list:
         try:
-            if reverse(view) == request_path:
+            if reverse(view) == request_path || \
+                    reverse('ajax__'+view) == request_path:
                 return True
         except NoReverseMatch:
             if view in request_path:

@@ -26,7 +26,6 @@ class HttpResponseBadRequest(DjangoResponseBadRequest):
         super(HttpResponseBadRequest, self).__init__(content, *args, **kwargs)
         self['Content-Type'] = 'application/json'
 
-from django.shortcuts import get_object_or_404, render_to_response
 def login(request):
     if request.method != 'POST':
         return HttpResponseBadRequest({}) 

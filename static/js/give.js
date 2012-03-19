@@ -19,10 +19,16 @@ $(document).ready(function() {
                     }
                 }
             } else {
-                window.location.replace(next);
+                window.location = next;
             }
         }).error(function(response) {
-            $('html').html(response.responseText);
+            if (response.status == 404) {
+                window.location = action;
+            } else {
+                content = response.responseText;
+                window.document.write(content);
+                window.history.pushState(content,document.title,action)
+            }
         });
 
         return false;

@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
 from urllib import urlencode
 from give.models import DataloveProfile
+from give.forms import DataloveAuthenticationForm
 import _common
 
 ## Helper functions

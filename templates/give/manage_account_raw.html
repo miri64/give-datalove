@@ -24,7 +24,7 @@
             <ul style="list-style-type: none">
             {% for form in profile_form %}
             {% with website_id=form.fields.id.initial %}
-            <li>
+            <li id="profile_website{% if website_id %}{{ website_id }}{% endif %}">
                 {{ form.id }}{{ form.url }}{% if website_id %}<a href="{% url manage_account_delete_website id=website_id %}">&ndash;</a>{% else %}<span style="color: #000000; opacity: 0;">&ndash;</span>{% endif %}
                 {% for error in form.url.errors %}<span class="errorlist">{{ error|escape }} | </span>{% endfor %}
                 {{ form.non_field_errors }}

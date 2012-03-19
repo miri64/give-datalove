@@ -1,5 +1,5 @@
         <p class="love">Username: {{ profile.username }}</p>
-        <p class="about">Received love: {{ profile.received_love }}</p>
+        <p class="about">Received love: <span id="{{ profile.username }}_received_love">{{ profile.received_love }}</span></p>
         {% if profile.websites.all|length > 0 %}
             <p class="about">
                 Websites: 
@@ -9,5 +9,6 @@
                 </ul>
             </p><br />
         {% endif %}
-        {% if error %}<p style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">{{ error }}</p>{% endif %}
         {% if logged_in and user != profile.user %}<a href="{% url give_datalove profile.username %}">Give love!</a>{% endif %}
+		{% if error %}<p style="font-size: 75%;color: #ff0000;margin-bottom: 2px;text-align: left;">{{ error }}</p>{% endif %}
+        

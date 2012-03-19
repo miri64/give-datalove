@@ -8,7 +8,7 @@ from give.models import DataloveProfile
 import _common
 
 ## Helper functions
-def query_redirect(to, query = {}, *args, **kwargs):
+def _query_redirect(to, query = {}, *args, **kwargs):
     response = redirect(to, *args, **kwargs)
     if len(query) > 0:
         response['Location'] += "?%s" % urlencode(query)
@@ -96,9 +96,9 @@ def profile(request, username):
 def give_datalove(request, username, from_users=False):
     query = _common.give_datalove(request,username) 
     if from_users:
-        return query_redirect(users, query)
+        return _query_redirect(users, query)
     else:
-        return query_redirect(profile, query, username)
+        return _query_redirect(profile, query, username)
 
 def widget(request):
     context = {'error': request.GET['error']} if 'error' in request.GET else {}
@@ -126,7 +126,7 @@ def widget_give_datalove(request, username):
     if not request.user.is_authenticated():
         return redirect(index)
     query = _common.give_datalove(request, username, query={'user': username})
-    return query_redirect(widget, query)
+    return _query_redirect(widget, query)
 
 def api_doc(request):
     pass

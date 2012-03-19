@@ -4,7 +4,7 @@ from give.models import DataloveProfile
 
 from urllib import urlencode
 
-def path_is_in(request_path, view_list):
+def _path_is_in(request_path, view_list):
     for view in view_list:
         try:
             if reverse(view) == request_path:
@@ -45,7 +45,7 @@ def menu(request, result = {}):
 def login_information(request, result = {}):
     logged_in = request.user.is_authenticated()
     result['logged_in'] = logged_in
-    login_form_needed = not logged_in and not path_is_in(
+    login_form_needed = not logged_in and not _path_is_in(
             request.path, 
             ['register','password_reset_confirm','reset_password']
         )

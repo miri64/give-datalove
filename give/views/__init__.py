@@ -70,6 +70,8 @@ def manage_account_delete_website(request,id):
     _common.manage_account_delete_website(request,id)
     return redirect(manage_account)
 
+
+@csrf_protect
 def users(request):
     context = _common.get_users_context(request)
     return _common.render_to_response2(request,'give/users.html',context)
@@ -88,6 +90,7 @@ def unregister(request):
     request.user.delete()
     return redirect(index)
 
+@csrf_protect
 def profile(request, username):
     context = _common.get_profile_context(request,username)
     return _common.render_to_response2(request,'give/profile.html',context)
@@ -118,6 +121,7 @@ def widget(request):
             )
     return _common.render_to_response2(request, 'give/widget.html', context)
 
+@csrf_protect
 def widget_doc(request):
     context = _common.get_widget_doc_context(request)
     return _common.render_to_response2(request, 'give/widget_doc.html', context)
@@ -128,5 +132,6 @@ def widget_give_datalove(request, username):
     query = _common.give_datalove(request, username, query={'user': username})
     return _query_redirect(widget, query)
 
+@csrf_protect
 def api_doc(request):
     pass

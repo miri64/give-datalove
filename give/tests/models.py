@@ -7,12 +7,18 @@ from datetime import timedelta, datetime
 
 from give.models import *
 
-def create_user(password=None):
+def create_user(username=None,password=None):
     if not password:
         password = randstr(30,True)
+    if not username:
+        username = randstr(30,True)
     while True:
         try:
-            user = User(username=randstr(30,True),password=password)
+            user = User.objects.create_user(
+                    username=username,
+                    email="",
+                    password=password
+                )
             break
         except IntegrityError:
             pass
@@ -39,7 +45,7 @@ def get_month_from_timedelta(relative_time, timedelta):
 class TestWithAuthUser(unittest.TestCase):
     def setUp(self):
         self.sender_password = randstr(30,True)
-        self.sender = create_user(self.sender_password)
+        self.sender = create_user(password=self.sender_password)
     
     def tearDown(self):
         self.sender.delete()
@@ -48,7 +54,7 @@ class TestWithTwoAuthUser(TestWithAuthUser):
     def setUp(self):
         super(TestWithTwoAuthUser,self).setUp()
         self.recipient_password = randstr(30,True)
-        self.recipient = create_user(self.recipient_password)
+        self.recipient = create_user(password=self.recipient_password)
     
     def tearDown(self):
         super(TestWithTwoAuthUser,self).tearDown()

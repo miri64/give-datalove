@@ -91,6 +91,10 @@ def unregister(request):
     request.user.delete()
     return redirect(index)
 
+@login_required
+def unregister_confirm(request):
+    return _common.render_to_response2(request,'give/unregister_confirm.html')
+
 @csrf_protect
 def profile(request, username):
     context = _common.get_profile_context(request,username)

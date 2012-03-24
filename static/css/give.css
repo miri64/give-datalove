@@ -20,11 +20,11 @@ input.login_input {
 }
 
 input.url_input {
-    width: 430px;
-    margin-right: 20px;
+    width: 400px;
+    margin-right: 5px;
 }
             
-input.button {
+.button {
     border-left: #ffffff 2pt solid;
     border-top: #ffffff 2pt solid;
     border-right: #aaaaaa 2pt solid;

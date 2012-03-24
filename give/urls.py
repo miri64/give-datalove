@@ -40,6 +40,7 @@ urlpatterns = patterns('give.views',
         ),
     url(r'^register/?$','register',name='register'),
     url(r'^unregister/?$','unregister',name='unregister'),
+    url(r'^unregister_confirm/?$','unregister_confirm',name='unregister_confirm'),
     url(r'^users/?$', 'users', name='users'),
     url(
             r'^users/give_(?P<username>[^?$/\\#%\s]+)_datalove/?$',

@@ -1,0 +1,8 @@
+{# Is loaded on '/manage_account' when a user is logged in. #}
+        <p class="love">Unregister Account</p>
+        <p class="about">You are about to delete your profile. If you do this all your data will be lost. Do you want to do this?</p>
+        <p class="about" style="text-align:center">
+            <a class="button" href="{% url unregister %}">Yes</a>
+            <a class="button" href="{% url manage_account %}">No</a>
+        </p>
+

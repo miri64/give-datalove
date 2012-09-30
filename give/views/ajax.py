@@ -38,4 +38,4 @@ def login(request):
         data['errors'] = dict()
         for field,error in form.errors.items():
             data['errors'][field.strip('_')] = error.as_ul()
-        return HttpResponse(errors)
+        return HttpResponse(data)
